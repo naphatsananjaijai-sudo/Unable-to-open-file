@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โรงงานประตู</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Sarabun', 'Segoe UI', sans-serif;
+  background: #eef5f0;
+  color: #1a3828;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Luxury Green Tokens ── */
+:root {
+  --white: #ffffff;
+  /* greens */
+  --g900: #0d2b1e;
+  --g800: #1a3828;
+  --g700: #1f4d35;
+  --g600: #276244;
+  --g500: #2e7d54;
+  --g400: #3ea06c;
+  --g300: #6abf93;
+  --g200: #a8dcc0;
+  --g100: #d4f0e2;
+  --g50:  #eef5f0;
+  /* gold accent */
+  --gold: #c9a227;
+  --gold-light: #f0d47a;
+  --gold-bg: #fdf8e7;
+  /* status */
+  --red-50: #fef2f2;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --yellow-50: #fffbeb;
+  --yellow-500: #f59e0b;
+  --yellow-600: #d97706;
+  --teal-500: #0d9488;
+  --purple-500: #7c3aed;
+  --orange-500: #ea580c;
+  --pink-500: #db2777;
+  /* shadows */
+  --shadow-sm: 0 1px 4px rgba(13,43,30,.08);
+  --shadow:    0 4px 16px rgba(13,43,30,.10);
+  --shadow-lg: 0 10px 30px rgba(13,43,30,.14);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --radius-xs: 6px;
+}
+
+/* ── Topbar ── */
+.topbar {
+  background: linear-gradient(135deg, var(--g900) 0%, var(--g700) 100%);
+  border-bottom: 1px solid var(--g800);
+  padding: 0 28px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 12px rgba(13,43,30,.3);
+}
+.topbar-logo { display: flex; align-items: center; gap: 12px; }
+.topbar-logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--gold), #e6b94a);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(201,162,39,.4);
+}
+.topbar-logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: .3px;
+}
+.topbar-logo-text span { color: var(--gold-light); }
+.topbar-divider { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
+.topbar-date-label { font-size: 11px; color: var(--g200); letter-spacing: .5px; text-transform: uppercase; }
+.topbar-date-value { font-size: 15px; font-weight: 700; color: #fff; }
+.topbar-spacer { flex: 1; }
+.date-input-wrap { display: flex; align-items: center; gap: 8px; position: relative; }
+.date-input-wrap label { font-size: 14px; color: var(--g200); }
+#date-input {
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.1);
+  color: #fff;
+  border-radius: var(--radius-xs);
+  padding: 7px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  width: 148px;
+  text-align: center;
+  letter-spacing: .5px;
+  outline: none;
+  transition: border .15s, background .15s;
+  cursor: pointer;
+}
+#date-input::placeholder { color: rgba(255,255,255,.35); font-size: 13px; letter-spacing: 0; }
+#date-input:focus { border-color: var(--gold-light); background: rgba(255,255,255,.18); }
+#date-input.invalid { border-color: var(--red-500); background: rgba(239,68,68,.15); }
+
+/* ── Calendar popup ── */
+#cal-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: var(--g900);
+  border: 1px solid var(--g600);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0,0,0,.55);
+  padding: 16px;
+  min-width: 280px;
+  user-select: none;
+}
+#cal-popup.open { display: block; }
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.cal-nav-btn {
+  background: rgba(255,255,255,.08); border: none; color: #fff;
+  width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+  font-size: 15px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.cal-nav-btn:hover { background: var(--g600); }
+.cal-month-label {
+  font-size: 14px; font-weight: 800; color: #fff; cursor: pointer;
+  padding: 4px 10px; border-radius: 6px; transition: background .15s;
+}
+.cal-month-label:hover { background: rgba(255,255,255,.1); }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 3px;
+}
+.cal-dow {
+  text-align: center; font-size: 10px; font-weight: 700;
+  color: var(--g300); padding: 4px 0; letter-spacing: .4px;
+}
+.cal-day {
+  text-align: center; font-size: 13px; font-weight: 600;
+  padding: 6px 0; border-radius: 6px; cursor: pointer; color: var(--g100);
+  transition: background .12s, color .12s;
+  position: relative;
+}
+.cal-day:hover { background: var(--g600); color: #fff; }
+.cal-day.other-month { color: var(--g600); }
+.cal-day.other-month:hover { background: var(--g700); color: var(--g400); }
+.cal-day.today { color: var(--gold-light); font-weight: 900; }
+.cal-day.today::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; background: var(--gold-light); border-radius: 50%;
+}
+.cal-day.selected { background: var(--g400); color: #fff; font-weight: 900; }
+.cal-day.has-data::before {
+  content: ''; position: absolute; top: 3px; right: 4px;
+  width: 5px; height: 5px; background: var(--g400); border-radius: 50%;
+}
+.cal-day.selected.has-data::before { background: rgba(255,255,255,.6); }
+.cal-day.empty { cursor: default; pointer-events: none; }
+.cal-legend {
+  display: flex; align-items: center; gap: 6px; margin-top: 12px;
+  padding-top: 10px; border-top: 1px solid var(--g700);
+  font-size: 10px; color: var(--g400);
+}
+.cal-legend-dot {
+  width: 6px; height: 6px; background: var(--g400); border-radius: 50%;
+}
+.save-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, var(--gold), #dbb73a);
+  color: var(--g900);
+  border: none;
+  border-radius: var(--radius-xs);
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(201,162,39,.35);
+  letter-spacing: .2px;
+}
+.save-btn:hover { opacity: .9; }
+.save-btn:active { transform: scale(.97); }
+.save-btn[disabled] { display: none !important; }
+
+/* ── Lock / Auth ── */
+.auth-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; border-radius: var(--radius-xs); padding: 7px 14px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background .15s;
+  white-space: nowrap;
+}
+.auth-btn:hover { background: rgba(255,255,255,.18); }
+.auth-btn.admin-mode { background: var(--g500); border-color: var(--g400); }
+
+/* ── Auth Modal ── */
+#auth-overlay {
+  display: none; position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+#auth-overlay.open { display: flex; }
+#auth-box {
+  background: var(--g900); border: 1px solid var(--g600);
+  border-radius: var(--radius); padding: 32px 36px; min-width: 320px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6); text-align: center;
+}
+#auth-box h2 { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+#auth-box p { color: var(--g300); font-size: 13px; margin-bottom: 22px; }
+#auth-pw {
+  width: 100%; padding: 10px 14px; border-radius: var(--radius-xs);
+  border: 1px solid var(--g600); background: rgba(255,255,255,.08);
+  color: #fff; font-size: 15px; font-family: inherit; outline: none;
+  text-align: center; letter-spacing: 2px; margin-bottom: 8px;
+  transition: border .15s;
+}
+#auth-pw:focus { border-color: var(--gold-light); }
+#auth-pw.shake { animation: shake .35s; border-color: #e74c3c; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)}
+}
+#auth-err { color: #e74c3c; font-size: 12px; min-height: 18px; margin-bottom: 14px; }
+.auth-submit {
+  width: 100%; padding: 11px; background: linear-gradient(135deg, var(--g500), var(--g400));
+  color: #fff; border: none; border-radius: var(--radius-xs); font-size: 15px;
+  font-weight: 800; cursor: pointer; font-family: inherit; margin-bottom: 10px;
+  transition: opacity .15s;
+}
+.auth-submit:hover { opacity: .9; }
+.auth-cancel {
+  width: 100%; padding: 9px; background: transparent; color: var(--g300);
+  border: 1px solid var(--g700); border-radius: var(--radius-xs); font-size: 13px;
+  cursor: pointer; font-family: inherit; transition: border .15s;
+}
+.auth-cancel:hover { border-color: var(--g500); color: #fff; }
+
+/* ── View-only overlay on inputs ── */
+body.view-only input:not(#date-input):not(#auth-pw):not(#month-input):not(#week-input),
+body.view-only textarea,
+body.view-only select {
+  pointer-events: none; opacity: .7;
+  background: rgba(0,0,0,.04) !important;
+}
+body.view-only .save-btn { display: none !important; }
+.view-only-badge {
+  display: none; align-items: center; gap: 6px;
+  background: rgba(255,200,0,.12); border: 1px solid rgba(255,200,0,.3);
+  color: #ffd740; border-radius: var(--radius-xs); padding: 6px 12px;
+  font-size: 12px; font-weight: 700;
+}
+body.view-only .view-only-badge { display: flex; }
+.saved-toast {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  background: var(--g800);
+  color: var(--gold-light);
+  border: 1px solid var(--gold);
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(90px);
+  opacity: 0;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999;
+}
+.saved-toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── Layout ── */
+.layout { display: flex; flex: 1; min-height: 0; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  background: var(--white);
+  border-right: 1px solid var(--g100);
+  padding: 20px 0;
+  position: sticky;
+  top: 68px;
+  height: calc(100vh - 68px);
+  overflow-y: auto;
+  flex-shrink: 0;
+  box-shadow: 2px 0 12px rgba(13,43,30,.05);
+}
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--g300);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 0 18px 8px;
+  margin-top: 10px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 18px;
+  margin: 2px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  color: var(--g600);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all .15s;
+  border: none;
+  background: none;
+  width: calc(100% - 20px);
+  text-align: left;
+  font-family: inherit;
+}
+.nav-item:hover { background: var(--g50); color: var(--g800); }
+.nav-item.active {
+  background: linear-gradient(135deg, var(--g500), var(--g400));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(46,125,84,.3);
+}
+.nav-item .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--g100);
+  color: var(--g500);
+  font-weight: 700;
+}
+.nav-item.active .nav-badge { background: rgba(255,255,255,.2); color: #fff; }
+
+/* ── Main Content ── */
+.content { flex: 1; padding: 28px; overflow-y: auto; min-width: 0; }
+
+/* ── Page ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Page Header ── */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title {
+  font-size: 26px; font-weight: 800; color: var(--g800);
+  display: flex; align-items: center; gap: 10px;
+}
+.page-subtitle { font-size: 14px; color: var(--g300); margin-top: 3px; }
+.oc-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--g100); color: var(--g600);
+  border: 1px solid var(--g200);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 13px; font-weight: 700;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--g100);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .15s;
+}
+.card:hover { box-shadow: var(--shadow); }
+.card-title {
+  font-size: 13px; font-weight: 800; color: var(--g400);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 9px;
+}
+.card-title .title-bar { width: 4px; height: 16px; border-radius: 3px; }
+
+/* ── Metric Input ── */
+.metric-item {
+  background: var(--g50);
+  border: 1px solid var(--g100);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.metric-item:focus-within {
+  border-color: var(--g400);
+  box-shadow: 0 0 0 3px rgba(62,160,108,.12);
+  background: #fff;
+}
+.metric-item-label {
+  font-size: 13px; color: var(--g400); margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 600;
+}
+.target-chip {
+  font-size: 10px;
+  background: var(--gold-bg); color: var(--gold);
+  border: 1px solid #e8cc6a;
+  border-radius: 8px; padding: 2px 8px; font-weight: 700;
+}
+.metric-item-input-row { display: flex; align-items: baseline; gap: 8px; }
+.metric-item-input {
+  background: transparent; border: none;
+  font-size: 28px; font-weight: 800; color: var(--g800);
+  width: 100%; outline: none; font-family: inherit; min-width: 0;
+}
+.metric-item-input::placeholder { color: var(--g200); font-weight: 400; font-size: 22px; }
+.metric-unit { font-size: 13px; color: var(--g300); white-space: nowrap; font-weight: 600; }
+
+/* ── Progress ── */
+.progress-wrap { margin-top: 12px; }
+.progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--g300); margin-bottom: 5px; font-weight: 600; }
+.progress-pct { font-weight: 800; color: var(--g500); }
+.progress-bg { height: 8px; background: var(--g100); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width .5s cubic-bezier(.34,1.2,.64,1), background .3s; }
+
+/* ── Grid ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.g-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
+@media(max-width:900px) { .g3{grid-template-columns:1fr 1fr} .g4{grid-template-columns:1fr 1fr} }
+@media(max-width:600px) { .g2{grid-template-columns:1fr} .g3{grid-template-columns:1fr} }
+
+/* ── Manpower Strip ── */
+.manpower-strip {
+  background: linear-gradient(135deg, var(--g50), #dff2e9);
+  border: 1px solid var(--g200);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 18px;
+  margin-top: 18px;
+}
+.mp-icon { font-size: 30px; }
+.mp-info { min-width: 90px; }
+.mp-label { font-size: 11px; color: var(--g400); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.mp-number { font-size: 32px; font-weight: 900; color: var(--g600); line-height: 1; }
+.mp-oc { font-size: 13px; color: var(--g300); margin-top: 2px; font-weight: 600; }
+.mp-bar-area { flex: 1; }
+.mp-input {
+  width: 100%; background: var(--white);
+  border: 1px solid var(--g200); border-radius: var(--radius-xs);
+  padding: 8px 12px; font-size: 15px; font-weight: 700; color: var(--g800);
+  outline: none; font-family: inherit; margin-bottom: 10px; transition: border .15s;
+}
+.mp-input:focus { border-color: var(--g400); box-shadow: 0 0 0 3px rgba(62,160,108,.1); }
+.mp-input::placeholder { font-weight: 400; color: var(--g200); }
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid var(--g100); margin: 22px 0; }
+.section-gap { margin-top: 18px; }
+
+/* ── Status badge ── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 700; padding: 4px 11px; border-radius: 20px;
+}
+.sb-ok   { background: var(--g100); color: var(--g600); border: 1px solid var(--g200); }
+.sb-warn { background: var(--yellow-50); color: var(--yellow-600); border: 1px solid #fde68a; }
+.sb-bad  { background: var(--red-50); color: var(--red-600); border: 1px solid #fecaca; }
+
+/* ── Downtime ── */
+.downtime-box {
+  background: #fff5f5; border: 1px solid #fecaca;
+  border-radius: var(--radius-sm); padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px; margin-top: 14px;
+}
+
+/* ── Pallet grid ── */
+.pallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; }
+
+/* ── KPI overview ── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 14px; margin-bottom: 22px; }
+.kpi-card {
+  background: var(--white); border: 1px solid var(--g100);
+  border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  border-top: 4px solid var(--g500);
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle at top right, rgba(62,160,108,.08), transparent 70%);
+}
+.kpi-card.green  { border-top-color: var(--g500); }
+.kpi-card.yellow { border-top-color: var(--gold); }
+.kpi-card.red    { border-top-color: var(--red-500); }
+.kpi-card.purple { border-top-color: var(--purple-500); }
+.kpi-label { font-size: 12px; color: var(--g300); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.kpi-value { font-size: 32px; font-weight: 900; color: var(--g800); line-height: 1.1; }
+.kpi-unit { font-size: 12px; color: var(--g300); margin-top: 3px; font-weight: 600; }
+.kpi-delta { font-size: 12px; margin-top: 6px; font-weight: 700; }
+.delta-up { color: var(--g500); }
+.delta-down { color: var(--red-600); }
+
+/* ── WH ── */
+.wh-ag .metric-item-input { color: var(--teal-500); }
+.wh-cp .metric-item-input { color: var(--purple-500); }
+
+/* scrollbar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 2px; }
+
+/* ── Monthly table ── */
+#mo-table th {
+  background: var(--g800); color: #fff; padding: 8px 12px;
+  text-align: center; font-size: 12px; font-weight: 700; white-space: nowrap;
+  position: sticky; top: 0;
+}
+#mo-table th:first-child { text-align: left; position: sticky; left: 0; z-index: 2; background: var(--g900); }
+#mo-table td {
+  padding: 7px 12px; border-bottom: 1px solid var(--g100);
+  text-align: right; white-space: nowrap; font-size: 13px; color: var(--g700);
+}
+#mo-table td:first-child {
+  text-align: left; font-weight: 700; color: var(--g500); font-size: 12px;
+  background: var(--g50); position: sticky; left: 0;
+  border-right: 2px solid var(--g200);
+}
+#mo-table tr.day-row { cursor: pointer; }
+#mo-table tr.day-row:hover td { background: #d6f0e4; }
+#mo-table tr.day-row:hover td:first-child { background: var(--g200); color: var(--g700); }
+#mo-table tr:not(.day-row):hover td { background: #f0faf5; }
+#mo-table tr:not(.day-row):hover td:first-child { background: var(--g100); }
+#mo-table .total-row td { background: var(--g100) !important; font-weight: 900; color: var(--g800); border-top: 2px solid var(--g300); }
+#mo-table .total-row td:first-child { background: var(--g200) !important; }
+#mo-table .day-no-data td { color: var(--g200); }
+
+.mo-section-card {
+  background: #fff; border: 1px solid var(--g100); border-radius: var(--radius);
+  padding: 20px 22px; box-shadow: var(--shadow-sm);
+}
+.mo-section-title {
+  font-size: 13px; font-weight: 800; color: var(--g400);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 9px;
+}
+.mo-metrics { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 12px; }
+.mo-metric {
+  background: var(--g50); border: 1px solid var(--g100); border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.mo-metric-label { font-size: 11px; color: var(--g400); font-weight: 700; margin-bottom: 5px; }
+.mo-metric-value { font-size: 22px; font-weight: 900; color: var(--g800); line-height: 1; }
+.mo-metric-unit { font-size: 11px; color: var(--g300); font-weight: 600; margin-top: 2px; }
+.mo-days-badge {
+  margin-left: auto; font-size: 11px; background: var(--g100);
+  color: var(--g500); border-radius: 10px; padding: 3px 10px; font-weight: 700;
+}
+
+/* ── Weekly compare ── */
+.wk-week-badge {
+  flex:1; min-width:220px; background:#fff; border:1px solid var(--g100);
+  border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow-sm);
+}
+.wk-week-label { font-size:11px; font-weight:800; color:var(--g400); letter-spacing:.7px; margin-bottom:6px; }
+.wk-week-range { font-size:14px; font-weight:700; color:var(--g800); }
+.wk-week-days  { font-size:11px; color:var(--g300); margin-top:3px; }
+.wk-compare-row {
+  background:#fff; border:1px solid var(--g100); border-radius:var(--radius);
+  padding:18px 22px; box-shadow:var(--shadow-sm);
+  display:grid; grid-template-columns:180px 1fr 80px 1fr; align-items:center; gap:10px;
+}
+.wk-metric-name { font-size:13px; font-weight:700; color:var(--g700); }
+.wk-metric-unit { font-size:11px; color:var(--g300); margin-top:2px; }
+.wk-bar-wrap { position:relative; }
+.wk-bar-bg { background:var(--g100); border-radius:4px; height:14px; position:relative; overflow:hidden; }
+.wk-bar-fill-prev { background:var(--g300); height:100%; border-radius:4px; transition:width .4s; }
+.wk-bar-fill-curr { background:var(--g500); height:100%; border-radius:4px; transition:width .4s; }
+.wk-bar-label { font-size:13px; font-weight:900; color:var(--g800); margin-top:3px; }
+.wk-bar-sublabel { font-size:11px; color:var(--g400); }
+.wk-delta-pos { font-size:15px; font-weight:900; color:#1a8c4a; text-align:center; }
+.wk-delta-neg { font-size:15px; font-weight:900; color:#c0392b; text-align:center; }
+.wk-delta-zero{ font-size:15px; font-weight:900; color:var(--g300); text-align:center; }
+#wk-table th {
+  background:var(--g800); color:#fff; padding:8px 12px; text-align:center;
+  font-size:12px; font-weight:700; white-space:nowrap; position:sticky; top:0;
+}
+#wk-table th:first-child { text-align:left; position:sticky; left:0; z-index:2; background:var(--g900); }
+#wk-table th.curr-hd { background:var(--g500); }
+#wk-table td {
+  padding:7px 12px; border-bottom:1px solid var(--g100);
+  text-align:right; white-space:nowrap; font-size:13px; color:var(--g700);
+}
+#wk-table td:first-child {
+  text-align:left; font-weight:700; color:var(--g500); font-size:12px;
+  background:var(--g50); position:sticky; left:0; border-right:2px solid var(--g200);
+}
+#wk-table tr:hover td { background:#f0faf5; }
+#wk-table tr:hover td:first-child { background:var(--g100); }
+#wk-table .total-row td { background:var(--g100)!important; font-weight:900; color:var(--g800); border-top:2px solid var(--g300); }
+#wk-table .total-row td:first-child { background:var(--g200)!important; }
+#wk-table .sep-col td { background:var(--g50)!important; font-size:11px; color:var(--g300); font-weight:700; text-align:center; border-left:2px solid var(--g200); border-right:2px solid var(--g200); }
+
+/* ══ MOBILE ══ */
+.hamburger-btn {
+  display: none;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; border-radius: var(--radius-xs); width: 38px; height: 38px;
+  align-items: center; justify-content: center; font-size: 20px; cursor: pointer;
+  flex-shrink: 0;
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 300; backdrop-filter: blur(2px);
+}
+.sidebar-overlay.open { display: block; }
+
+@media(max-width:768px) {
+  /* Topbar */
+  .topbar { padding: 0 14px; gap: 10px; height: 58px; }
+  .topbar-logo-text { font-size: 16px; }
+  .topbar-logo-icon { width: 32px; height: 32px; font-size: 16px; border-radius: 8px; }
+  .topbar-divider,
+  .topbar-date-label,
+  .topbar-date-value { display: none; }
+  .topbar-spacer { flex: 1; }
+  #date-input { width: 115px; font-size: 13px; padding: 6px 8px; }
+  .date-input-wrap label { display: none; }
+  .auth-btn { font-size: 12px; padding: 6px 10px; }
+  .save-btn { font-size: 13px; padding: 7px 12px; }
+  .view-only-badge { display: none !important; }
+  .hamburger-btn { display: flex; }
+
+  /* Layout */
+  .layout { position: relative; }
+  .sidebar {
+    position: fixed; left: -260px; top: 58px; height: calc(100vh - 58px);
+    width: 240px; z-index: 400; transition: left .25s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,.2);
+  }
+  .sidebar.mobile-open { left: 0; }
+  .content { padding: 16px; }
+
+  /* Page header */
+  .page-header { flex-direction: column; gap: 12px; }
+  .page-title { font-size: 20px; }
+
+  /* KPI grid */
+  .kpi-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpi-card { padding: 14px; }
+  .kpi-value { font-size: 24px; }
+
+  /* Cards */
+  .card { padding: 16px; border-radius: var(--radius-sm); }
+  .section-gap { margin-top: 16px; }
+
+  /* Tables – horizontal scroll */
+  .card > div[style*="overflow"] { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #mo-table, #wk-table { font-size: 12px; }
+  #mo-table td, #mo-table th,
+  #wk-table td, #wk-table th { padding: 6px 8px; }
+
+  /* Weekly compare rows */
+  .wk-compare-row {
+    grid-template-columns: 130px 1fr 60px 1fr;
+    padding: 12px 14px; gap: 8px;
+  }
+  .wk-metric-name { font-size: 12px; }
+
+  /* Monthly section cards */
+  .mo-metrics { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .mo-metric-value { font-size: 18px; }
+
+  /* Calendar popup – full width centered */
+  #cal-popup {
+    left: 50% !important; transform: translateX(-50%);
+    min-width: 290px; max-width: 95vw;
+  }
+
+  /* Auth modal */
+  #auth-box { padding: 24px 20px; min-width: 280px; margin: 0 16px; }
+
+  /* Input fields in pages */
+  input[type=number], input[type=text]:not(#date-input):not(#auth-pw):not(#month-input):not(#week-input) {
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="เมนู">☰</button>
+  <div class="topbar-logo">
+    <div class="topbar-logo-icon">🏭</div>
+    <div class="topbar-logo-text"><span>โรงงานประตู</span></div>
+  </div>
+  <div class="topbar-divider"></div>
+  <div>
+    <div class="topbar-date-label">วันที่รายงาน</div>
+    <div class="topbar-date-value" id="hdr-date-text">—</div>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="view-only-badge">🔒 โหมดดูอย่างเดียว</div>
+  <div class="date-input-wrap">
+    <label for="date-input">📅</label>
+    <input type="text" id="date-input" placeholder="วว/ดด/ปปปป" maxlength="10" autocomplete="off" readonly />
+  </div>
+  <button class="save-btn" onclick="saveData()">💾 บันทึก</button>
+  <button class="auth-btn" id="auth-btn" onclick="authToggle()">🔒 เข้าสู่ระบบ</button>
+</div>
+
+<!-- Auth modal -->
+<div id="auth-overlay">
+  <div id="auth-box">
+    <h2>🔐 Admin Login</h2>
+    <p>กรอกรหัสผ่านเพื่อเปิดโหมดแก้ไข</p>
+    <input type="password" id="auth-pw" placeholder="รหัสผ่าน" maxlength="50"
+      onkeydown="if(event.key==='Enter')authSubmit()" oninput="document.getElementById('auth-err').textContent=''">
+    <div id="auth-err"></div>
+    <button class="auth-submit" onclick="authSubmit()">เข้าสู่ระบบ</button>
+    <button class="auth-cancel" onclick="authCloseModal()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- Calendar popup -->
+<div id="cal-popup">
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calShiftMonth(-1)">&#8249;</button>
+    <span class="cal-month-label" id="cal-month-label" onclick="calGoToday()"></span>
+    <button class="cal-nav-btn" onclick="calShiftMonth(1)">&#8250;</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div class="cal-legend">
+    <div class="cal-legend-dot"></div> มีข้อมูลบันทึกไว้
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-section-label">เมนูหลัก</div>
+  <button class="nav-item active" onclick="goPage('overview',this)">
+    <span class="nav-icon">📊</span> ภาพรวม
+  </button>
+
+  <div class="sidebar-section-label" style="margin-top:8px;">การผลิต</div>
+  <button class="nav-item" onclick="goPage('saw1',this)">
+    <span class="nav-icon">🪵</span> โรงเลื่อยไทรน้อย
+    <span class="nav-badge">OC 40</span>
+  </button>
+  <button class="nav-item" onclick="goPage('saw2',this)">
+    <span class="nav-icon">🪵</span> โรงเลื่อยปราจีน
+    <span class="nav-badge">OC 17</span>
+  </button>
+  <button class="nav-item" onclick="goPage('dry',this)">
+    <span class="nav-icon">🌡️</span> โรงอบ
+    <span class="nav-badge">OC 5</span>
+  </button>
+  <button class="nav-item" onclick="goPage('blade8',this)">
+    <span class="nav-icon">⚙️</span> โรง 8 ใบ
+    <span class="nav-badge">OC 36</span>
+  </button>
+  <button class="nav-item" onclick="goPage('press',this)">
+    <span class="nav-icon">🔥</span> อัดร้อน/อัดเย็น
+    <span class="nav-badge">OC 34</span>
+  </button>
+  <button class="nav-item" onclick="goPage('cts',this)">
+    <span class="nav-icon">✂️</span> CTS &amp; คัดเกรด
+    <span class="nav-badge">OC 24</span>
+  </button>
+  <button class="nav-item" onclick="goPage('pallet',this)">
+    <span class="nav-icon">📦</span> พาเลท
+    <span class="nav-badge">OC 6</span>
+  </button>
+  <button class="nav-item" onclick="goPage('warehouse',this)">
+    <span class="nav-icon">🏬</span> คลังสินค้า
+    <span class="nav-badge">OC 6</span>
+  </button>
+
+  <div class="sidebar-section-label" style="margin-top:8px;">รายงาน</div>
+  <button class="nav-item" onclick="goPage('monthly',this);buildMonthly()">
+    <span class="nav-icon">📅</span> สรุปรายเดือน
+  </button>
+  <button class="nav-item" onclick="goPage('weekly',this);buildWeekly()">
+    <span class="nav-icon">📊</span> เปรียบสัปดาห์
+  </button>
+
+  <div class="sidebar-section-label" style="margin-top:8px;">อื่น ๆ</div>
+  <button class="nav-item" onclick="showShareGuide()">
+    <span class="nav-icon">📤</span> วิธีแชร์แดชบอร์ด
+  </button>
+</nav>
+
+<!-- Share guide modal -->
+<div id="share-overlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;overflow-y:auto;padding:20px;">
+  <div style="background:#fff;border-radius:var(--radius);padding:32px;max-width:520px;width:100%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+    <button onclick="document.getElementById('share-overlay').style.display='none'" style="position:absolute;top:16px;right:16px;background:var(--g100);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:var(--g500);">✕</button>
+    <div style="font-size:22px;font-weight:900;color:var(--g800);margin-bottom:6px;">📤 วิธีแชร์แดชบอร์ด</div>
+    <div style="font-size:13px;color:var(--g400);margin-bottom:22px;">เลือกวิธีที่เหมาะกับการใช้งานของคุณ</div>
+
+    <div style="background:linear-gradient(135deg,#0f4c2e,#1a6b3d);color:#fff;border-radius:var(--radius-sm);padding:18px;margin-bottom:16px;">
+      <div style="font-weight:800;font-size:15px;margin-bottom:8px;">☁️ ตั้งค่า Google Apps Script (ทำครั้งเดียว ~10 นาที)</div>
+      <ol style="font-size:13px;line-height:1.9;padding-left:18px;color:#d1fae5;">
+        <li>ไปที่ <a href="https://script.google.com/home/start" target="_blank" style="color:#6ee7b7;">script.google.com</a> → กด <strong>+ New project</strong></li>
+        <li>ลบ code เดิมออก → วาง <strong>Google Apps Script Code</strong> จากขั้นตอนด้านล่าง</li>
+        <li>กด <strong>Deploy → New deployment</strong> → Type: <strong>Web app</strong></li>
+        <li>Execute as: <strong>Me</strong> · Who has access: <strong>Anyone</strong> → Deploy → คัดลอก URL</li>
+        <li>เปิดไฟล์ .html → หาบรรทัด <code style="background:rgba(255,255,255,.15);padding:2px 6px;border-radius:4px;">const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAOxHZMFMyCNnXzA2NlA_ZCBwXDBc5WpN06qduhaYHu7vv71wpPZf_Ngml9o8RcQO8g/exec'</code> → วาง URL</li>
+        <li>อัปโหลดไฟล์ขึ้น GitHub Pages → กด "อัปโหลดทั้งหมดไป Cloud"</li>
+      </ol>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="border:1px solid var(--g100);border-radius:var(--radius-sm);padding:18px;border-left:4px solid var(--g500);">
+        <div style="font-weight:800;color:var(--g700);margin-bottom:6px;">🌐 วิธีที่ 1 — GitHub Pages (ฟรี ถาวร)</div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.7;">
+          1. ไปที่ <a href="https://github.com" target="_blank" style="color:var(--g500);font-weight:700;">github.com</a> → สร้าง account → New repository<br>
+          2. ชื่อ repository: <code style="background:var(--g50);padding:2px 6px;border-radius:4px;font-size:12px;">door-factory</code> → Public → Create<br>
+          3. อัปโหลดไฟล์ <code style="background:var(--g50);padding:2px 6px;border-radius:4px;font-size:12px;">index.html</code> (เปลี่ยนชื่อจาก door_factory_v2.html)<br>
+          4. Settings → Pages → Branch: main → Save<br>
+          5. ได้ URL: <code style="background:var(--g50);padding:2px 6px;border-radius:4px;font-size:12px;">https://ชื่อของคุณ.github.io/door-factory/</code><br>
+          <span style="font-size:12px;color:var(--g400);">✅ ฟรี ตลอดชีพ · ไม่มีโฆษณา · ใช้ได้จากทุกที่ทุกอุปกรณ์</span>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--g100);border-radius:var(--radius-sm);padding:18px;border-left:4px solid var(--gold);">
+        <div style="font-weight:800;color:var(--g700);margin-bottom:6px;">📁 วิธีที่ 2 — แชร์ไฟล์ตรง ๆ</div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.7;">
+          ส่งไฟล์ <code style="background:var(--g50);padding:2px 6px;border-radius:4px;font-size:12px;">.html</code> ผ่าน Line / Email / Google Drive<br>
+          ผู้รับดาวน์โหลดแล้วเปิดด้วยเบราว์เซอร์ได้ทันที<br>
+          <span style="font-size:12px;color:var(--g400);">⚠️ ข้อมูลที่บันทึกเพิ่มเติมจะอยู่เฉพาะในเครื่องผู้ใช้แต่ละคน</span>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--g100);border-radius:var(--radius-sm);padding:18px;border-left:4px solid var(--purple-500);">
+        <div style="font-weight:800;color:var(--g700);margin-bottom:6px;">🔄 การส่งออก/นำเข้าข้อมูล</div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.7;">
+          ข้อมูลที่บันทึกรายวันเก็บใน browser ของแต่ละคน<br>
+          หากต้องการซิงก์ข้อมูลใหม่ระหว่างเครื่อง ให้กดปุ่ม <strong>ส่งออก/นำเข้าข้อมูล</strong> ด้านล่าง<br>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="exportData()" style="background:var(--g800);color:#fff;border:none;border-radius:var(--radius-xs);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📥 ส่งออก JSON</button>
+            <label style="background:var(--g100);color:var(--g700);border:none;border-radius:var(--radius-xs);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;display:inline-block;">
+              📤 นำเข้า JSON <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--g100);border-radius:var(--radius-sm);padding:18px;border-left:4px solid var(--g500);">
+        <div style="font-weight:800;color:var(--g700);margin-bottom:6px;">☁️ Cloud Sync — อัปโหลดข้อมูลเก่า</div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.7;">
+          หลังจากตั้งค่า Apps Script แล้ว กด Upload เพื่ออัปโหลดข้อมูล 1–23 ก.ค. ทั้งหมดขึ้น Cloud<br>
+          ทำครั้งเดียวก็พอ (ใช้เวลาประมาณ 1–2 นาที)
+          <div style="margin-top:10px;">
+            <button onclick="uploadAllToGAS()" style="background:var(--g700);color:#fff;border:none;border-radius:var(--radius-xs);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☁️ อัปโหลดทั้งหมดไป Cloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTENT ══ -->
+<div class="content">
+
+  <!-- ───── OVERVIEW ───── -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📊 ภาพรวมประจำวัน</div>
+        <div class="page-subtitle">สรุปยอดการผลิตและกำลังคนทุกแผนก</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-card green">
+        <div class="kpi-label">อัดร้อน</div>
+        <div class="kpi-value" id="ov_hot">—</div>
+        <div class="kpi-unit">บาน / เป้า 2,000</div>
+        <div class="kpi-delta" id="ov_hot_d"></div>
+      </div>
+      <div class="kpi-card yellow">
+        <div class="kpi-label">อัดเย็น</div>
+        <div class="kpi-value" id="ov_cold">—</div>
+        <div class="kpi-unit">บาน / เป้า 160</div>
+        <div class="kpi-delta" id="ov_cold_d"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ห่อประตู</div>
+        <div class="kpi-value" id="ov_wrap">—</div>
+        <div class="kpi-unit">บาน / เป้า 1,300</div>
+        <div class="kpi-delta" id="ov_wrap_d"></div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">ยิงโครงกระดาษ</div>
+        <div class="kpi-value" id="ov_frame">—</div>
+        <div class="kpi-unit">pcs. / เป้า 2,000</div>
+        <div class="kpi-delta" id="ov_frame_d"></div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">ของเสีย</div>
+        <div class="kpi-value" id="ov_waste">—</div>
+        <div class="kpi-unit">% / เป้า ≤0.15%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">เข้าคลัง FG</div>
+        <div class="kpi-value" id="ov_fg">—</div>
+        <div class="kpi-unit">บาน</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--blue-500)"></span>ยอดผลิต vs เป้าหมาย</div>
+        <div id="ov_bar_chart" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--green-500)"></span>กำลังคนรวม vs OC</div>
+        <div id="ov_oc_chart" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── โรงเลื่อยไทรน้อย ───── -->
+  <div class="page" id="page-saw1">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🪵 โรงเลื่อยไทรน้อย</div>
+        <div class="page-subtitle">ยอดเข้าเลื่อย · ยอดเลื่อย · กำลังคน</div>
+      </div>
+      <span class="oc-chip">👷 OC 40 คน</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--g400)"></span>1.1 ยอดเข้าเลื่อย &amp; ยอดเลื่อย</div>
+      <div class="g2">
+        <div>
+          <div style="font-size:11px;color:var(--g300);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">1.1 ยอดเข้าเลื่อย</div>
+          <div class="metric-item">
+            <div class="metric-item-label">ยอดเข้าเลื่อย</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:var(--g600)" type="number" id="s1_enter" placeholder="0" min="0">
+              <span class="metric-unit">Ton.</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--g300);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">1.2 ยอดเลื่อย</div>
+          <div class="g2" style="gap:10px;">
+            <div class="metric-item">
+              <div class="metric-item-label">ชิ้นส่วนประตู</div>
+              <div class="metric-item-input-row">
+                <input class="metric-item-input" style="color:var(--g500)" type="number" id="s1_door" placeholder="0" min="0" oninput="calcSaw1Total()">
+                <span class="metric-unit">Cu.ft.</span>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-item-label">พาเลท/งานทั่วไป</div>
+              <div class="metric-item-input-row">
+                <input class="metric-item-input" style="color:var(--gold)" type="number" id="s1_pal" placeholder="0" min="0" oninput="calcSaw1Total()">
+                <span class="metric-unit">Cu.ft.</span>
+              </div>
+            </div>
+          </div>
+          <div class="metric-item section-gap" style="background:var(--g100);border-color:var(--g200);">
+            <div class="metric-item-label">รวมยอดเลื่อย</div>
+            <div class="metric-item-input-row">
+              <span class="metric-item-input" id="s1_total" style="color:var(--g700)">0</span>
+              <span class="metric-unit">Cu.ft.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="manpower-strip">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info">
+          <div class="mp-label">กำลังคน</div>
+          <div class="mp-number" id="s1_oc_v">0</div>
+          <div class="mp-oc">OC 40 คน</div>
+        </div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="s1_oc" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="40" oninput="updOC('s1_oc',40,'s1_oc_v','s1_ocp','s1_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 40</span><span class="progress-pct" id="s1_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="s1_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── โรงเลื่อยปราจีน ───── -->
+  <div class="page" id="page-saw2">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🪵 โรงเลื่อยปราจีน</div>
+        <div class="page-subtitle">ยอดเข้าเลื่อย · ยอดเลื่อย · กำลังคน</div>
+      </div>
+      <span class="oc-chip">👷 OC 17 คน</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--orange-500)"></span>1.1 ยอดเข้าเลื่อย &amp; ยอดเลื่อย</div>
+      <div class="g2">
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดเข้าเลื่อย</div>
+          <div class="metric-item-input-row">
+            <input class="metric-item-input" style="color:var(--orange-500)" type="number" id="s2_enter" placeholder="0" min="0">
+            <span class="metric-unit">Ton.</span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดเลื่อย</div>
+          <div class="metric-item-input-row">
+            <input class="metric-item-input" style="color:var(--orange-500)" type="number" id="s2_saw" placeholder="0" min="0">
+            <span class="metric-unit">Cu.ft.</span>
+          </div>
+        </div>
+      </div>
+      <div class="manpower-strip" style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa;">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info">
+          <div class="mp-label">กำลังคน</div>
+          <div class="mp-number" style="color:var(--orange-500)" id="s2_oc_v">0</div>
+          <div class="mp-oc">OC 17 คน</div>
+        </div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="s2_oc" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="17" oninput="updOC('s2_oc',17,'s2_oc_v','s2_ocp','s2_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 17</span><span class="progress-pct" id="s2_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="s2_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── โรงอบ ───── -->
+  <div class="page" id="page-dry">
+    <div class="page-header">
+      <div><div class="page-title">🌡️ โรงอบ</div></div>
+      <span class="oc-chip">👷 OC 5 คน</span>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--cyan-500)"></span>2.1 ยอดไม้อบส่งโรง 8 ใบ</div>
+        <div class="g2" style="gap:10px;">
+          <div class="metric-item">
+            <div class="metric-item-label">จำนวน</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="d1_cf" placeholder="0">
+              <span class="metric-unit">Cu.ft.</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-item-label">จำนวน</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="d1_pl" placeholder="0">
+              <span class="metric-unit">Pallet</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--orange-500)"></span>2.2 ยอดอบไม้ในเตาอบ</div>
+        <div class="g2" style="gap:10px;">
+          <div class="metric-item">
+            <div class="metric-item-label">จำนวน</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:var(--orange-500)" type="number" id="d2_cf" placeholder="0">
+              <span class="metric-unit">Cu.ft.</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-item-label">จำนวน</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:var(--orange-500)" type="number" id="d2_pl" placeholder="0">
+              <span class="metric-unit">Pallet</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="manpower-strip section-gap">
+      <span class="mp-icon">👷</span>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" id="dry_oc_v">0</div><div class="mp-oc">OC 5 คน</div></div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="dry_oc" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="5" oninput="updOC('dry_oc',5,'dry_oc_v','dry_ocp','dry_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 5</span><span class="progress-pct" id="dry_ocp">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="dry_ocb" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── โรง 8 ใบ ───── -->
+  <div class="page" id="page-blade8">
+    <div class="page-header">
+      <div><div class="page-title">⚙️ โรง 8 ใบ</div></div>
+      <span class="oc-chip">👷 OC 26 + 10 คน</span>
+    </div>
+
+    <!-- 3.1 Stock -->
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--green-500)"></span>3.1 Stock รอผลิต</div>
+      <div class="g3">
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้แปรรูป</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--green-600)" type="number" id="bk_pr" placeholder="0"><span class="metric-unit">Cu.ft.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้หัว</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--green-600)" type="number" id="bk_h" placeholder="0"><span class="metric-unit">Cu.ft.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้ข้าง</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--green-600)" type="number" id="bk_k" placeholder="0"><span class="metric-unit">Cu.ft.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2 ยอดตัด -->
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--blue-500)"></span>3.2 ยอดตัด</div>
+      <div class="g2">
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดตัด</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--blue-600)" type="number" id="bc_cuft" placeholder="0"><span class="metric-unit">Cu.ft.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">อัตรา <span class="target-chip">เป้า 30 Cu.ft/Hr.</span></div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="bc_rate" placeholder="0" step="0.1" oninput="calcCutRate()"><span class="metric-unit">Cu.ft/Hr.</span></div>
+          <div class="progress-wrap">
+            <div class="progress-meta"><span>vs เป้า 30</span><span class="progress-pct" id="bc_rate_pct">0%</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bc_rate_bar" style="width:0%"></div></div>
+          </div>
+          <div style="margin-top:8px;" id="cut_badge"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.3 ยอดต่อ -->
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--purple-500)"></span>3.3 ยอดต่อ</div>
+      <div class="g3">
+        <div class="metric-item">
+          <div class="metric-item-label">6"</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--purple-500)" type="number" id="bj_6" placeholder="0"><span class="metric-unit">pcs.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">4.5"</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--purple-500)" type="number" id="bj_45" placeholder="0"><span class="metric-unit">pcs.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">3"</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--purple-500)" type="number" id="bj_3" placeholder="0"><span class="metric-unit">pcs.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.4 ยอดซอย -->
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--cyan-500)"></span>3.4 ยอดซอย</div>
+      <div class="g4">
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้หัว <span class="target-chip">4,000 pcs.</span></div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="bs_h1" placeholder="0" oninput="calcProg('bs_h1',4000,'bs_h1p','bs_h1b')"><span class="metric-unit">pcs.</span></div>
+          <div class="progress-wrap"><div class="progress-meta"><span>vs 4,000</span><span class="progress-pct" id="bs_h1p">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bs_h1b" style="width:0%"></div></div></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้ข้าง <span class="target-chip">4,000 pcs.</span></div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="bs_k1" placeholder="0" oninput="calcProg('bs_k1',4000,'bs_k1p','bs_k1b')"><span class="metric-unit">pcs.</span></div>
+          <div class="progress-wrap"><div class="progress-meta"><span>vs 4,000</span><span class="progress-pct" id="bs_k1p">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bs_k1b" style="width:0%"></div></div></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้ข้าง</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="bs_k2" placeholder="0"><span class="metric-unit">pcs.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ไม้ LVL</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="bs_lvl" placeholder="0"><span class="metric-unit">pcs.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="manpower-strip section-gap">
+      <span class="mp-icon">👷</span>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" id="b8_oc_v">0</div><div class="mp-oc">OC 26 คน</div></div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="b8_oc" placeholder="กรอกจำนวนคน" min="0" max="26" oninput="updOC('b8_oc',26,'b8_oc_v','b8_ocp','b8_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 26</span><span class="progress-pct" id="b8_ocp">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="b8_ocb" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 3.5 ยิงโครง -->
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--pink-500)"></span>3.5 ยอดยิงโครง <span class="target-chip" style="margin-left:4px;">เป้า 300 pcs.</span></div>
+      <div class="g2">
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดโครงไม้</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--pink-500)" type="number" id="bf_w" placeholder="0" oninput="calcProg('bf_w',300,'bf_wp','bf_wb')"><span class="metric-unit">pcs.</span></div>
+          <div class="progress-wrap"><div class="progress-meta"><span>vs 300</span><span class="progress-pct" id="bf_wp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bf_wb" style="width:0%"></div></div></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดยิงโครง มอก.</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--pink-500)" type="number" id="bf_m" placeholder="0" oninput="calcProg('bf_m',300,'bf_mp','bf_mb')"><span class="metric-unit">pcs.</span></div>
+          <div class="progress-wrap"><div class="progress-meta"><span>vs 300</span><span class="progress-pct" id="bf_mp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bf_mb" style="width:0%"></div></div></div>
+        </div>
+      </div>
+      <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-color:#fbcfe8;">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--pink-500)" id="bf_oc_v">0</div><div class="mp-oc">OC 10 คน</div></div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="bf_oc" placeholder="กรอกจำนวนคน" min="0" max="10" oninput="updOC('bf_oc',10,'bf_oc_v','bf_ocp','bf_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 10</span><span class="progress-pct" id="bf_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="bf_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── อัดร้อน/เย็น ───── -->
+  <div class="page" id="page-press">
+    <div class="page-header">
+      <div><div class="page-title">🔥 ยิงโครง / อัดร้อน / อัดเย็น</div></div>
+      <span class="oc-chip">👷 OC 34 คน</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--orange-500)"></span>4.1 ยอดยิงโครงกระดาษ <span class="target-chip" style="margin-left:4px;">เป้า 2,000 pcs.</span></div>
+      <div class="metric-item" style="max-width:340px;">
+        <div class="metric-item-label">ยอดยิงโครงกระดาษ</div>
+        <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--orange-500)" type="number" id="p1_frame" placeholder="0" oninput="calcProg('p1_frame',2000,'p1fp','p1fb')"><span class="metric-unit">pcs.</span></div>
+        <div class="progress-wrap"><div class="progress-meta"><span>vs เป้า 2,000</span><span class="progress-pct" id="p1fp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="p1fb" style="width:0%"></div></div></div>
+      </div>
+      <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa;">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--orange-500)" id="p1_oc_v">0</div><div class="mp-oc">OC 20 คน</div></div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="p1_oc" placeholder="กรอกจำนวนคน" min="0" max="20" oninput="updOC('p1_oc',20,'p1_oc_v','p1_ocp','p1_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 20</span><span class="progress-pct" id="p1_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="p1_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--red-500)"></span>4.2 ยอดอัดร้อน <span class="target-chip" style="margin-left:4px;">เป้า 2,000 บาน</span></div>
+      <div class="metric-item" style="max-width:340px;">
+        <div class="metric-item-label">ยอดอัดร้อน</div>
+        <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--red-600)" type="number" id="p2_hot" placeholder="0" oninput="calcProg('p2_hot',2000,'p2hp','p2hb');updateOverview()"><span class="metric-unit">บาน</span></div>
+        <div class="progress-wrap"><div class="progress-meta"><span>vs เป้า 2,000</span><span class="progress-pct" id="p2hp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="p2hb" style="width:0%"></div></div></div>
+      </div>
+      <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fecaca;">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--red-600)" id="p2_oc_v">0</div><div class="mp-oc">OC 11 คน</div></div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="p2_oc" placeholder="กรอกจำนวนคน" min="0" max="11" oninput="updOC('p2_oc',11,'p2_oc_v','p2_ocp','p2_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 11</span><span class="progress-pct" id="p2_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="p2_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="downtime-box">
+        <span style="font-size:22px;">⏱️</span>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--red-600);font-weight:700;margin-bottom:4px;">Downtime เครื่องอัดร้อน</div>
+          <div class="metric-item-input-row">
+            <input class="metric-item-input" style="color:var(--red-600);font-size:26px;" type="number" id="p2_down" placeholder="0">
+            <span class="metric-unit" style="color:var(--red-500);">นาที</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--cyan-500)"></span>4.3 ยอดอัดเย็น <span class="target-chip" style="margin-left:4px;">เป้า 160 บาน</span></div>
+      <div class="metric-item" style="max-width:340px;">
+        <div class="metric-item-label">ยอดอัดเย็น</div>
+        <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="p3_cold" placeholder="0" oninput="calcProg('p3_cold',160,'p3cp','p3cb');updateOverview()"><span class="metric-unit">บาน</span></div>
+        <div class="progress-wrap"><div class="progress-meta"><span>vs เป้า 160</span><span class="progress-pct" id="p3cp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="p3cb" style="width:0%"></div></div></div>
+      </div>
+      <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#ecfeff,#cffafe);border-color:#a5f3fc;">
+        <span class="mp-icon">👷</span>
+        <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--cyan-500)" id="p3_oc_v">0</div><div class="mp-oc">OC 3 คน</div></div>
+        <div class="mp-bar-area">
+          <input class="mp-input" type="number" id="p3_oc" placeholder="กรอกจำนวนคน" min="0" max="3" oninput="updOC('p3_oc',3,'p3_oc_v','p3_ocp','p3_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 3</span><span class="progress-pct" id="p3_ocp">0%</span></div>
+          <div class="progress-bg"><div class="progress-fill" id="p3_ocb" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── CTS ───── -->
+  <div class="page" id="page-cts">
+    <div class="page-header">
+      <div><div class="page-title">✂️ CTS &amp; คัดเกรด</div></div>
+      <span class="oc-chip">👷 OC 24 คน</span>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--green-500)"></span>5.1 ยอดซอย</div>
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดซอย</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--green-600)" type="number" id="cts_sloy" placeholder="0" oninput="calcWaste()"><span class="metric-unit">บาน</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--purple-500)"></span>5.2 ยอดห่อประตู <span class="target-chip" style="margin-left:4px;">เป้า 1,300 บาน</span></div>
+        <div class="metric-item">
+          <div class="metric-item-label">ยอดห่อประตู</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--purple-500)" type="number" id="cts_wrap" placeholder="0" oninput="calcProg('cts_wrap',1300,'ctwp','ctwb');updateOverview()"><span class="metric-unit">บาน</span></div>
+          <div class="progress-wrap"><div class="progress-meta"><span>vs เป้า 1,300</span><span class="progress-pct" id="ctwp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="ctwb" style="width:0%"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section-gap">
+      <div class="card-title">
+        <span class="title-bar" style="background:var(--red-500)"></span>5.3 ยอดของเสีย
+        <span id="waste_badge" class="status-badge sb-ok" style="margin-left:8px;">0.00%</span>
+        <span style="font-size:10px;color:var(--gray-400);margin-left:6px;">เป้า ≤ 0.15%</span>
+      </div>
+      <div class="g3">
+        <div class="metric-item">
+          <div class="metric-item-label">อัดร้อน</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--red-600)" type="number" id="w_hot" placeholder="0" oninput="calcWaste()"><span class="metric-unit">บาน</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">อัดเย็น</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--red-600)" type="number" id="w_cold" placeholder="0" oninput="calcWaste()"><span class="metric-unit">บาน</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">เครื่องซอย</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--red-600)" type="number" id="w_sloy" placeholder="0" oninput="calcWaste()"><span class="metric-unit">บาน</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="manpower-strip section-gap">
+      <span class="mp-icon">👷</span>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" id="cts_oc_v">0</div><div class="mp-oc">OC 24 คน</div></div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="cts_oc" placeholder="กรอกจำนวนคน" min="0" max="24" oninput="updOC('cts_oc',24,'cts_oc_v','cts_ocp','cts_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 24</span><span class="progress-pct" id="cts_ocp">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="cts_ocb" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── พาเลท ───── -->
+  <div class="page" id="page-pallet">
+    <div class="page-header">
+      <div><div class="page-title">📦 พาเลท</div></div>
+      <span class="oc-chip">👷 OC 6 คน</span>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--yellow-500)"></span>ยอดพาเลท (Pcs.)</div>
+      <div class="pallet-grid">
+        <div class="metric-item"><div class="metric-item-label">3"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_3x6" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x6" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8s" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD ตัวใหม่)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--orange-500)" type="number" id="pl_4x8sn" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (HPL)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8h" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x9" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×10"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x10" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×12"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x12" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">7"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_7x9" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+      </div>
+    </div>
+    <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;">
+      <span class="mp-icon">👷</span>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--yellow-600)" id="pl_oc_v">0</div><div class="mp-oc">OC 6 คน</div></div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="pl_oc" placeholder="กรอกจำนวนคน" min="0" max="6" oninput="updOC('pl_oc',6,'pl_oc_v','pl_ocp','pl_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 6</span><span class="progress-pct" id="pl_ocp">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="pl_ocb" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── คลังสินค้า ───── -->
+  <div class="page" id="page-warehouse">
+    <div class="page-header">
+      <div><div class="page-title">🏬 คลังสินค้า</div></div>
+      <span class="oc-chip">👷 OC 6 คน</span>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--green-500)"></span>7.1 ยอดเข้าคลัง FG</div>
+        <div class="metric-item" style="margin-bottom:10px;">
+          <div class="metric-item-label">รวม FG</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--green-600)" type="number" id="wh_in" placeholder="0" oninput="updateOverview()"><span class="metric-unit">บาน</span></div>
+        </div>
+        <div class="g2" style="gap:10px;">
+          <div class="metric-item wh-ag">
+            <div class="metric-item-label">Ag</div>
+            <div class="metric-item-input-row"><input class="metric-item-input" type="number" id="wh_in_ag" placeholder="0"><span class="metric-unit">บาน</span></div>
+          </div>
+          <div class="metric-item wh-cp">
+            <div class="metric-item-label">C+</div>
+            <div class="metric-item-input-row"><input class="metric-item-input" type="number" id="wh_in_cp" placeholder="0"><span class="metric-unit">บาน</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="title-bar" style="background:var(--blue-500)"></span>7.2 ยอดโหลดสินค้า</div>
+        <div class="metric-item" style="margin-bottom:10px;">
+          <div class="metric-item-label">รวมโหลด</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--blue-600)" type="number" id="wh_out" placeholder="0"><span class="metric-unit">บาน</span></div>
+        </div>
+        <div class="g2" style="gap:10px;">
+          <div class="metric-item wh-ag">
+            <div class="metric-item-label">Ag</div>
+            <div class="metric-item-input-row"><input class="metric-item-input" type="number" id="wh_out_ag" placeholder="0"><span class="metric-unit">บาน</span></div>
+          </div>
+          <div class="metric-item wh-cp">
+            <div class="metric-item-label">C+</div>
+            <div class="metric-item-input-row"><input class="metric-item-input" type="number" id="wh_out_cp" placeholder="0"><span class="metric-unit">บาน</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="manpower-strip section-gap">
+      <span class="mp-icon">👷</span>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" style="color:var(--purple-500)" id="wh_oc_v">0</div><div class="mp-oc">OC 6 คน</div></div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="wh_oc" placeholder="กรอกจำนวนคน" min="0" max="6" oninput="updOC('wh_oc',6,'wh_oc_v','wh_ocp','wh_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 6</span><span class="progress-pct" id="wh_ocp">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="wh_ocb" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ───── สรุปรายเดือน ───── -->
+  <div class="page" id="page-monthly">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📅 สรุปยอดผลิตรายเดือน</div>
+        <div class="page-subtitle">รวมข้อมูลทุกผลิตภัณฑ์จากบันทึกรายวัน</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="text" id="month-input" placeholder="ดด/ปปปป" maxlength="7"
+          style="border:1px solid var(--g200);background:#fff;color:var(--g800);border-radius:var(--radius-xs);padding:8px 14px;font-size:15px;font-family:inherit;width:120px;text-align:center;outline:none;transition:border .15s;"
+          oninput="autoSlashMonth(this)" onblur="buildMonthly()" onkeydown="if(event.key==='Enter')this.blur()">
+        <button onclick="buildMonthly()" style="background:linear-gradient(135deg,var(--g500),var(--g400));color:#fff;border:none;border-radius:var(--radius-xs);padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 โหลด</button>
+      </div>
+    </div>
+
+    <!-- KPI Summary row -->
+    <div id="mo-kpi" class="kpi-row" style="margin-bottom:22px;"></div>
+
+    <!-- Section cards -->
+    <div id="mo-sections" style="display:flex;flex-direction:column;gap:18px;"></div>
+
+    <!-- Daily detail table -->
+    <div class="card section-gap" id="mo-table-wrap" style="display:none;">
+      <div class="card-title"><span class="title-bar" style="background:var(--g400)"></span>รายละเอียดรายวัน</div>
+      <div style="overflow-x:auto;">
+        <table id="mo-table" style="width:100%;border-collapse:collapse;font-size:13px;"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── เปรียบสัปดาห์ ───── -->
+  <div class="page" id="page-weekly">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📊 เปรียบเทียบสัปดาห์</div>
+        <div class="page-subtitle">เทียบยอดผลิตสัปดาห์ปัจจุบัน vs สัปดาห์ก่อนหน้า</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="text" id="week-input" placeholder="วว/ดด/ปปปป" maxlength="10"
+          style="border:1px solid var(--g200);background:#fff;color:var(--g800);border-radius:var(--radius-xs);padding:8px 14px;font-size:15px;font-family:inherit;width:145px;text-align:center;outline:none;transition:border .15s;"
+          oninput="autoSlashWeek(this)" onblur="buildWeekly()" onkeydown="if(event.key==='Enter')this.blur()">
+        <button onclick="buildWeekly()" style="background:linear-gradient(135deg,var(--g500),var(--g400));color:#fff;border:none;border-radius:var(--radius-xs);padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 โหลด</button>
+      </div>
+    </div>
+    <div id="wk-header-row" style="display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;"></div>
+    <div id="wk-compare" style="display:flex;flex-direction:column;gap:14px;"></div>
+    <div class="card section-gap" id="wk-table-wrap" style="display:none;margin-top:18px;">
+      <div class="card-title"><span class="title-bar" style="background:var(--g400)"></span>รายละเอียดรายวัน</div>
+      <div style="overflow-x:auto;">
+        <table id="wk-table" style="width:100%;border-collapse:collapse;font-size:13px;"></table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /layout -->
+
+<div class="saved-toast" id="toast">✅ บันทึกข้อมูลแล้ว</div>
+
+<script>
+/* ── Date ── */
+const dateEl = document.getElementById('date-input');
+const hdrDate = document.getElementById('hdr-date-text');
+const pad = x => String(x).padStart(2,'0');
+const toNum = v => parseFloat(v)||0;
+const fmtNum = (v,dec=0) => Number.isFinite(v) ? v.toLocaleString('th-TH',{minimumFractionDigits:dec,maximumFractionDigits:dec}) : '—';
+const today = new Date();
+const todayIso = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+const DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+// currentIso = YYYY-MM-DD used as localStorage key
+let currentIso = todayIso;
+
+function isoToDisplay(iso) {
+  // YYYY-MM-DD → DD/MM/YYYY
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function displayToIso(dmy) {
+  // DD/MM/YYYY → YYYY-MM-DD
+  const parts = dmy.split('/');
+  if (parts.length !== 3) return null;
+  const [d, m, y] = parts;
+  if (!d || !m || !y || y.length !== 4) return null;
+  const iso = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  if (isNaN(new Date(iso + 'T12:00:00'))) return null;
+  return iso;
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  return `วัน${DAYS[d.getDay()]}ที่ ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+
+// Set initial value as DD/MM/YYYY
+dateEl.value = isoToDisplay(todayIso);
+hdrDate.textContent = fmtDate(todayIso);
+
+/* ══ Calendar popup ══ */
+const calPopup  = document.getElementById('cal-popup');
+const calGrid   = document.getElementById('cal-grid');
+const calLabel  = document.getElementById('cal-month-label');
+const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const DOW_LABELS = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+let calYear, calMonth; // currently displayed month
+
+function calOpen() {
+  const cur = new Date(currentIso + 'T12:00:00');
+  calYear  = cur.getFullYear();
+  calMonth = cur.getMonth();
+  calRender();
+  // Position below the input
+  const rect = dateEl.getBoundingClientRect();
+  calPopup.style.top  = (rect.bottom + 6) + 'px';
+  if (window.innerWidth <= 768) {
+    calPopup.style.left = '50%';
+    calPopup.style.transform = 'translateX(-50%)';
+  } else {
+    calPopup.style.left = Math.min(rect.left, window.innerWidth - 296) + 'px';
+    calPopup.style.transform = '';
+  }
+  calPopup.classList.add('open');
+}
+
+function calClose() { calPopup.classList.remove('open'); }
+
+function calShiftMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  calRender();
+}
+
+function calGoToday() {
+  const t = new Date(todayIso + 'T12:00:00');
+  calYear = t.getFullYear(); calMonth = t.getMonth();
+  calRender();
+}
+
+function calRender() {
+  calLabel.textContent = `${THAI_MONTHS_SHORT[calMonth]} ${calYear + 543}`;
+
+  // Collect keys with data for this month (localStorage-only for calendar dots —
+  // pulling Firebase for every calendar render would be expensive; dots use local cache)
+  const prefix = `door_${calYear}-${pad(calMonth+1)}-`;
+  const dataKeys = new Set();
+  for (let k in localStorage) {
+    if (k.startsWith(prefix)) dataKeys.add(k.replace('door_',''));
+  }
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+
+  let html = DOW_LABELS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // Leading blanks from previous month
+  for (let i = 0; i < firstDay; i++) {
+    const d = daysInPrev - firstDay + 1 + i;
+    html += `<div class="cal-day other-month empty">${d}</div>`;
+  }
+
+  const selIso = currentIso;
+  const todIso = todayIso;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${calYear}-${pad(calMonth+1)}-${pad(d)}`;
+    let cls = 'cal-day';
+    if (iso === selIso) cls += ' selected';
+    if (iso === todIso) cls += ' today';
+    if (dataKeys.has(iso)) cls += ' has-data';
+    html += `<div class="${cls}" onclick="calSelect('${iso}')">${d}</div>`;
+  }
+
+  // Trailing blanks
+  const total = firstDay + daysInMonth;
+  const trailing = (7 - (total % 7)) % 7;
+  for (let d = 1; d <= trailing; d++) {
+    html += `<div class="cal-day other-month empty">${d}</div>`;
+  }
+
+  calGrid.innerHTML = html;
+}
+
+function calSelect(iso) {
+  currentIso = iso;
+  dateEl.value = isoToDisplay(iso);
+  hdrDate.textContent = fmtDate(iso);
+  loadData();
+  updateOverview();
+  calClose();
+}
+
+// Open on click / close on outside click
+dateEl.addEventListener('click', e => {
+  e.stopPropagation();
+  if (calPopup.classList.contains('open')) calClose();
+  else calOpen();
+});
+document.addEventListener('click', e => {
+  if (!calPopup.contains(e.target)) calClose();
+});
+calPopup.addEventListener('click', e => e.stopPropagation());
+
+/* ── Navigation ── */
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  closeSidebar();
+}
+
+/* ── Mobile sidebar ── */
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const open = sb.classList.contains('mobile-open');
+  sb.classList.toggle('mobile-open', !open);
+  ov.classList.toggle('open', !open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ── Progress color ── */
+function barColor(pct) {
+  if (pct >= 100) return '#22c55e';
+  if (pct >= 70)  return '#3b82f6';
+  if (pct >= 40)  return '#f59e0b';
+  return '#ef4444';
+}
+
+/* ── OC manpower ── */
+function updOC(inId, oc, valId, pctId, barId) {
+  const v = parseFloat(document.getElementById(inId).value) || 0;
+  document.getElementById(valId).textContent = v;
+  const pct = Math.min((v/oc)*100, 150);
+  document.getElementById(pctId).textContent = pct.toFixed(0)+'%';
+  const bar = document.getElementById(barId);
+  bar.style.width = Math.min(pct,100)+'%';
+  bar.style.background = barColor(pct);
+  updateOverview();
+}
+
+/* ── Generic progress ── */
+function calcProg(inId, target, pctId, barId) {
+  const v = parseFloat(document.getElementById(inId).value) || 0;
+  const pct = target > 0 ? (v/target)*100 : 0;
+  document.getElementById(pctId).textContent = pct.toFixed(1)+'%';
+  const bar = document.getElementById(barId);
+  bar.style.width = Math.min(pct,100)+'%';
+  bar.style.background = barColor(pct);
+}
+
+/* ── Saw1 total ── */
+function calcSaw1Total() {
+  const a = parseFloat(document.getElementById('s1_door').value)||0;
+  const b = parseFloat(document.getElementById('s1_pal').value)||0;
+  document.getElementById('s1_total').textContent = (a+b).toLocaleString();
+}
+
+/* ── Cut rate ── */
+function calcCutRate() {
+  const r = parseFloat(document.getElementById('bc_rate').value)||0;
+  calcProg('bc_rate',30,'bc_rate_pct','bc_rate_bar'); // reuse with manual set
+  const pct = (r/30)*100;
+  document.getElementById('bc_rate_pct').textContent = pct.toFixed(1)+'%';
+  const bar = document.getElementById('bc_rate_bar');
+  bar.style.width = Math.min(pct,100)+'%';
+  bar.style.background = barColor(pct);
+  const badge = document.getElementById('cut_badge');
+  if (r > 0) {
+    if (r >= 30) badge.innerHTML = '<span class="status-badge sb-ok">✓ ตามเป้า</span>';
+    else if (r >= 20) badge.innerHTML = '<span class="status-badge sb-warn">⚠ ต่ำกว่าเป้า</span>';
+    else badge.innerHTML = '<span class="status-badge sb-bad">✗ ต่ำมาก</span>';
+  } else badge.innerHTML = '';
+}
+
+/* ── Waste ── */
+function calcWaste() {
+  const wh = parseFloat(document.getElementById('w_hot').value)||0;
+  const wc = parseFloat(document.getElementById('w_cold').value)||0;
+  const ws = parseFloat(document.getElementById('w_sloy').value)||0;
+  const total = wh+wc+ws;
+  const base = (parseFloat(document.getElementById('p2_hot').value)||0)
+             + (parseFloat(document.getElementById('p3_cold').value)||0)
+             + (parseFloat(document.getElementById('cts_sloy').value)||0);
+  const pct = base > 0 ? (total/base)*100 : 0;
+  const badge = document.getElementById('waste_badge');
+  badge.textContent = pct.toFixed(2)+'%';
+  badge.className = 'status-badge ' + (pct<=0.15?'sb-ok':pct<=0.30?'sb-warn':'sb-bad');
+  updateOverview();
+}
+
+/* ── Overview KPIs ── */
+const OC_DEF = [
+  {label:'โรงเลื่อย ไทรน้อย', oc:40, ids:['s1_oc']},
+  {label:'โรงเลื่อย ปราจีน', oc:17, ids:['s2_oc']},
+  {label:'โรงอบ', oc:5, ids:['dry_oc']},
+  {label:'โรง 8 ใบ', oc:36, ids:['b8_oc','bf_oc']},
+  {label:'อัดร้อน/เย็น', oc:34, ids:['p1_oc','p2_oc','p3_oc']},
+  {label:'CTS', oc:24, ids:['cts_oc']},
+  {label:'พาเลท', oc:6, ids:['pl_oc']},
+  {label:'คลังสินค้า', oc:6, ids:['wh_oc']},
+];
+
+function g(id) { return parseFloat(document.getElementById(id)?.value)||0; }
+function setText(id, txt) { const el=document.getElementById(id); if(el) el.textContent=txt; }
+
+function updateOverview() {
+  // KPIs
+  const hot=g('p2_hot'), cold=g('p3_cold'), wrap=g('cts_wrap'), frame=g('p1_frame'), fg=g('wh_in');
+  const wTotal=(g('w_hot')+g('w_cold')+g('w_sloy'));
+  const wBase=(g('p2_hot')+g('p3_cold')+g('cts_sloy'));
+  const wastePct=wBase>0?(wTotal/wBase)*100:0;
+
+  setText('ov_hot', hot||'—');
+  setText('ov_hot_d', hot?((hot/2000*100).toFixed(1)+'% ของเป้า'):'');
+  document.getElementById('ov_hot_d').className = 'kpi-delta '+(hot>=2000?'delta-up':'delta-down');
+
+  setText('ov_cold', cold||'—');
+  setText('ov_cold_d', cold?((cold/160*100).toFixed(1)+'% ของเป้า'):'');
+  document.getElementById('ov_cold_d').className = 'kpi-delta '+(cold>=160?'delta-up':'delta-down');
+
+  setText('ov_wrap', wrap||'—');
+  setText('ov_wrap_d', wrap?((wrap/1300*100).toFixed(1)+'% ของเป้า'):'');
+  document.getElementById('ov_wrap_d').className = 'kpi-delta '+(wrap>=1300?'delta-up':'delta-down');
+
+  setText('ov_frame', frame||'—');
+  setText('ov_frame_d', frame?((frame/2000*100).toFixed(1)+'% ของเป้า'):'');
+  document.getElementById('ov_frame_d').className = 'kpi-delta '+(frame>=2000?'delta-up':'delta-down');
+
+  setText('ov_waste', wBase>0?wastePct.toFixed(2)+'%':'—');
+  document.getElementById('ov_waste').style.color = wastePct>0.30?'var(--red-600)':wastePct>0.15?'var(--yellow-600)':'var(--green-600)';
+  setText('ov_fg', fg||'—');
+
+  // Bar chart
+  const items = [
+    {l:'อัดร้อน',v:hot,t:2000,c:'var(--red-500)'},
+    {l:'อัดเย็น',v:cold,t:160,c:'var(--cyan-500)'},
+    {l:'ห่อประตู',v:wrap,t:1300,c:'var(--purple-500)'},
+    {l:'ยิงโครงกระดาษ',v:frame,t:2000,c:'var(--orange-500)'},
+  ];
+  document.getElementById('ov_bar_chart').innerHTML = items.map(i=>{
+    const pct=Math.min(i.t>0?(i.v/i.t)*100:0,100);
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);margin-bottom:4px;">
+        <span>${i.l}</span>
+        <span style="font-weight:700;color:var(--gray-800)">${i.v||0} <span style="color:var(--gray-400);font-weight:400;">/ ${i.t.toLocaleString()}</span></span>
+      </div>
+      <div style="height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${i.c};border-radius:5px;transition:width .5s ease;"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // OC chart
+  document.getElementById('ov_oc_chart').innerHTML = OC_DEF.map(dept=>{
+    const actual = dept.ids.reduce((s,id)=>s+(g(id)||0),0);
+    const pct = Math.min((actual/dept.oc)*100,100);
+    const c = barColor(pct);
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);margin-bottom:4px;">
+        <span>${dept.label}</span>
+        <span style="font-weight:700;color:var(--gray-800)">${actual} <span style="color:var(--gray-400);font-weight:400;">/ ${dept.oc}</span></span>
+      </div>
+      <div style="height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${c};border-radius:4px;transition:width .5s ease;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── localStorage save/load ── */
+const FIELDS = [
+  's1_enter','s1_door','s1_pal','s1_oc',
+  's2_enter','s2_saw','s2_oc',
+  'd1_cf','d1_pl','d2_cf','d2_pl','dry_oc',
+  'bk_pr','bk_h','bk_k','bc_cuft','bc_rate',
+  'bj_6','bj_45','bj_3',
+  'bs_h1','bs_k1','bs_k2','bs_lvl',
+  'bf_w','bf_m','bf_oc','b8_oc',
+  'p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
+  'cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy',
+  'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_oc',
+  'wh_in','wh_in_ag','wh_in_cp','wh_out','wh_out_ag','wh_out_cp','wh_oc'
+];
+
+async function saveData() {
+  const data = {};
+  FIELDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+  // Always cache locally first
+  localStorage.setItem('door_' + currentIso, JSON.stringify(data));
+  // Push to Google Apps Script if configured (no-cors = fire and forget)
+  if (GAS_READY) {
+    try {
+      fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ key: currentIso, data })
+      });
+    } catch(e) { console.error('GAS save error', e); }
+  }
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+async function loadData() {
+  FIELDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  let data = null;
+  if (GAS_READY) {
+    try {
+      const resp = await fetch(`${GAS_URL}?action=get&key=${currentIso}`);
+      const result = await resp.json();
+      if (result.ok && result.data) {
+        data = result.data;
+        localStorage.setItem('door_' + currentIso, JSON.stringify(data));
+      }
+    } catch(e) {
+      const raw = localStorage.getItem('door_' + currentIso);
+      if (raw) data = JSON.parse(raw);
+    }
+  } else {
+    const raw = localStorage.getItem('door_' + currentIso);
+    if (raw) data = JSON.parse(raw);
+  }
+  if (data) {
+    FIELDS.forEach(id => { const el = document.getElementById(id); if (el && data[id] !== undefined) el.value = data[id]; });
+  }
+  // Re-trigger all computed fields
+  calcSaw1Total(); calcCutRate(); calcWaste();
+  ['s1_oc','s2_oc','dry_oc','b8_oc','bf_oc','p1_oc','p2_oc','p3_oc','cts_oc','pl_oc','wh_oc'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[26,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[24,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
+    const m = maps[id]; if(m) updOC(id,...m);
+  });
+  [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',300,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
+  updateOverview();
+}
+
+/* ══════════════════════════════════════════════════
+   GOOGLE APPS SCRIPT CONFIG
+   วางลิ้งค์ Web App URL ที่นี่
+   ดูวิธีตั้งค่าในหน้า "วิธีแชร์แดชบอร์ด"
+══════════════════════════════════════════════════ */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAOxHZMFMyCNnXzA2NlA_ZCBwXDBc5WpN06qduhaYHu7vv71wpPZf_Ngml9o8RcQO8g/exec';
+const GAS_READY = GAS_URL !== 'https://script.google.com/macros/s/AKfycbxTAOxHZMFMyCNnXzA2NlA_ZCBwXDBc5WpN06qduhaYHu7vv71wpPZf_Ngml9o8RcQO8g/exec';
+
+// ── Pre-load all Excel data (1–23 July 2026) ──
+(function(){
+  const bulk = {
+    'door_2026-07-01': {"s1_enter": "38.96", "s1_door": "779.14", "s1_pal": "0.0", "s1_oc": "35", "s2_enter": "6.93", "s2_saw": "138.58", "s2_oc": "11", "d1_cf": "0.0", "d1_pl": "0", "d2_cf": "11246.14", "d2_pl": "240", "dry_oc": "5", "bk_pr": "0", "bk_h": "7827", "bk_k": "11397", "bc_cuft": "1025.32", "bc_rate": "38.69", "bj_6": "0", "bj_45": "1111", "bj_3": "0", "bs_h1": "1606", "bs_k1": "1144", "bs_k2": "0", "bs_lvl": "4320", "b8_oc": "25", "bf_w": "185", "bf_m": "0", "bf_oc": "10", "p1_frame": "1721", "p1_oc": "10", "p2_hot": "1224", "p2_oc": "10", "p2_down": "0", "p3_cold": "79", "p3_oc": "3", "cts_sloy": "1094", "cts_wrap": "1481", "w_hot": "1", "w_cold": "0", "w_sloy": "1", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "40", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1021", "wh_in_ag": "817", "wh_in_cp": "204", "wh_out": "1790", "wh_out_ag": "1790", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-02': {"s1_enter": "36.97", "s1_door": "739.49", "s1_pal": "0.0", "s1_oc": "36", "s2_enter": "0.0", "s2_saw": "0.0", "s2_oc": "5", "d1_cf": "757.61", "d1_pl": "17", "d2_cf": "12824.41", "d2_pl": "276", "dry_oc": "5", "bk_pr": "0", "bk_h": "6623", "bk_k": "13675", "bc_cuft": "1142.48", "bc_rate": "24.05", "bj_6": "0", "bj_45": "1005", "bj_3": "0", "bs_h1": "3570", "bs_k1": "572", "bs_k2": "0", "bs_lvl": "6480", "b8_oc": "24", "bf_w": "231", "bf_m": "0", "bf_oc": "10", "p1_frame": "2156", "p1_oc": "13", "p2_hot": "1666", "p2_oc": "10", "p2_down": "0", "p3_cold": "135", "p3_oc": "3", "cts_sloy": "1259", "cts_wrap": "1291", "w_hot": "1", "w_cold": "0", "w_sloy": "0", "cts_oc": "22", "pl_3x6": "10", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "30", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1050", "wh_in_ag": "893", "wh_in_cp": "157", "wh_out": "1280", "wh_out_ag": "1101", "wh_out_cp": "179", "wh_oc": "6"},
+    'door_2026-07-03': {"s1_enter": "49.49", "s1_door": "989.76", "s1_pal": "0.0", "s1_oc": "34", "s2_enter": "11.59", "s2_saw": "231.87", "s2_oc": "9", "d1_cf": "711.9", "d1_pl": "16", "d2_cf": "12824.41", "d2_pl": "276", "dry_oc": "5", "bk_pr": "0", "bk_h": "4490", "bk_k": "12436", "bc_cuft": "428.27", "bc_rate": "17.84", "bj_6": "894", "bj_45": "442", "bj_3": "0", "bs_h1": "3043", "bs_k1": "3937", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "21", "bf_w": "210", "bf_m": "0", "bf_oc": "10", "p1_frame": "2378", "p1_oc": "12", "p2_hot": "1655", "p2_oc": "10", "p2_down": "0", "p3_cold": "106", "p3_oc": "3", "cts_sloy": "1702", "cts_wrap": "1242", "w_hot": "2", "w_cold": "0", "w_sloy": "0", "cts_oc": "21", "pl_3x6": "30", "pl_4x6": "10", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1315", "wh_in_ag": "1117", "wh_in_cp": "198", "wh_out": "201", "wh_out_ag": "0", "wh_out_cp": "201", "wh_oc": "6"},
+    'door_2026-07-04': {"s1_enter": "30.94", "s1_door": "618.86", "s1_pal": "0.0", "s1_oc": "34", "s2_enter": "10.57", "s2_saw": "211.44", "s2_oc": "10", "d1_cf": "1849.96", "d1_pl": "40", "d2_cf": "12448.32", "d2_pl": "276", "dry_oc": "5", "bk_pr": "0", "bk_h": "4912", "bk_k": "14129", "bc_cuft": "842.14", "bc_rate": "26.73", "bj_6": "1125", "bj_45": "308", "bj_3": "0", "bs_h1": "5408", "bs_k1": "3439", "bs_k2": "0", "bs_lvl": "3240", "b8_oc": "25", "bf_w": "150", "bf_m": "0", "bf_oc": "10", "p1_frame": "2343", "p1_oc": "15", "p2_hot": "1674", "p2_oc": "10", "p2_down": "0", "p3_cold": "122", "p3_oc": "3", "cts_sloy": "1674", "cts_wrap": "1266", "w_hot": "1", "w_cold": "0", "w_sloy": "1", "cts_oc": "21", "pl_3x6": "0", "pl_4x6": "15", "pl_4x8s": "30", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1462", "wh_in_ag": "1424", "wh_in_cp": "38", "wh_out": "160", "wh_out_ag": "21", "wh_out_cp": "139", "wh_oc": "6"},
+    'door_2026-07-06': {"s1_enter": "43.2", "s1_door": "822.47", "s1_pal": "41.61", "s1_oc": "34", "s2_enter": "10.02", "s2_saw": "200.49", "s2_oc": "10", "d1_cf": "1530.17", "d1_pl": "37", "d2_cf": "14038.43", "d2_pl": "312", "dry_oc": "5", "bk_pr": "0", "bk_h": "3668", "bk_k": "18541", "bc_cuft": "337.41", "bc_rate": "16.07", "bj_6": "400", "bj_45": "357", "bj_3": "0", "bs_h1": "4284", "bs_k1": "4540", "bs_k2": "0", "bs_lvl": "5400", "b8_oc": "24", "bf_w": "281", "bf_m": "0", "bf_oc": "10", "p1_frame": "2483", "p1_oc": "18", "p2_hot": "1679", "p2_oc": "10", "p2_down": "0", "p3_cold": "124", "p3_oc": "3", "cts_sloy": "1564", "cts_wrap": "1600", "w_hot": "4", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "20", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1762", "wh_in_ag": "1589", "wh_in_cp": "173", "wh_out": "6", "wh_out_ag": "6", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-07': {"s1_enter": "39.26", "s1_door": "785.28", "s1_pal": "0.0", "s1_oc": "35", "s2_enter": "6.94", "s2_saw": "138.83", "s2_oc": "10", "d1_cf": "906.97", "d1_pl": "20", "d2_cf": "14027.28", "d2_pl": "312", "dry_oc": "5", "bk_pr": "1743.68", "bk_h": "2391", "bk_k": "23449", "bc_cuft": "999.83", "bc_rate": "25.31", "bj_6": "995", "bj_45": "0", "bj_3": "0", "bs_h1": "2891", "bs_k1": "2596", "bs_k2": "0", "bs_lvl": "6480", "b8_oc": "24", "bf_w": "197", "bf_m": "0", "bf_oc": "10", "p1_frame": "1887", "p1_oc": "17", "p2_hot": "1531", "p2_oc": "10", "p2_down": "0", "p3_cold": "53", "p3_oc": "3", "cts_sloy": "1685", "cts_wrap": "1495", "w_hot": "18", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "30", "pl_oc": "6", "wh_in": "1745", "wh_in_ag": "1649", "wh_in_cp": "96", "wh_out": "1131", "wh_out_ag": "1131", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-08': {"s1_enter": "45.48", "s1_door": "909.53", "s1_pal": "0.0", "s1_oc": "36", "s2_enter": "8.13", "s2_saw": "162.56", "s2_oc": "7", "d1_cf": "1427.84", "d1_pl": "31", "d2_cf": "14027.28", "d2_pl": "312", "dry_oc": "4", "bk_pr": "4050.03", "bk_h": "3334", "bk_k": "23980", "bc_cuft": "1026.45", "bc_rate": "24.44", "bj_6": "469", "bj_45": "116", "bj_3": "0", "bs_h1": "5009", "bs_k1": "768", "bs_k2": "0", "bs_lvl": "3829", "b8_oc": "25", "bf_w": "213", "bf_m": "0", "bf_oc": "8", "p1_frame": "1820", "p1_oc": "16", "p2_hot": "2494", "p2_oc": "10", "p2_down": "0", "p3_cold": "52", "p3_oc": "3", "cts_sloy": "1403", "cts_wrap": "1853", "w_hot": "6", "w_cold": "0", "w_sloy": "2", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "20", "pl_oc": "4", "wh_in": "1897", "wh_in_ag": "1773", "wh_in_cp": "124", "wh_out": "1711", "wh_out_ag": "1711", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-09': {"s1_enter": "30.83", "s1_door": "524.08", "s1_pal": "92.48", "s1_oc": "33", "s2_enter": "13.52", "s2_saw": "270.34", "s2_oc": "13", "d1_cf": "368.84", "d1_pl": "8", "d2_cf": "13841.85", "d2_pl": "327", "dry_oc": "4", "bk_pr": "3780.73", "bk_h": "3709", "bk_k": "25051", "bc_cuft": "982.13", "bc_rate": "23.38", "bj_6": "520", "bj_45": "0", "bj_3": "0", "bs_h1": "4841", "bs_k1": "5537", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "25", "bf_w": "153", "bf_m": "0", "bf_oc": "7", "p1_frame": "2080", "p1_oc": "19", "p2_hot": "1501", "p2_oc": "9", "p2_down": "0", "p3_cold": "66", "p3_oc": "3", "cts_sloy": "2370", "cts_wrap": "1774", "w_hot": "1", "w_cold": "18", "w_sloy": "2", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "20", "pl_4x8sn": "6", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "10", "pl_oc": "6", "wh_in": "2322", "wh_in_ag": "2230", "wh_in_cp": "92", "wh_out": "898", "wh_out_ag": "898", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-10': {"s1_enter": "22.95", "s1_door": "364.91", "s1_pal": "94.08", "s1_oc": "36", "s2_enter": "7.91", "s2_saw": "158.25", "s2_oc": "13", "d1_cf": "1258.83", "d1_pl": "28", "d2_cf": "15444.42", "d2_pl": "363", "dry_oc": "5", "bk_pr": "3244.37", "bk_h": "5695", "bk_k": "22231", "bc_cuft": "1003.12", "bc_rate": "23.88", "bj_6": "800", "bj_45": "95", "bj_3": "0", "bs_h1": "4806", "bs_k1": "0", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "25", "bf_w": "0", "bf_m": "0", "bf_oc": "9", "p1_frame": "1410", "p1_oc": "16", "p2_hot": "2277", "p2_oc": "9", "p2_down": "0", "p3_cold": "57", "p3_oc": "3", "cts_sloy": "1578", "cts_wrap": "1673", "w_hot": "4", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "6", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "6", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "2064", "wh_in_ag": "2011", "wh_in_cp": "53", "wh_out": "1464", "wh_out_ag": "1464", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-11': {"s1_enter": "0", "s1_door": "0", "s1_pal": "0", "s1_oc": "0", "s2_enter": "0.0", "s2_saw": "0.0", "s2_oc": "8", "d1_cf": "0", "d1_pl": "0", "d2_cf": "0", "d2_pl": "0", "dry_oc": "0", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "0", "bj_45": "0", "bj_3": "0", "bs_h1": "0", "bs_k1": "0", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "0", "bf_w": "0", "bf_m": "0", "bf_oc": "0", "p1_frame": "0", "p1_oc": "0", "p2_hot": "0", "p2_oc": "0", "p2_down": "0", "p3_cold": "0", "p3_oc": "0", "cts_sloy": "0", "cts_wrap": "0", "w_hot": "0", "w_cold": "0", "w_sloy": "0", "cts_oc": "0", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "0", "wh_in": "0", "wh_in_ag": "0", "wh_in_cp": "0", "wh_out": "900", "wh_out_ag": "900", "wh_out_cp": "0", "wh_oc": "2"},
+    'door_2026-07-13': {"s1_enter": "31.23", "s1_door": "624.66", "s1_pal": "0.0", "s1_oc": "36", "s2_enter": "13.34", "s2_saw": "266.75", "s2_oc": "10", "d1_cf": "531.84", "d1_pl": "12", "d2_cf": "13284.97", "d2_pl": "327", "dry_oc": "5", "bk_pr": "3748.94", "bk_h": "5591", "bk_k": "27997", "bc_cuft": "904.19", "bc_rate": "21.53", "bj_6": "840", "bj_45": "81", "bj_3": "40", "bs_h1": "3850", "bs_k1": "0", "bs_k2": "0", "bs_lvl": "9720", "b8_oc": "23", "bf_w": "182", "bf_m": "0", "bf_oc": "8", "p1_frame": "1795", "p1_oc": "17", "p2_hot": "1319", "p2_oc": "10", "p2_down": "135", "p3_cold": "63", "p3_oc": "3", "cts_sloy": "2193", "cts_wrap": "1915", "w_hot": "11", "w_cold": "0", "w_sloy": "1", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "30", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "6", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1714", "wh_in_ag": "1639", "wh_in_cp": "75", "wh_out": "1688", "wh_out_ag": "1688", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-07-14': {"s1_enter": "53.89", "s1_door": "942.84", "s1_pal": "135.06", "s1_oc": "40", "s2_enter": "7.8", "s2_saw": "156.09", "s2_oc": "10", "d1_cf": "797.76", "d1_pl": "18", "d2_cf": "11829.57", "d2_pl": "303", "dry_oc": "5", "bk_pr": "2829.06", "bk_h": "3817", "bk_k": "29857", "bc_cuft": "591.44", "bc_rate": "18.78", "bj_6": "730", "bj_45": "320", "bj_3": "174", "bs_h1": "2652", "bs_k1": "3812", "bs_k2": "0", "bs_lvl": "2160", "b8_oc": "24", "bf_w": "212", "bf_m": "0", "bf_oc": "9", "p1_frame": "1388", "p1_oc": "16", "p2_hot": "1646", "p2_oc": "10", "p2_down": "0", "p3_cold": "122", "p3_oc": "3", "cts_sloy": "1269", "cts_wrap": "1414", "w_hot": "1", "w_cold": "0", "w_sloy": "0", "cts_oc": "22", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "30", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "2820", "wh_in_ag": "2707", "wh_in_cp": "113", "wh_out": "2296", "wh_out_ag": "2051", "wh_out_cp": "245", "wh_oc": "6"},
+    'door_2026-07-15': {"s1_enter": "52.52", "s1_door": "1050.48", "s1_pal": "0.0", "s1_oc": "38", "s2_enter": "12.45", "s2_saw": "249.02", "s2_oc": "13", "d1_cf": "1414.98", "d1_pl": "32", "d2_cf": "14061.87", "d2_pl": "339", "dry_oc": "5", "bk_pr": "2772.78", "bk_h": "2024", "bk_k": "34951", "bc_cuft": "503.62", "bc_rate": "17.37", "bj_6": "789", "bj_45": "400", "bj_3": "300", "bs_h1": "3697", "bs_k1": "4851", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "25", "bf_w": "267", "bf_m": "0", "bf_oc": "9", "p1_frame": "1907", "p1_oc": "18", "p2_hot": "1456", "p2_oc": "10", "p2_down": "120", "p3_cold": "161", "p3_oc": "3", "cts_sloy": "1572", "cts_wrap": "1227", "w_hot": "0", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "19", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "10", "pl_oc": "5", "wh_in": "1624", "wh_in_ag": "1561", "wh_in_cp": "63", "wh_out": "2149", "wh_out_ag": "1900", "wh_out_cp": "249", "wh_oc": "6"},
+    'door_2026-07-16': {"s1_enter": "31.85", "s1_door": "556.97", "s1_pal": "80.03", "s1_oc": "33", "s2_enter": "8.77", "s2_saw": "175.38", "s2_oc": "10", "d1_cf": "1493.75", "d1_pl": "34", "d2_cf": "14019.48", "d2_pl": "339", "dry_oc": "5", "bk_pr": "3100.0", "bk_h": "3654", "bk_k": "34646", "bc_cuft": "693.45", "bc_rate": "22.01", "bj_6": "933", "bj_45": "392", "bj_3": "0", "bs_h1": "2273", "bs_k1": "3279", "bs_k2": "0", "bs_lvl": "4320", "b8_oc": "20", "bf_w": "156", "bf_m": "0", "bf_oc": "8", "p1_frame": "1557", "p1_oc": "17", "p2_hot": "1611", "p2_oc": "10", "p2_down": "60", "p3_cold": "119", "p3_oc": "3", "cts_sloy": "1407", "cts_wrap": "1417", "w_hot": "6", "w_cold": "0", "w_sloy": "4", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "25", "pl_oc": "5", "wh_in": "1763", "wh_in_ag": "1686", "wh_in_cp": "77", "wh_out": "2524", "wh_out_ag": "2475", "wh_out_cp": "49", "wh_oc": "6"},
+    'door_2026-07-17': {"s1_enter": "37.71", "s1_door": "722.16", "s1_pal": "32.01", "s1_oc": "37", "s2_enter": "6.2", "s2_saw": "123.99", "s2_oc": "12", "d1_cf": "1511.63", "d1_pl": "39", "d2_cf": "12755.4", "d2_pl": "303", "dry_oc": "5", "bk_pr": "3404.92", "bk_h": "1036", "bk_k": "39072", "bc_cuft": "691.01", "bc_rate": "21.94", "bj_6": "628", "bj_45": "0", "bj_3": "860", "bs_h1": "4830", "bs_k1": "3596", "bs_k2": "0", "bs_lvl": "4320", "b8_oc": "27", "bf_w": "278", "bf_m": "0", "bf_oc": "9", "p1_frame": "1820", "p1_oc": "18", "p2_hot": "2331", "p2_oc": "10", "p2_down": "0", "p3_cold": "103", "p3_oc": "3", "cts_sloy": "1616", "cts_wrap": "1209", "w_hot": "2", "w_cold": "0", "w_sloy": "0", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "25", "pl_oc": "6", "wh_in": "1346", "wh_in_ag": "1136", "wh_in_cp": "210", "wh_out": "742", "wh_out_ag": "562", "wh_out_cp": "180", "wh_oc": "6"},
+    'door_2026-07-18': {"s1_enter": "39.86", "s1_door": "730.55", "s1_pal": "66.62", "s1_oc": "38", "s2_enter": "2.32", "s2_saw": "46.32", "s2_oc": "7", "d1_cf": "418.99", "d1_pl": "11", "d2_cf": "12755.4", "d2_pl": "303", "dry_oc": "4", "bk_pr": "2794.03", "bk_h": "0", "bk_k": "43002", "bc_cuft": "365.11", "bc_rate": "19.74", "bj_6": "981", "bj_45": "0", "bj_3": "576", "bs_h1": "4842", "bs_k1": "6638", "bs_k2": "0", "bs_lvl": "0", "b8_oc": "24", "bf_w": "259", "bf_m": "0", "bf_oc": "9", "p1_frame": "1744", "p1_oc": "19", "p2_hot": "1167", "p2_oc": "10", "p2_down": "120", "p3_cold": "0", "p3_oc": "3", "cts_sloy": "2268", "cts_wrap": "1852", "w_hot": "4", "w_cold": "0", "w_sloy": "8", "cts_oc": "24", "pl_3x6": "40", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1418", "wh_in_ag": "1170", "wh_in_cp": "248", "wh_out": "2058", "wh_out_ag": "1892", "wh_out_cp": "166", "wh_oc": "6"},
+    'door_2026-07-20': {"s1_enter": "38.5", "s1_door": "730.55", "s1_pal": "66.62", "s1_oc": "36", "s2_enter": "8.35", "s2_saw": "166.92", "s2_oc": "10", "d1_cf": "1843.17", "d1_pl": "42", "d2_cf": "11165.29", "d2_pl": "267", "dry_oc": "4", "bk_pr": "2524.44", "bk_h": "0", "bk_k": "48119", "bc_cuft": "559.37", "bc_rate": "17.76", "bj_6": "308", "bj_45": "280", "bj_3": "560", "bs_h1": "3352", "bs_k1": "1508", "bs_k2": "0", "bs_lvl": "6480", "b8_oc": "25", "bf_w": "188", "bf_m": "0", "bf_oc": "8", "p1_frame": "1148", "p1_oc": "16", "p2_hot": "976", "p2_oc": "9", "p2_down": "450", "p3_cold": "128", "p3_oc": "3", "cts_sloy": "1057", "cts_wrap": "1657", "w_hot": "0", "w_cold": "0", "w_sloy": "0", "cts_oc": "23", "pl_3x6": "40", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "2273", "wh_in_ag": "2215", "wh_in_cp": "58", "wh_out": "1478", "wh_out_ag": "1225", "wh_out_cp": "253", "wh_oc": "6"},
+    'door_2026-07-21': {"s1_enter": "30.67", "s1_door": "585.95", "s1_pal": "27.47", "s1_oc": "34", "s2_enter": "6.82", "s2_saw": "136.39", "s2_oc": "13", "d1_cf": "789.2", "d1_pl": "16", "d2_cf": "12681.43", "d2_pl": "301", "dry_oc": "0", "bk_pr": "3319.57", "bk_h": "2582", "bk_k": "510045", "bc_cuft": "378.96", "bc_rate": "18.05", "bj_6": "0", "bj_45": "469", "bj_3": "0", "bs_h1": "4805", "bs_k1": "3650", "bs_k2": "0", "bs_lvl": "1080", "b8_oc": "24", "bf_w": "250", "bf_m": "0", "bf_oc": "9", "p1_frame": "1738", "p1_oc": "17", "p2_hot": "1333", "p2_oc": "9", "p2_down": "90", "p3_cold": "110", "p3_oc": "3", "cts_sloy": "1095", "cts_wrap": "1376", "w_hot": "5", "w_cold": "0", "w_sloy": "1", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "20", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1551", "wh_in_ag": "1461", "wh_in_cp": "90", "wh_out": "1813", "wh_out_ag": "1596", "wh_out_cp": "217", "wh_oc": "6"},
+    'door_2026-07-22': {"s1_enter": "34.72", "s1_door": "659.78", "s1_pal": "34.63", "s1_oc": "34", "s2_enter": "10.77", "s2_saw": "215.34", "s2_oc": "15", "d1_cf": "1110.71", "d1_pl": "24", "d2_cf": "15496.16", "d2_pl": "379", "dry_oc": "5", "bk_pr": "2725.45", "bk_h": "4805", "bk_k": "50099", "bc_cuft": "443.23", "bc_rate": "14.07", "bj_6": "50", "bj_45": "338", "bj_3": "0", "bs_h1": "2281", "bs_k1": "1226", "bs_k2": "0", "bs_lvl": "2160", "b8_oc": "28", "bf_w": "241", "bf_m": "0", "bf_oc": "9", "p1_frame": "1815", "p1_oc": "18", "p2_hot": "1414", "p2_oc": "10", "p2_down": "35", "p3_cold": "83", "p3_oc": "3", "cts_sloy": "1341", "cts_wrap": "1069", "w_hot": "1", "w_cold": "0", "w_sloy": "3", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "20", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "3", "wh_in": "1292", "wh_in_ag": "1282", "wh_in_cp": "10", "wh_out": "1220", "wh_out_ag": "1137", "wh_out_cp": "83", "wh_oc": "6"},
+    'door_2026-07-23': {"s1_enter": "36.34", "s1_door": "699.02", "s1_pal": "27.7", "s1_oc": "36", "s2_enter": "9.65", "s2_saw": "193.0", "s2_oc": "10", "d1_cf": "799.15", "d1_pl": "18", "d2_cf": "13936.36", "d2_pl": "345", "dry_oc": "5", "bk_pr": "3113.13", "bk_h": "1849", "bk_k": "50113", "bc_cuft": "509.58", "bc_rate": "16.18", "bj_6": "1150", "bj_45": "0", "bj_3": "250", "bs_h1": "4797", "bs_k1": "754", "bs_k2": "0", "bs_lvl": "9720", "b8_oc": "28", "bf_w": "169", "bf_m": "0", "bf_oc": "9", "p1_frame": "1075", "p1_oc": "17", "p2_hot": "2226", "p2_oc": "10", "p2_down": "0", "p3_cold": "80", "p3_oc": "3", "cts_sloy": "1381", "cts_wrap": "336", "w_hot": "3", "w_cold": "0", "w_sloy": "1", "cts_oc": "21", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "6", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1018", "wh_in_ag": "891", "wh_in_cp": "127", "wh_out": "1324", "wh_out_ag": "1140", "wh_out_cp": "184", "wh_oc": "6"},
+  };
+  for (const [k,v] of Object.entries(bulk)) {
+    if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify(v));
+  }
+  // Set date to most recent data day
+  currentIso = '2026-07-23';
+  const di = document.getElementById('date-input');
+  if (di) di.value = '23/07/2026';
+  document.getElementById('hdr-date-text').textContent = fmtDate('2026-07-23');
+})();
+
+/* ══════════════════════════════
+   สรุปรายเดือน (Monthly Report)
+══════════════════════════════ */
+
+async function getMonthData(yearMonthPrefix) {
+  // yearMonthPrefix e.g. 'door_2026-07'
+  const isoPrefix = yearMonthPrefix.replace('door_',''); // '2026-07'
+  if (GAS_READY) {
+    try {
+      const resp = await fetch(`${GAS_URL}?action=getMonth&month=${isoPrefix}`);
+      const result = await resp.json();
+      if (result.ok && result.data && Object.keys(result.data).length > 0) {
+        Object.entries(result.data).forEach(([k,v]) => localStorage.setItem('door_'+k, JSON.stringify(v)));
+        return result.data;
+      }
+    } catch(e) { /* fall through to localStorage */ }
+  }
+  // localStorage fallback
+  const result = {};
+  for (let k in localStorage) {
+    if (k.startsWith(yearMonthPrefix)) {
+      try { result[k.replace('door_','')] = JSON.parse(localStorage.getItem(k)); } catch(e){}
+    }
+  }
+  return result;
+}
+
+function autoSlashMonth(el) {
+  let v = el.value.replace(/[^0-9/]/g,'');
+  if (v.length === 2 && !v.includes('/')) v += '/';
+  el.value = v;
+}
+
+function initMonthInput() {
+  const d = new Date(currentIso + 'T12:00:00');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  document.getElementById('month-input').value = `${mm}/${yyyy}`;
+}
+
+function parseMonthInput() {
+  const v = document.getElementById('month-input').value.trim();
+  const parts = v.split('/');
+  if (parts.length !== 2 || parts[1].length !== 4) return null;
+  const m = parseInt(parts[0]), y = parseInt(parts[1]);
+  if (isNaN(m) || isNaN(y) || m<1 || m>12) return null;
+  return { m, y, prefix: `door_${y}-${String(m).padStart(2,'0')}-` };
+}
+
+async function buildMonthly() {
+  const parsed = parseMonthInput();
+  if (!parsed) { alert('กรุณาพิมพ์เดือน/ปี เช่น 07/2026'); return; }
+  const { m, y, prefix } = parsed;
+
+  // Collect all days for this month from Firebase or localStorage
+  const days = [];
+  const monthData = await getMonthData(prefix.replace(/-$/, '')); // pass 'door_2026-07'
+  Object.entries(monthData).forEach(([iso, raw]) => {
+    days.push({ iso, d: new Date(iso+'T12:00:00'), data: raw });
+  });
+  days.sort((a,b) => a.d - b.d);
+
+  const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+  const n = toNum;
+  const fmtN = fmtNum;
+
+  // Aggregate totals
+  const tot = {};
+  const sumFields = ['s1_enter','s1_door','s1_pal','s1_oc',
+    's2_enter','s2_saw','s2_oc',
+    'd1_cf','d1_pl','dry_oc',
+    'bc_cuft','bj_6','bj_45','bj_3','bs_h1','bs_k1','bs_lvl','b8_oc','bf_w','bf_m','bf_oc',
+    'p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
+    'cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy',
+    'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_oc',
+    'wh_in','wh_in_ag','wh_in_cp','wh_out','wh_out_ag','wh_out_cp','wh_oc'];
+  sumFields.forEach(f => tot[f] = 0);
+
+  days.forEach(({data}) => {
+    sumFields.forEach(f => { tot[f] += toNum(data[f]); });
+  });
+
+  const daysWithData = days.length;
+  const totalPallet = ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+tot[f],0);
+  const totalWaste = tot['w_hot']+tot['w_cold']+tot['w_sloy'];
+  const wasteBase = tot['p2_hot']+tot['p3_cold']+tot['cts_sloy'];
+  const wastePct = wasteBase>0 ? (totalWaste/wasteBase*100) : 0;
+
+  // ── KPI Cards ──
+  const kpiData = [
+    {l:'อัดร้อน', v:fmtN(tot.p2_hot), u:'บาน', c:'green'},
+    {l:'อัดเย็น', v:fmtN(tot.p3_cold), u:'บาน', c:'yellow'},
+    {l:'ห่อประตู', v:fmtN(tot.cts_wrap), u:'บาน', c:''},
+    {l:'ยิงโครงกระดาษ', v:fmtN(tot.p1_frame), u:'pcs.', c:'purple'},
+    {l:'ยอดเลื่อย รวม', v:fmtN(tot.s1_door+tot.s1_pal+tot.s2_saw,0), u:'Cu.ft.', c:''},
+    {l:'พาเลท รวม', v:fmtN(totalPallet), u:'Pcs.', c:'yellow'},
+    {l:'เข้าคลัง FG', v:fmtN(tot.wh_in), u:'บาน', c:''},
+    {l:'ของเสีย', v:wastePct.toFixed(3)+'%', u:'เป้า ≤0.15%', c:'red'},
+  ];
+  document.getElementById('mo-kpi').innerHTML = kpiData.map(k=>`
+    <div class="kpi-card ${k.c}">
+      <div class="kpi-label">${k.l}</div>
+      <div class="kpi-value" style="font-size:26px;">${k.v}</div>
+      <div class="kpi-unit">${k.u}</div>
+      <div class="kpi-delta" style="color:var(--g300);font-size:11px;margin-top:4px;">${THAI_MONTHS[m-1]} ${y+543} · ${daysWithData} วันทำงาน</div>
+    </div>`).join('');
+
+  // ── Section Cards ──
+  const sections = [
+    {
+      icon:'🪵', title:'โรงเลื่อยไทรน้อย',
+      metrics:[
+        {l:'ยอดเข้าเลื่อย',v:fmtN(tot.s1_enter,2),u:'Ton.'},
+        {l:'ชิ้นส่วนประตู',v:fmtN(tot.s1_door,0),u:'Cu.ft.'},
+        {l:'พาเลท/ทั่วไป',v:fmtN(tot.s1_pal,0),u:'Cu.ft.'},
+        {l:'รวมยอดเลื่อย',v:fmtN(tot.s1_door+tot.s1_pal,0),u:'Cu.ft.'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s1_oc/daysWithData,1):'—',u:`คน / OC 40`},
+      ]
+    },
+    {
+      icon:'🪵', title:'โรงเลื่อยปราจีน',
+      metrics:[
+        {l:'ยอดเข้าเลื่อย',v:fmtN(tot.s2_enter,2),u:'Ton.'},
+        {l:'ยอดเลื่อย',v:fmtN(tot.s2_saw,0),u:'Cu.ft.'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s2_oc/daysWithData,1):'—',u:`คน / OC 17`},
+      ]
+    },
+    {
+      icon:'🌡️', title:'โรงอบ',
+      metrics:[
+        {l:'ส่งโรง 8 ใบ',v:fmtN(tot.d1_cf,0),u:'Cu.ft.'},
+        {l:'ส่งโรง 8 ใบ',v:fmtN(tot.d1_pl,0),u:'Pallet'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.dry_oc/daysWithData,1):'—',u:`คน / OC 5`},
+      ]
+    },
+    {
+      icon:'⚙️', title:'โรง 8 ใบ',
+      metrics:[
+        {l:'ยอดตัด',v:fmtN(tot.bc_cuft,0),u:'Cu.ft.'},
+        {l:'ยอดต่อ 6"',v:fmtN(tot.bj_6,0),u:'pcs.'},
+        {l:'ยอดต่อ 4.5"',v:fmtN(tot.bj_45,0),u:'pcs.'},
+        {l:'ยอดต่อ 3"',v:fmtN(tot.bj_3,0),u:'pcs.'},
+        {l:'ซอยไม้หัว',v:fmtN(tot.bs_h1,0),u:'pcs.'},
+        {l:'ซอยไม้ข้าง',v:fmtN(tot.bs_k1,0),u:'pcs.'},
+        {l:'ไม้ LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
+        {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),u:'pcs.'},
+        {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),u:'pcs.'},
+        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,1):'—',u:`คน / OC 26`},
+        {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,1):'—',u:`คน / OC 10`},
+      ]
+    },
+    {
+      icon:'🔥', title:'อัดร้อน / อัดเย็น',
+      metrics:[
+        {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),u:'pcs.'},
+        {l:'อัดร้อน',v:fmtN(tot.p2_hot,0),u:'บาน'},
+        {l:'Downtime รวม',v:fmtN(tot.p2_down,0),u:'นาที'},
+        {l:'อัดเย็น',v:fmtN(tot.p3_cold,0),u:'บาน'},
+        {l:'เฉลี่ยกำลังคน (ยิงโครง)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,1):'—',u:`คน / OC 20`},
+        {l:'เฉลี่ยกำลังคน (อัดร้อน)',v:daysWithData?fmtN(tot.p2_oc/daysWithData,1):'—',u:`คน / OC 11`},
+        {l:'เฉลี่ยกำลังคน (อัดเย็น)',v:daysWithData?fmtN(tot.p3_oc/daysWithData,1):'—',u:`คน / OC 3`},
+      ]
+    },
+    {
+      icon:'✂️', title:'CTS & คัดเกรด',
+      metrics:[
+        {l:'ยอดซอย',v:fmtN(tot.cts_sloy,0),u:'บาน'},
+        {l:'ยอดห่อประตู',v:fmtN(tot.cts_wrap,0),u:'บาน'},
+        {l:'ของเสีย อัดร้อน',v:fmtN(tot.w_hot,0),u:'บาน'},
+        {l:'ของเสีย อัดเย็น',v:fmtN(tot.w_cold,0),u:'บาน'},
+        {l:'ของเสีย เครื่องซอย',v:fmtN(tot.w_sloy,0),u:'บาน'},
+        {l:'% ของเสียรวม',v:wastePct.toFixed(3)+'%',u:'เป้า ≤0.15%'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.cts_oc/daysWithData,1):'—',u:`คน / OC 24`},
+      ]
+    },
+    {
+      icon:'📦', title:'พาเลท',
+      metrics:[
+        {l:'3"×6"',v:fmtN(tot.pl_3x6,0),u:'Pcs.'},
+        {l:'4"×6"',v:fmtN(tot.pl_4x6,0),u:'Pcs.'},
+        {l:'4"×8" SPD',v:fmtN(tot.pl_4x8s,0),u:'Pcs.'},
+        {l:'4"×8" SPD ใหม่',v:fmtN(tot.pl_4x8sn,0),u:'Pcs.'},
+        {l:'4"×8" HPL',v:fmtN(tot.pl_4x8h,0),u:'Pcs.'},
+        {l:'4"×9"',v:fmtN(tot.pl_4x9,0),u:'Pcs.'},
+        {l:'4"×10"',v:fmtN(tot.pl_4x10,0),u:'Pcs.'},
+        {l:'4"×12"',v:fmtN(tot.pl_4x12,0),u:'Pcs.'},
+        {l:'7"×9"',v:fmtN(tot.pl_7x9,0),u:'Pcs.'},
+        {l:'รวมทุกขนาด',v:fmtN(totalPallet,0),u:'Pcs.'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.pl_oc/daysWithData,1):'—',u:`คน / OC 6`},
+      ]
+    },
+    {
+      icon:'🏬', title:'คลังสินค้า',
+      metrics:[
+        {l:'เข้าคลัง FG รวม',v:fmtN(tot.wh_in,0),u:'บาน'},
+        {l:'เข้าคลัง Ag',v:fmtN(tot.wh_in_ag,0),u:'บาน'},
+        {l:'เข้าคลัง C+',v:fmtN(tot.wh_in_cp,0),u:'บาน'},
+        {l:'โหลดสินค้า รวม',v:fmtN(tot.wh_out,0),u:'บาน'},
+        {l:'โหลดสินค้า Ag',v:fmtN(tot.wh_out_ag,0),u:'บาน'},
+        {l:'โหลดสินค้า C+',v:fmtN(tot.wh_out_cp,0),u:'บาน'},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.wh_oc/daysWithData,1):'—',u:`คน / OC 6`},
+      ]
+    },
+  ];
+
+  document.getElementById('mo-sections').innerHTML = sections.map(s=>`
+    <div class="mo-section-card">
+      <div class="mo-section-title">
+        <span>${s.icon}</span> ${s.title}
+        <span class="mo-days-badge">${daysWithData} วัน</span>
+      </div>
+      <div class="mo-metrics">
+        ${s.metrics.map(m=>`
+          <div class="mo-metric">
+            <div class="mo-metric-label">${m.l}</div>
+            <div class="mo-metric-value">${m.v}</div>
+            <div class="mo-metric-unit">${m.u}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  // ── Daily Table ──
+  if (days.length === 0) {
+    document.getElementById('mo-table-wrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('mo-table-wrap').style.display = '';
+
+  const COLS = [
+    {h:'วันที่', fn: d => { const dt=d.d; return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; }},
+    {h:'เลื่อยไทรน้อย (Cu.ft.)', fn: d => fmtN(toNum(d.data.s1_door)+toNum(d.data.s1_pal),0)},
+    {h:'เลื่อยปราจีน (Cu.ft.)', fn: d => fmtN(toNum(d.data.s2_saw),0)},
+    {h:'ส่งโรง8ใบ (Cu.ft.)', fn: d => fmtN(toNum(d.data.d1_cf),0)},
+    {h:'ยอดตัด (Cu.ft.)', fn: d => fmtN(toNum(d.data.bc_cuft),0)},
+    {h:'ยิงโครงกระดาษ', fn: d => fmtN(toNum(d.data.p1_frame),0)},
+    {h:'อัดร้อน (บาน)', fn: d => fmtN(toNum(d.data.p2_hot),0)},
+    {h:'อัดเย็น (บาน)', fn: d => fmtN(toNum(d.data.p3_cold),0)},
+    {h:'ห่อประตู (บาน)', fn: d => fmtN(toNum(d.data.cts_wrap),0)},
+    {h:'พาเลท (Pcs.)', fn: d => { const pl=['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d.data[f]),0); return fmtN(pl,0); }},
+    {h:'เข้าคลัง FG (บาน)', fn: d => fmtN(toNum(d.data.wh_in),0)},
+    {h:'โหลดสินค้า (บาน)', fn: d => fmtN(toNum(d.data.wh_out),0)},
+  ];
+
+  // Compute column totals
+  const colTotals = COLS.map((_,i) => i === 0 ? 'รวม' : null);
+  days.forEach(d => {
+    COLS.forEach((col, i) => {
+      if (i === 0) return;
+      const raw = parseFloat(col.fn(d).replace(/,/g,'')) || 0;
+      colTotals[i] = (colTotals[i]||0) + raw;
+    });
+  });
+
+  let html = '<thead><tr>' + COLS.map(c=>`<th>${c.h}</th>`).join('') + '</tr></thead><tbody>';
+  days.forEach(d => {
+    const iso = d.iso;
+    html += `<tr class="day-row" title="คลิกเพื่อดูรายละเอียด ${COLS[0].fn(d)}" onclick="jumpToDay('${iso}')">` + COLS.map(col => `<td>${col.fn(d)}</td>`).join('') + '</tr>';
+  });
+  html += '<tr class="total-row">' + colTotals.map((v,i) => `<td>${i===0?v:fmtN(v,0)}</td>`).join('') + '</tr>';
+  html += '</tbody>';
+  document.getElementById('mo-table').innerHTML = html;
+}
+
+// Jump from monthly table row → overview of that day
+function jumpToDay(iso) {
+  currentIso = iso;
+  const di = document.getElementById('date-input');
+  if (di) di.value = isoToDisplay(iso);
+  di.classList.remove('invalid');
+  document.getElementById('hdr-date-text').textContent = fmtDate(iso);
+  loadData();
+  updateOverview();
+  const overviewBtn = document.querySelector('.nav-item.active') || document.querySelectorAll('.nav-item')[0];
+  // find overview nav button
+  const navBtns = document.querySelectorAll('.nav-item');
+  let ovBtn = null;
+  navBtns.forEach(b => { if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'overview'")) ovBtn = b; });
+  _goPage('overview', ovBtn);
+}
+
+// Init monthly month input when switching to page
+const _goPage = goPage;
+goPage = function(id, btn) {
+  _goPage(id, btn);
+  if (id === 'monthly') initMonthInput();
+  if (id === 'weekly')  initWeekInput();
+};
+
+/* ══════════════════════════════════════════════════
+   WEEKLY COMPARE PAGE
+══════════════════════════════════════════════════ */
+
+const WK_METRICS = [
+  { label:'เลื่อยไทรน้อย', unit:'Cu.ft.',  fn: d => toNum(d.s1_door)+toNum(d.s1_pal) },
+  { label:'เลื่อยปราจีน',  unit:'Cu.ft.',  fn: d => toNum(d.s2_saw)               },
+  { label:'ส่งโรง 8 ใบ',  unit:'Cu.ft.',  fn: d => toNum(d.d1_cf)+toNum(d.d2_cf)      },
+  { label:'ยอดตัดไม้',    unit:'Cu.ft.',  fn: d => toNum(d.bc_cuft)               },
+  { label:'ยิงโครงกระดาษ',unit:'ชิ้น',   fn: d => toNum(d.p1_frame)              },
+  { label:'อัดร้อน',      unit:'บาน',    fn: d => toNum(d.p2_hot)                 },
+  { label:'อัดเย็น',      unit:'บาน',    fn: d => toNum(d.p3_cold)                },
+  { label:'ห่อประตู',     unit:'บาน',    fn: d => toNum(d.cts_wrap)               },
+  { label:'สลอย/ขัด',    unit:'บาน',    fn: d => toNum(d.cts_sloy)               },
+  { label:'พาเลท',        unit:'Pcs.',   fn: d => ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0) },
+  { label:'เข้าคลัง FG', unit:'บาน',    fn: d => toNum(d.wh_in)                  },
+  { label:'โหลดสินค้า',  unit:'บาน',    fn: d => toNum(d.wh_out)                 },
+];
+
+// Get Mon–Fri ISO dates of the week containing `iso`
+function weekDates(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  const dow = d.getDay(); // 0=Sun
+  // Monday of this week
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+  const dates = [];
+  for (let i = 0; i < 5; i++) {
+    const dd = new Date(mon);
+    dd.setDate(mon.getDate() + i);
+    dates.push(`${dd.getFullYear()}-${pad(dd.getMonth()+1)}-${pad(dd.getDate())}`);
+  }
+  return dates;
+}
+
+function weekLabel(dates) {
+  const fmtShort = iso => { const [y,m,d]=iso.split('-'); return `${d}/${m}/${parseInt(y)+543}`; };
+  return `${fmtShort(dates[0])} – ${fmtShort(dates[4])}`;
+}
+
+async function getWeekData(dates) {
+  return Promise.all(dates.map(async iso => {
+    if (GAS_READY) {
+      try {
+        const resp = await fetch(`${GAS_URL}?action=get&key=${iso}`);
+        const result = await resp.json();
+        if (result.ok && result.data) {
+          localStorage.setItem('door_' + iso, JSON.stringify(result.data));
+          return { iso, data: result.data };
+        }
+      } catch(e) {}
+    }
+    const raw = localStorage.getItem('door_' + iso);
+    return { iso, data: raw ? JSON.parse(raw) : null };
+  }));
+}
+
+function sumWeek(days) {
+  const tot = {};
+  WK_METRICS.forEach(m => { tot[m.label] = 0; });
+  days.forEach(({data}) => {
+    if (!data) return;
+    WK_METRICS.forEach(m => { tot[m.label] += m.fn(data); });
+  });
+  return tot;
+}
+
+function autoSlashWeek(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length > 2) v = v.slice(0,2)+'/'+v.slice(2);
+  if (v.length > 5) v = v.slice(0,5)+'/'+v.slice(5);
+  el.value = v.slice(0,10);
+}
+
+function initWeekInput() {
+  const el = document.getElementById('week-input');
+  if (!el.value) el.value = isoToDisplay(currentIso);
+}
+
+async function buildWeekly() {
+  const el = document.getElementById('week-input');
+  const iso = displayToIso(el.value);
+  if (!iso) { el.style.borderColor='#e74c3c'; return; }
+  el.style.borderColor='';
+
+  // Determine current week (week containing `iso`) and previous week
+  const currDates = weekDates(iso);
+  const prevStart = new Date(currDates[0]+'T12:00:00');
+  prevStart.setDate(prevStart.getDate() - 7);
+  const prevIso = `${prevStart.getFullYear()}-${pad(prevStart.getMonth()+1)}-${pad(prevStart.getDate())}`;
+  const prevDates = weekDates(prevIso);
+
+  const currDays = await getWeekData(currDates);
+  const prevDays = await getWeekData(prevDates);
+  const currTot  = sumWeek(currDays);
+  const prevTot  = sumWeek(prevDays);
+
+  const currHasDays = currDays.filter(d=>d.data).length;
+  const prevHasDays = prevDays.filter(d=>d.data).length;
+
+  // ── Header badges ──
+  document.getElementById('wk-header-row').innerHTML = `
+    <div class="wk-week-badge" style="border-left:4px solid var(--g300);">
+      <div class="wk-week-label">◀ สัปดาห์ก่อนหน้า</div>
+      <div class="wk-week-range">${weekLabel(prevDates)}</div>
+      <div class="wk-week-days">${prevHasDays} วันที่มีข้อมูล</div>
+    </div>
+    <div class="wk-week-badge" style="border-left:4px solid var(--g500);">
+      <div class="wk-week-label" style="color:var(--g500);">▶ สัปดาห์ปัจจุบัน</div>
+      <div class="wk-week-range">${weekLabel(currDates)}</div>
+      <div class="wk-week-days">${currHasDays} วันที่มีข้อมูล</div>
+    </div>
+  `;
+
+  // ── Compare rows ──
+  const fmtN = fmtNum;
+  const maxVal = WK_METRICS.map(m => Math.max(currTot[m.label]||0, prevTot[m.label]||0));
+
+  const compareHTML = WK_METRICS.map((m,i) => {
+    const cv = currTot[m.label]||0, pv = prevTot[m.label]||0;
+    const mx = maxVal[i] || 1;
+    const pPct = Math.round(pv/mx*100);
+    const cPct = Math.round(cv/mx*100);
+    let delta = '', deltaClass = 'wk-delta-zero';
+    if (pv > 0) {
+      const diff = ((cv-pv)/pv*100);
+      const sign = diff > 0 ? '+' : '';
+      delta = `${sign}${diff.toFixed(1)}%`;
+      deltaClass = diff > 0 ? 'wk-delta-pos' : diff < 0 ? 'wk-delta-neg' : 'wk-delta-zero';
+    } else if (cv > 0) {
+      delta = '+∞'; deltaClass = 'wk-delta-pos';
+    }
+    return `
+    <div class="wk-compare-row">
+      <div>
+        <div class="wk-metric-name">${m.label}</div>
+        <div class="wk-metric-unit">${m.unit}</div>
+      </div>
+      <div class="wk-bar-wrap">
+        <div style="font-size:10px;color:var(--g300);margin-bottom:3px;">ก่อนหน้า</div>
+        <div class="wk-bar-bg"><div class="wk-bar-fill-prev" style="width:${pPct}%"></div></div>
+        <div class="wk-bar-label" style="color:var(--g400);">${fmtN(pv,0)}</div>
+      </div>
+      <div class="${deltaClass}">${delta || '—'}</div>
+      <div class="wk-bar-wrap">
+        <div style="font-size:10px;color:var(--g500);margin-bottom:3px;font-weight:700;">ปัจจุบัน</div>
+        <div class="wk-bar-bg"><div class="wk-bar-fill-curr" style="width:${cPct}%"></div></div>
+        <div class="wk-bar-label">${fmtN(cv,0)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('wk-compare').innerHTML = compareHTML;
+
+  // ── Daily detail table ──
+  const WK_TBL_COLS = [
+    { h:'วันที่', fn: d => { if(!d) return '—'; const dt=new Date(d.iso+'T12:00:00'); return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; }},
+    ...WK_METRICS.map(m => ({ h: m.label, fn: d => d && d.data ? fmtN(m.fn(d.data),0) : '—' })),
+  ];
+
+  const allDays = [
+    ...prevDays.map(d=>({...d, wk:'prev'})),
+    { wk:'sep' },
+    ...currDays.map(d=>({...d, wk:'curr'})),
+  ];
+
+  // totals
+  const pTot = [null, ...WK_METRICS.map(m=>prevTot[m.label])];
+  const cTot = [null, ...WK_METRICS.map(m=>currTot[m.label])];
+
+  const thStyle = i => i >= 1+WK_METRICS.length ? ' class="curr-hd"' : '';
+  let tblHtml = '<thead><tr>';
+  tblHtml += `<th>วันที่ (ก่อนหน้า)</th>`;
+  WK_METRICS.forEach(m => tblHtml += `<th>${m.label}</th>`);
+  tblHtml += `<th style="background:var(--g700);color:var(--g200);">↔</th>`;
+  tblHtml += `<th class="curr-hd">วันที่ (ปัจจุบัน)</th>`;
+  WK_METRICS.forEach(m => tblHtml += `<th class="curr-hd">${m.label}</th>`);
+  tblHtml += '</tr></thead><tbody>';
+
+  // Build rows side-by-side (prev col | sep | curr col)
+  for (let i = 0; i < 5; i++) {
+    const p = prevDays[i], c = currDays[i];
+    const pDate = p ? (() => { const dt=new Date(p.iso+'T12:00:00'); return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; })() : '—';
+    const cDate = c ? (() => { const dt=new Date(c.iso+'T12:00:00'); return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; })() : '—';
+    tblHtml += `<tr>`;
+    tblHtml += `<td style="font-weight:700;color:var(--g400);">${pDate}</td>`;
+    WK_METRICS.forEach(m => tblHtml += `<td>${p && p.data ? fmtN(m.fn(p.data),0) : '—'}</td>`);
+    tblHtml += `<td style="background:var(--g100);text-align:center;border-left:2px solid var(--g200);border-right:2px solid var(--g200);font-size:10px;color:var(--g300);">↔</td>`;
+    tblHtml += `<td style="font-weight:700;color:var(--g600);">${cDate}</td>`;
+    WK_METRICS.forEach(m => tblHtml += `<td>${c && c.data ? fmtN(m.fn(c.data),0) : '—'}</td>`);
+    tblHtml += `</tr>`;
+  }
+
+  // Total rows
+  tblHtml += `<tr class="total-row">`;
+  tblHtml += `<td>รวม</td>`;
+  WK_METRICS.forEach((_,i) => tblHtml += `<td>${fmtN(pTot[i+1],0)}</td>`);
+  tblHtml += `<td style="background:var(--g200);border-left:2px solid var(--g300);border-right:2px solid var(--g300);"></td>`;
+  tblHtml += `<td>รวม</td>`;
+  WK_METRICS.forEach((_,i) => tblHtml += `<td>${fmtN(cTot[i+1],0)}</td>`);
+  tblHtml += `</tr></tbody>`;
+
+  document.getElementById('wk-table').innerHTML = tblHtml;
+  document.getElementById('wk-table-wrap').style.display = '';
+}
+
+/* ══════════════════════════════════════════════════
+   AUTH / VIEW-ONLY SYSTEM
+══════════════════════════════════════════════════ */
+
+// Simple hash (djb2) — not cryptographic, suitable for client-side gating
+function hashStr(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return (h >>> 0).toString(16);
+}
+// Hash of 'Factory@123'
+const ADMIN_HASH = hashStr('Factory@123');
+const SESSION_KEY = 'door_admin_session';
+
+let isAdmin = false;
+
+function applyMode() {
+  const btn = document.getElementById('auth-btn');
+  if (isAdmin) {
+    document.body.classList.remove('view-only');
+    btn.textContent = '🔓 Admin';
+    btn.classList.add('admin-mode');
+  } else {
+    document.body.classList.add('view-only');
+    btn.textContent = '🔒 เข้าสู่ระบบ';
+    btn.classList.remove('admin-mode');
+  }
+}
+
+function authToggle() {
+  if (isAdmin) {
+    // Logout
+    isAdmin = false;
+    sessionStorage.removeItem(SESSION_KEY);
+    applyMode();
+  } else {
+    // Open login modal
+    document.getElementById('auth-overlay').classList.add('open');
+    document.getElementById('auth-pw').value = '';
+    document.getElementById('auth-err').textContent = '';
+    setTimeout(() => document.getElementById('auth-pw').focus(), 80);
+  }
+}
+
+function authCloseModal() {
+  document.getElementById('auth-overlay').classList.remove('open');
+}
+
+function authSubmit() {
+  const pw = document.getElementById('auth-pw').value;
+  if (hashStr(pw) === ADMIN_HASH) {
+    isAdmin = true;
+    sessionStorage.setItem(SESSION_KEY, '1');
+    authCloseModal();
+    applyMode();
+  } else {
+    const pwEl = document.getElementById('auth-pw');
+    document.getElementById('auth-err').textContent = 'รหัสผ่านไม่ถูกต้อง';
+    pwEl.classList.add('shake');
+    pwEl.value = '';
+    setTimeout(() => pwEl.classList.remove('shake'), 400);
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('auth-overlay').addEventListener('click', function(e) {
+  if (e.target === this) authCloseModal();
+});
+
+// Restore session if still active
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  isAdmin = true;
+}
+
+// Apply mode on load
+applyMode();
+
+/* ══ Share guide ══ */
+function showShareGuide() {
+  const el = document.getElementById('share-overlay');
+  el.style.display = 'flex';
+  closeSidebar();
+}
+
+/* ══ Export / Import data ══ */
+function exportData() {
+  const out = {};
+  for (let k in localStorage) {
+    if (k.startsWith('door_')) out[k] = JSON.parse(localStorage.getItem(k));
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'door_factory_data_' + todayIso + '.json';
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      let count = 0;
+      for (const [k, v] of Object.entries(data)) {
+        if (k.startsWith('door_')) {
+          localStorage.setItem(k, JSON.stringify(v));
+          count++;
+        }
+      }
+      alert(`✅ นำเข้าสำเร็จ ${count} วัน`);
+      loadData(); updateOverview();
+    } catch(err) { alert('❌ ไฟล์ไม่ถูกต้อง'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+/* ══ Upload all localStorage data to Google Apps Script ══ */
+async function uploadAllToGAS() {
+  if (!GAS_READY) { alert('❌ ยังไม่ได้ตั้งค่า GAS_URL กรุณาใส่ URL ในไฟล์ก่อน'); return; }
+  const items = [];
+  for (let k in localStorage) {
+    if (k.startsWith('door_2')) {
+      try { items.push([k.replace('door_',''), JSON.parse(localStorage.getItem(k))]); } catch(e){}
+    }
+  }
+  if (items.length === 0) { alert('ไม่มีข้อมูลใน localStorage'); return; }
+  const btn = document.querySelector('[onclick="uploadAllToGAS()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังอัปโหลด...'; }
+  let success = 0;
+  for (const [iso, data] of items) {
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ key: iso, data })
+      });
+      success++;
+      await new Promise(r => setTimeout(r, 200)); // small delay to avoid rate limits
+    } catch(e) {}
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '☁️ อัปโหลดทั้งหมดไป Cloud'; }
+  alert(`✅ อัปโหลดสำเร็จ ${success} วัน (Refresh เพื่อยืนยัน)`);
+}
+
+window.addEventListener('load', () => {
+  if (GAS_READY) console.log('Google Apps Script connected:', GAS_URL.substring(0, 60) + '...');
+  loadData();
+  updateOverview();
+});
+</script>
+</body>
+</html>
