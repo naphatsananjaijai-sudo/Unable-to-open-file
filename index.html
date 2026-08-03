@@ -2010,8 +2010,9 @@ async function getMonthData(yearMonthPrefix) {
   }
   // localStorage fallback
   const result = {};
-  for (let k in localStorage) {
-    if (k.startsWith(yearMonthPrefix)) {
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(yearMonthPrefix)) {
       try { result[k.replace('door_','')] = JSON.parse(localStorage.getItem(k)); } catch(e){}
     }
   }
@@ -2139,7 +2140,7 @@ async function buildMonthly() {
         {l:'ไม้ LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),u:'pcs.'},
-        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,1):'—',u:`คน / OC 26`},
+        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,1):'—',u:`คน / OC 30`},
         {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,1):'—',u:`คน / OC 10`},
       ]
     },
