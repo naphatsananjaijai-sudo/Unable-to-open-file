@@ -198,6 +198,25 @@ body {
 .save-btn:hover { opacity: .9; box-shadow: 0 4px 14px rgba(14,165,233,.40); }
 .save-btn:active { transform: scale(.97); }
 .save-btn[disabled] { display: none !important; }
+/* Sync-all button */
+.sync-all-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border: none; border-radius: 8px;
+  background: #f59e0b; color: #fff; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.sync-all-btn:hover { background: #d97706; }
+.sync-all-btn:disabled { opacity: .6; cursor: not-allowed; }
+/* Sync-all modal */
+.sa-modal-wrap { display:none; position:fixed; inset:0; z-index:500; align-items:center; justify-content:center; }
+.sa-modal-wrap.show { display:flex; }
+.sa-overlay { position:absolute; inset:0; background:rgba(15,23,42,.5); }
+.sa-box { position:relative; background:#fff; border-radius:18px; padding:28px; width:min(480px,96vw); box-shadow:0 20px 60px rgba(0,0,0,.2); z-index:1; }
+.sa-title { font-size:18px; font-weight:800; margin-bottom:8px; }
+.sa-progress { font-size:13px; color:#475569; margin:12px 0; min-height:60px; }
+.sa-bar-bg { height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden; margin:10px 0; }
+.sa-bar-fill { height:100%; background:#f59e0b; border-radius:4px; transition:width .3s; }
+.sa-close-btn { margin-top:14px; padding:10px 20px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
 
 /* ── Lock / Auth ── */
 .auth-btn {
@@ -334,6 +353,48 @@ body.view-only .view-only-badge { display: flex; }
   cursor: pointer; white-space: nowrap;
 }
 .import-fab:hover { background: #4338ca; }
+/* Share-view button */
+.share-view-fab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border: none; border-radius: 8px;
+  background: #0d9488; color: #fff; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.share-view-fab:hover { background: #0f766e; }
+/* View-only banner */
+#view-only-banner {
+  display: none; position: fixed; top: 72px; left: 0; right: 0; z-index: 300;
+  background: #0d9488; color: #fff;
+  padding: 10px 24px; font-size: 14px; font-weight: 700;
+  text-align: center; letter-spacing: .3px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+/* Share-view modal */
+.sv-modal-wrap { display:none; position:fixed; inset:0; z-index:500; align-items:center; justify-content:center; }
+.sv-modal-wrap.show { display:flex; }
+.sv-overlay-bg { position:absolute; inset:0; background:rgba(15,23,42,.5); }
+.sv-box {
+  position:relative; background:#fff; border-radius:18px;
+  padding:28px; width:min(520px,96vw); box-shadow:0 20px 60px rgba(0,0,0,.2); z-index:1;
+}
+.sv-title { font-size:18px; font-weight:800; margin-bottom:6px; }
+.sv-hint { font-size:13px; color:#64748b; margin-bottom:16px; }
+.sv-link-block {
+  font-size:12px; font-family:monospace; background:#f8fafc; border:1px solid #e2e8f0;
+  border-radius:8px; padding:12px; word-break:break-all; max-height:100px; overflow-y:auto;
+  margin-bottom:14px; color:#334155;
+}
+.sv-btn-row { display:flex; gap:10px; flex-wrap:wrap; }
+.sv-copy-btn { flex:1; padding:10px; background:#0d9488; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+.sv-copy-btn:hover { background:#0f766e; }
+.sv-share-btn { flex:1; padding:10px; background:#4f46e5; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+.sv-close-btn { padding:10px 18px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+
+/* View-only: disable all inputs visually */
+body.view-only input, body.view-only textarea, body.view-only select {
+  pointer-events: none; opacity: .75; background: #f8fafc !important;
+}
+body.view-only .save-btn, body.view-only .import-fab, body.view-only .auth-btn { display: none !important; }
 
 /* ── Layout ── */
 .layout { display: flex; flex: 1; min-height: 0; }
@@ -749,6 +810,48 @@ body.view-only .view-only-badge { display: flex; }
     font-size: 16px; /* prevent iOS zoom */
   }
 }
+
+/* ── PDF Print styles ── */
+@media print {
+  /* Hide everything except the monthly page content */
+  .topbar, .sidebar, .saved-toast,
+  #view-only-banner, ._sv-modal-wrap, ._import-modal-wrap,
+  .page-header .print-hide,
+  #page-overview, #page-s1, #page-s2, #page-dry, #page-b8,
+  #page-bf, #page-p1, #page-p2, #page-cts, #page-pl, #page-wh,
+  #page-weekly {
+    display: none !important;
+  }
+  body { background: #fff !important; font-family: 'Sarabun', sans-serif; }
+  .layout { display: block !important; }
+  .content { padding: 0 !important; }
+  .page { display: block !important; padding: 0 !important; }
+  #page-monthly {
+    display: block !important;
+    padding: 16px 20px !important;
+  }
+  .page-header { margin-bottom: 16px !important; }
+  .page-header > div:last-child { display: none !important; } /* hide input/button row */
+  .card { box-shadow: none !important; border: 1px solid #e2e8f0 !important; break-inside: avoid; }
+  .kpi-row { flex-wrap: wrap !important; gap: 8px !important; }
+  .kpi-card { min-width: 120px !important; flex: 1 1 18% !important; break-inside: avoid; }
+  #mo-table-wrap { display: block !important; }
+  .pdf-export-btn { display: none !important; }
+  /* Print header */
+  #mo-print-header { display: block !important; }
+}
+#mo-print-header {
+  display: none;
+  font-size: 18px; font-weight: 800; color: #0f172a;
+  border-bottom: 2px solid #0ea5e9; padding-bottom: 8px; margin-bottom: 16px;
+}
+.pdf-export-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border: none; border-radius: 8px;
+  background: #dc2626; color: #fff; font-size: 14px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.pdf-export-btn:hover { background: #b91c1c; }
 </style>
 </head>
 <body>
@@ -772,9 +875,12 @@ body.view-only .view-only-badge { display: flex; }
     <input type="text" id="date-input" placeholder="วว/ดด/ปปปป" maxlength="10" autocomplete="off" readonly />
   </div>
   <button class="import-fab" onclick="showImportModal()" title="นำเข้าข้อมูลจากฟอร์มเลื่อยเครื่องอื่น">📥 นำเข้า</button>
+  <button class="share-view-fab" onclick="shareViewLink()" title="แชร์ link ให้ผู้อื่นดูข้อมูลวันนี้">🔗 แชร์ดูข้อมูล</button>
+  <button class="sync-all-btn" id="sync-all-btn" onclick="syncAllToGAS()" title="Sync ข้อมูลทั้งหมดใน localStorage ขึ้น GAS" style="display:none">☁️ Sync ทั้งหมด</button>
   <button class="save-btn" onclick="saveData()">💾 บันทึก</button>
   <button class="auth-btn" id="auth-btn" onclick="authToggle()">🔒 เข้าสู่ระบบ</button>
 </div>
+<div id="view-only-banner">👁️ โหมดดูอย่างเดียว — ข้อมูลวันที่ <span id="vo-date"></span> (ไม่สามารถแก้ไขได้)</div>
 
 <!-- Auth modal -->
 <div id="auth-overlay">
@@ -1501,6 +1607,7 @@ body.view-only .view-only-badge { display: flex; }
 
   <!-- ───── สรุปรายเดือน ───── -->
   <div class="page" id="page-monthly">
+    <div id="mo-print-header">📅 สรุปยอดผลิตรายเดือน — <span id="mo-print-month"></span></div>
     <div class="page-header">
       <div>
         <div class="page-title">📅 สรุปยอดผลิตรายเดือน</div>
@@ -1511,6 +1618,7 @@ body.view-only .view-only-badge { display: flex; }
           style="border:1px solid var(--g200);background:#fff;color:var(--g800);border-radius:var(--radius-xs);padding:8px 14px;font-size:15px;font-family:inherit;width:120px;text-align:center;outline:none;transition:border .15s;"
           oninput="autoSlashMonth(this)" onblur="buildMonthly()" onkeydown="if(event.key==='Enter')this.blur()">
         <button onclick="buildMonthly()" style="background:linear-gradient(135deg,var(--g500),var(--g400));color:#fff;border:none;border-radius:var(--radius-xs);padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 โหลด</button>
+        <button class="pdf-export-btn" onclick="exportMonthlyPDF()">📄 Export PDF</button>
       </div>
     </div>
 
@@ -1954,7 +2062,7 @@ async function loadData() {
    วางลิ้งค์ Web App URL ที่นี่
    ดูวิธีตั้งค่าในหน้า "วิธีแชร์แดชบอร์ด"
 ══════════════════════════════════════════════════ */
-const GAS_URL = 'YOUR_GAS_URL';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzqjD1YAiGUtTMjhsrfkp_aTPgkyXR1B4xYym2IE_efh3imX9lWWBOkHozIKoGTDRT1Rg/exec';
 const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
 
 // ── Pre-load all Excel data (1–23 July 2026) ──
@@ -2638,7 +2746,11 @@ async function uploadAllToGAS() {
 }
 
 window.addEventListener('load', () => {
-  if (GAS_READY) console.log('Google Apps Script connected:', GAS_URL.substring(0, 60) + '...');
+  if (GAS_READY) {
+    console.log('Google Apps Script connected:', GAS_URL.substring(0, 60) + '...');
+    const saBtn = document.getElementById('sync-all-btn');
+    if (saBtn) saBtn.style.display = '';
+  }
   loadData();
   updateOverview();
   // ── Auto-import from URL hash ──
@@ -2649,6 +2761,11 @@ window.addEventListener('load', () => {
       if (code.startsWith('PP:')) {
         _applyImportCode(code, true);
         history.replaceState(null, '', location.pathname + location.search);
+      }
+    } else if (hash && hash.startsWith('#view=')) {
+      const code = decodeURIComponent(hash.slice(6));
+      if (code.startsWith('DOOR:')) {
+        setTimeout(() => _applyViewCode(code), 100);
       }
     }
   } catch(e) {}
@@ -2749,6 +2866,247 @@ function _applyImportCode(raw, fromHash) {
   } catch(e) {
     showResult(false, '❌ ' + (e.message || 'โค้ดไม่ถูกต้อง'));
   }
+}
+
+// ══════════════════════════════════════════════
+//  SHARE VIEW LINK — แชร์ link ดูอย่างเดียว
+// ══════════════════════════════════════════════
+function shareViewLink() {
+  // Collect current field values
+  const data = {};
+  FIELDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+  const hasData = FIELDS.some(id => data[id] && data[id] !== '');
+  if (!hasData) { alert('ยังไม่มีข้อมูลในวันนี้ กรุณากรอกข้อมูลก่อนแชร์'); return; }
+
+  let encoded;
+  try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
+  catch(e) { encoded = btoa(JSON.stringify(data)); }
+  const code = 'DOOR:' + currentIso + ':' + encoded;
+  const shareUrl = location.origin + location.pathname + '#view=' + encodeURIComponent(code);
+
+  // Show modal
+  let wrap = document.getElementById('_sv-modal-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = '_sv-modal-wrap';
+    wrap.className = 'sv-modal-wrap';
+    wrap.innerHTML = `
+      <div class="sv-overlay-bg" onclick="closeSvModal()"></div>
+      <div class="sv-box">
+        <div class="sv-title">🔗 แชร์ link ดูข้อมูล</div>
+        <div class="sv-hint">ผู้รับเปิด link นี้จะเห็นข้อมูลวันที่ <strong id="_sv-date"></strong> แบบดูอย่างเดียว</div>
+        <div class="sv-link-block" id="_sv-link-text"></div>
+        <div class="sv-btn-row">
+          <button class="sv-copy-btn" onclick="_copySvLink()">📋 คัดลอก link</button>
+          <button class="sv-share-btn" id="_sv-share-btn" onclick="_shareSvLink()" style="display:none">📱 แชร์</button>
+          <button class="sv-close-btn" onclick="closeSvModal()">ปิด</button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
+  }
+  const MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const [y,m,d] = currentIso.split('-');
+  document.getElementById('_sv-date').textContent = `${parseInt(d)} ${MONTHS_SHORT[parseInt(m)-1]} ${parseInt(y)+543}`;
+  document.getElementById('_sv-link-text').textContent = shareUrl;
+  document.getElementById('_sv-link-text')._url = shareUrl;
+  if (navigator.share) document.getElementById('_sv-share-btn').style.display = '';
+  wrap.classList.add('show');
+}
+function closeSvModal() {
+  const w = document.getElementById('_sv-modal-wrap');
+  if (w) w.classList.remove('show');
+}
+function _copySvLink() {
+  const url = document.getElementById('_sv-link-text')._url;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.querySelector('.sv-copy-btn');
+    btn.textContent = '✅ คัดลอกแล้ว!';
+    setTimeout(() => btn.textContent = '📋 คัดลอก link', 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    const btn = document.querySelector('.sv-copy-btn');
+    btn.textContent = '✅ คัดลอกแล้ว!';
+    setTimeout(() => btn.textContent = '📋 คัดลอก link', 2000);
+  });
+}
+function _shareSvLink() {
+  const url = document.getElementById('_sv-link-text')._url;
+  const MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const [y,m,d] = currentIso.split('-');
+  const dateStr = `${parseInt(d)} ${MONTHS_SHORT[parseInt(m)-1]} ${parseInt(y)+543}`;
+  navigator.share({ title: `ข้อมูลโรงงานประตู ${dateStr}`, url });
+}
+
+// ══════════════════════════════════════════════
+//  SYNC ALL LOCALSTORAGE → GAS
+// ══════════════════════════════════════════════
+async function syncAllToGAS() {
+  if (!GAS_READY) { alert('ยังไม่ได้เชื่อม Google Apps Script'); return; }
+
+  // Collect all door_ keys from localStorage
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('door_')) keys.push(k);
+  }
+  if (keys.length === 0) { alert('ไม่พบข้อมูลใน localStorage'); return; }
+  keys.sort();
+
+  // Build modal
+  let wrap = document.getElementById('_sa-modal-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = '_sa-modal-wrap';
+    wrap.className = 'sa-modal-wrap';
+    wrap.innerHTML = `
+      <div class="sa-overlay"></div>
+      <div class="sa-box">
+        <div class="sa-title">☁️ Sync ข้อมูลทั้งหมดขึ้น GAS</div>
+        <div class="sa-progress" id="_sa-progress">กำลังเตรียม...</div>
+        <div class="sa-bar-bg"><div class="sa-bar-fill" id="_sa-bar" style="width:0%"></div></div>
+        <div id="_sa-log" style="font-size:12px;color:#64748b;max-height:120px;overflow-y:auto;margin-top:8px;"></div>
+        <button class="sa-close-btn" id="_sa-close-btn" onclick="closeSaModal()" disabled>ปิด</button>
+      </div>`;
+    document.body.appendChild(wrap);
+  }
+  document.getElementById('_sa-progress').textContent = `พบ ${keys.length} วัน — กำลัง sync...`;
+  document.getElementById('_sa-bar').style.width = '0%';
+  document.getElementById('_sa-log').textContent = '';
+  document.getElementById('_sa-close-btn').disabled = true;
+  wrap.classList.add('show');
+
+  const btn = document.getElementById('sync-all-btn');
+  if (btn) btn.disabled = true;
+
+  let done = 0, ok = 0, fail = 0;
+  const log = document.getElementById('_sa-log');
+
+  for (const k of keys) {
+    const date = k.replace('door_', '');
+    let data;
+    try { data = JSON.parse(localStorage.getItem(k)); } catch(e) { fail++; continue; }
+
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ key: date, data })
+      });
+      ok++;
+      log.innerHTML += `<div style="color:#166534">✅ ${date}</div>`;
+    } catch(e) {
+      fail++;
+      log.innerHTML += `<div style="color:#991b1b">❌ ${date} — ${e.message}</div>`;
+    }
+    done++;
+    log.scrollTop = log.scrollHeight;
+    document.getElementById('_sa-bar').style.width = `${Math.round(done/keys.length*100)}%`;
+    document.getElementById('_sa-progress').textContent = `${done} / ${keys.length} วัน — สำเร็จ ${ok} | ผิดพลาด ${fail}`;
+    await new Promise(r => setTimeout(r, 200)); // throttle
+  }
+
+  document.getElementById('_sa-progress').textContent = `✅ เสร็จแล้ว! sync ${ok} วัน สำเร็จ${fail > 0 ? ` | ❌ ผิดพลาด ${fail} วัน` : ''}`;
+  document.getElementById('_sa-close-btn').disabled = false;
+  if (btn) btn.disabled = false;
+}
+function closeSaModal() {
+  const w = document.getElementById('_sa-modal-wrap');
+  if (w) w.classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+//  EXPORT MONTHLY PDF
+// ══════════════════════════════════════════════
+function exportMonthlyPDF() {
+  const kpi = document.getElementById('mo-kpi');
+  const sec = document.getElementById('mo-sections');
+  const hasData = (kpi && kpi.children.length > 0) || (sec && sec.children.length > 0);
+  if (!hasData) { alert('กรุณากดโหลดข้อมูลก่อน Export PDF'); return; }
+
+  // Update print header with current month
+  const mi = document.getElementById('month-input');
+  const pm = document.getElementById('mo-print-month');
+  if (pm && mi) {
+    const val = mi.value;
+    if (val) {
+      const parts = val.split('/');
+      if (parts.length === 2) {
+        const MONTHS_LONG = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+        const mIdx = parseInt(parts[0]) - 1;
+        const y = parseInt(parts[1]) + 543;
+        pm.textContent = `${MONTHS_LONG[mIdx] || parts[0]} ${y}`;
+      }
+    }
+  }
+
+  // Show the daily table for print
+  const tableWrap = document.getElementById('mo-table-wrap');
+  const wasHidden = tableWrap && tableWrap.style.display === 'none';
+  if (wasHidden) tableWrap.style.display = 'block';
+
+  window.print();
+
+  // Restore hidden table
+  if (wasHidden) setTimeout(() => { tableWrap.style.display = 'none'; }, 500);
+}
+
+// ══════════════════════════════════════════════
+//  VIEW-ONLY MODE — โหมดดูอย่างเดียวจาก link
+// ══════════════════════════════════════════════
+function _applyViewCode(raw) {
+  try {
+    if (!raw.startsWith('DOOR:')) return;
+    const colonIdx2 = raw.indexOf(':', 5);
+    if (colonIdx2 < 0) return;
+    const date = raw.slice(5, colonIdx2);
+    const b64  = raw.slice(colonIdx2 + 1);
+    if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+
+    let data;
+    try { data = JSON.parse(decodeURIComponent(escape(atob(b64)))); }
+    catch(e) { data = JSON.parse(atob(b64)); }
+
+    // Switch date
+    currentIso = date;
+    const [y, m, d] = date.split('-');
+    const dateEl2 = document.getElementById('date-input');
+    if (dateEl2) dateEl2.value = `${d}/${m}/${y}`;
+    const hdrDate2 = document.getElementById('hdr-date');
+    if (hdrDate2) hdrDate2.textContent = fmtDate(date);
+
+    // Fill fields from payload (bypass localStorage)
+    FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && data[id] !== undefined) el.value = data[id];
+    });
+
+    // Trigger computed fields
+    calcSaw1Total(); calcCutRate(); calcWaste();
+    ['s1_oc','s2_oc','dry_oc','b8_oc','bf_oc','p1_oc','p2_oc','p3_oc','cts_oc','pl_oc','wh_oc'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return;
+      const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[30,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[24,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
+      const mp = maps[id]; if(mp) updOC(id,...mp);
+    });
+    [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',300,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
+    updateOverview();
+
+    // Enable view-only UI
+    document.body.classList.add('view-only');
+    const banner = document.getElementById('view-only-banner');
+    if (banner) {
+      const MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const dateDisp = `${parseInt(d)} ${MONTHS_SHORT[parseInt(m)-1]} ${parseInt(y)+543}`;
+      document.getElementById('vo-date').textContent = dateDisp;
+      banner.style.display = 'block';
+      // Push layout down
+      const layout = document.querySelector('.layout');
+      if (layout) layout.style.marginTop = '44px';
+    }
+
+    history.replaceState(null, '', location.pathname + location.search);
+  } catch(e) { console.warn('view-only load error', e); }
 }
 </script>
 </body>
