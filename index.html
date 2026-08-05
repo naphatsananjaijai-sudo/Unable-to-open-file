@@ -1160,7 +1160,7 @@ body.view-only .view-only-badge { display: flex; }
   <div class="page" id="page-blade8">
     <div class="page-header">
       <div><div class="page-title">⚙️ โรง 8 ใบ</div></div>
-      <span class="oc-chip">👷 OC 30 + 10 คน</span>
+      <span class="oc-chip">👷 OC 26 + 10 คน</span>
     </div>
 
     <!-- 3.1 Stock -->
@@ -1236,7 +1236,7 @@ body.view-only .view-only-badge { display: flex; }
           <div class="progress-wrap"><div class="progress-meta"><span>vs 4,000</span><span class="progress-pct" id="bs_k1p">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bs_k1b" style="width:0%"></div></div></div>
         </div>
         <div class="metric-item">
-          <div class="metric-item-label">ไม้ข้าง (เบญ-ยาง)</div>
+          <div class="metric-item-label">ไม้ข้าง</div>
           <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--cyan-500)" type="number" id="bs_k2" placeholder="0"><span class="metric-unit">pcs.</span></div>
         </div>
         <div class="metric-item">
@@ -1248,10 +1248,10 @@ body.view-only .view-only-badge { display: flex; }
 
     <div class="manpower-strip section-gap">
       <span class="mp-icon">👷</span>
-      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" id="b8_oc_v">0</div><div class="mp-oc">OC 30 คน</div></div>
+      <div class="mp-info"><div class="mp-label">กำลังคน</div><div class="mp-number" id="b8_oc_v">0</div><div class="mp-oc">OC 26 คน</div></div>
       <div class="mp-bar-area">
-        <input class="mp-input" type="number" id="b8_oc" placeholder="กรอกจำนวนคน" min="0" max="30" oninput="updOC('b8_oc',30,'b8_oc_v','b8_ocp','b8_ocb')">
-        <div class="progress-meta"><span>Actual vs OC 30</span><span class="progress-pct" id="b8_ocp">0%</span></div>
+        <input class="mp-input" type="number" id="b8_oc" placeholder="กรอกจำนวนคน" min="0" max="26" oninput="updOC('b8_oc',26,'b8_oc_v','b8_ocp','b8_ocb')">
+        <div class="progress-meta"><span>Actual vs OC 26</span><span class="progress-pct" id="b8_ocp">0%</span></div>
         <div class="progress-bg"><div class="progress-fill" id="b8_ocb" style="width:0%"></div></div>
       </div>
     </div>
@@ -1804,7 +1804,7 @@ const OC_DEF = [
   {label:'โรงเลื่อย ไทรน้อย', oc:40, ids:['s1_oc']},
   {label:'โรงเลื่อย ปราจีน', oc:17, ids:['s2_oc']},
   {label:'โรงอบ', oc:5, ids:['dry_oc']},
-  {label:'โรง 8 ใบ', oc:40, ids:['b8_oc','bf_oc']},
+  {label:'โรง 8 ใบ', oc:36, ids:['b8_oc','bf_oc']},
   {label:'อัดร้อน/เย็น', oc:34, ids:['p1_oc','p2_oc','p3_oc']},
   {label:'CTS', oc:24, ids:['cts_oc']},
   {label:'พาเลท', oc:6, ids:['pl_oc']},
@@ -1818,7 +1818,7 @@ function updateOverview() {
   // KPIs
   const hot=g('p2_hot'), cold=g('p3_cold'), wrap=g('cts_wrap'), frame=g('p1_frame'), fg=g('wh_in');
   const wTotal=(g('w_hot')+g('w_cold')+g('w_sloy'));
-  const wBase=g('p2_hot'); // ฐาน = ยอดอัดร้อน
+  const wBase=(g('p2_hot')+g('p3_cold')+g('cts_sloy'));
   const wastePct=wBase>0?(wTotal/wBase)*100:0;
 
   setText('ov_hot', hot||'—');
@@ -1942,7 +1942,7 @@ async function loadData() {
   calcSaw1Total(); calcCutRate(); calcWaste();
   ['s1_oc','s2_oc','dry_oc','b8_oc','bf_oc','p1_oc','p2_oc','p3_oc','cts_oc','pl_oc','wh_oc'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
-    const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[30,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[24,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
+    const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[26,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[24,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
     const m = maps[id]; if(m) updOC(id,...m);
   });
   [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',300,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
@@ -1980,22 +1980,15 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     'door_2026-07-21': {"s1_enter": "30.67", "s1_door": "585.95", "s1_pal": "27.47", "s1_oc": "34", "s2_enter": "6.82", "s2_saw": "136.39", "s2_oc": "13", "d1_cf": "789.2", "d1_pl": "16", "d2_cf": "12681.43", "d2_pl": "301", "dry_oc": "0", "bk_pr": "3319.57", "bk_h": "2582", "bk_k": "510045", "bc_cuft": "378.96", "bc_rate": "18.05", "bj_6": "0", "bj_45": "469", "bj_3": "0", "bs_h1": "4805", "bs_k1": "3650", "bs_k2": "0", "bs_lvl": "1080", "b8_oc": "24", "bf_w": "250", "bf_m": "0", "bf_oc": "9", "p1_frame": "1738", "p1_oc": "17", "p2_hot": "1333", "p2_oc": "9", "p2_down": "90", "p3_cold": "110", "p3_oc": "3", "cts_sloy": "1095", "cts_wrap": "1376", "w_hot": "5", "w_cold": "0", "w_sloy": "1", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "20", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1551", "wh_in_ag": "1461", "wh_in_cp": "90", "wh_out": "1813", "wh_out_ag": "1596", "wh_out_cp": "217", "wh_oc": "6"},
     'door_2026-07-22': {"s1_enter": "34.72", "s1_door": "659.78", "s1_pal": "34.63", "s1_oc": "34", "s2_enter": "10.77", "s2_saw": "215.34", "s2_oc": "15", "d1_cf": "1110.71", "d1_pl": "24", "d2_cf": "15496.16", "d2_pl": "379", "dry_oc": "5", "bk_pr": "2725.45", "bk_h": "4805", "bk_k": "50099", "bc_cuft": "443.23", "bc_rate": "14.07", "bj_6": "50", "bj_45": "338", "bj_3": "0", "bs_h1": "2281", "bs_k1": "1226", "bs_k2": "0", "bs_lvl": "2160", "b8_oc": "28", "bf_w": "241", "bf_m": "0", "bf_oc": "9", "p1_frame": "1815", "p1_oc": "18", "p2_hot": "1414", "p2_oc": "10", "p2_down": "35", "p3_cold": "83", "p3_oc": "3", "cts_sloy": "1341", "cts_wrap": "1069", "w_hot": "1", "w_cold": "0", "w_sloy": "3", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "20", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "3", "wh_in": "1292", "wh_in_ag": "1282", "wh_in_cp": "10", "wh_out": "1220", "wh_out_ag": "1137", "wh_out_cp": "83", "wh_oc": "6"},
     'door_2026-07-23': {"s1_enter": "36.34", "s1_door": "699.02", "s1_pal": "27.7", "s1_oc": "36", "s2_enter": "9.65", "s2_saw": "193.0", "s2_oc": "10", "d1_cf": "799.15", "d1_pl": "18", "d2_cf": "13936.36", "d2_pl": "345", "dry_oc": "5", "bk_pr": "3113.13", "bk_h": "1849", "bk_k": "50113", "bc_cuft": "509.58", "bc_rate": "16.18", "bj_6": "1150", "bj_45": "0", "bj_3": "250", "bs_h1": "4797", "bs_k1": "754", "bs_k2": "0", "bs_lvl": "9720", "b8_oc": "28", "bf_w": "169", "bf_m": "0", "bf_oc": "9", "p1_frame": "1075", "p1_oc": "17", "p2_hot": "2226", "p2_oc": "10", "p2_down": "0", "p3_cold": "80", "p3_oc": "3", "cts_sloy": "1381", "cts_wrap": "336", "w_hot": "3", "w_cold": "0", "w_sloy": "1", "cts_oc": "21", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "6", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1018", "wh_in_ag": "891", "wh_in_cp": "127", "wh_out": "1324", "wh_out_ag": "1140", "wh_out_cp": "184", "wh_oc": "6"},
-    'door_2026-07-24': {"s1_enter": "43.725", "s1_door": "0.00", "s1_pal": "874.49", "s1_oc": "34", "s2_enter": "2.10", "s2_saw": "33.79", "s2_oc": "12", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13980.20", "d2_pl": "345", "dry_oc": "5", "bk_pr": "0", "bk_h": "6256", "bk_k": "56156", "bc_cuft": "0", "bc_rate": "0", "bj_6": "920", "bj_45": "0", "bj_3": "0", "bs_h1": "3688", "bs_k1": "4386", "bs_k2": "4386", "bs_lvl": "0", "b8_oc": "28", "bf_w": "204", "bf_m": "0", "bf_oc": "9", "p1_frame": "1673", "p1_oc": "19", "p2_hot": "2683", "p2_oc": "9", "p2_down": "0", "p3_cold": "0", "p3_oc": "3", "cts_sloy": "1717", "cts_wrap": "1918", "w_hot": "2", "w_cold": "0", "w_sloy": "0", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "10", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "5", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "4", "wh_in": "1075", "wh_in_ag": "988", "wh_in_cp": "87", "wh_out": "1187", "wh_out_ag": "949", "wh_out_cp": "238", "wh_oc": "6"},
-    'door_2026-07-25': {"s1_enter": "44.531", "s1_door": "0.00", "s1_pal": "890.62", "s1_oc": "38", "s2_enter": "9.29", "s2_saw": "156.66", "s2_oc": "12", "d1_cf": "763.98", "d1_pl": "16", "d2_cf": "13980.20", "d2_pl": "345", "dry_oc": "5", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "520", "bj_45": "0", "bj_3": "0", "bs_h1": "5154", "bs_k1": "7176", "bs_k2": "1776", "bs_lvl": "5400", "b8_oc": "27", "bf_w": "1722", "bf_m": "0", "bf_oc": "8", "p1_frame": "1722", "p1_oc": "18", "p2_hot": "2526", "p2_oc": "10", "p2_down": "0", "p3_cold": "0", "p3_oc": "3", "cts_sloy": "2527", "cts_wrap": "1980", "w_hot": "5", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "10", "pl_4x8s": "20", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "2699", "wh_in_ag": "2682", "wh_in_cp": "17", "wh_out": "758", "wh_out_ag": "758", "wh_out_cp": "0", "wh_oc": "6"},
-    'door_2026-07-27': {"s1_enter": "39.586", "s1_door": "0.00", "s1_pal": "791.71", "s1_oc": "34", "s2_enter": "0", "s2_saw": "0", "s2_oc": "0", "d1_cf": "620.48", "d1_pl": "14", "d2_cf": "13980.20", "d2_pl": "345", "dry_oc": "5", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "148", "bj_45": "0", "bj_3": "0", "bs_h1": "2933", "bs_k1": "8850", "bs_k2": "0", "bs_lvl": "8850", "b8_oc": "27", "bf_w": "268", "bf_m": "0", "bf_oc": "9", "p1_frame": "1545", "p1_oc": "17", "p2_hot": "1779", "p2_oc": "9", "p2_down": "0", "p3_cold": "0", "p3_oc": "3", "cts_sloy": "2210", "cts_wrap": "1916", "w_hot": "7", "w_cold": "0", "w_sloy": "4", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "10", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "12", "pl_7x9": "0", "pl_oc": "4", "wh_in": "2257", "wh_in_ag": "2219", "wh_in_cp": "38", "wh_out": "1201", "wh_out_ag": "1201", "wh_out_cp": "0", "wh_oc": "6"},
-    'door_2026-07-28': {"s1_enter": "28.532", "s1_door": "0.00", "s1_pal": "570.63", "s1_oc": "26", "s2_enter": "0", "s2_saw": "0", "s2_oc": "0", "d1_cf": "1040.49", "d1_pl": "24", "d2_cf": "13980.20", "d2_pl": "345", "dry_oc": "5", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "0", "bj_45": "470", "bj_3": "0", "bs_h1": "1696", "bs_k1": "4962", "bs_k2": "2802", "bs_lvl": "2160", "b8_oc": "12", "bf_w": "0", "bf_m": "0", "bf_oc": "1", "p1_frame": "1697", "p1_oc": "15", "p2_hot": "2700", "p2_oc": "8", "p2_down": "0", "p3_cold": "0", "p3_oc": "3", "cts_sloy": "1504", "cts_wrap": "2008", "w_hot": "1", "w_cold": "0", "w_sloy": "0", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1165", "wh_in_ag": "1165", "wh_in_cp": "0", "wh_out": "0", "wh_out_ag": "0", "wh_out_cp": "0", "wh_oc": "3"},
-    'door_2026-07-30': {"s1_enter": "51.083", "s1_door": "1021.67", "s1_pal": "0.00", "s1_oc": "36", "s2_enter": "3.72", "s2_saw": "60.79", "s2_oc": "0", "d1_cf": "714.09", "d1_pl": "26", "d2_cf": "14153.59", "d2_pl": "330", "dry_oc": "5", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "280", "bj_45": "161", "bj_3": "620", "bs_h1": "2199", "bs_k1": "3325", "bs_k2": "3325", "bs_lvl": "0", "b8_oc": "30", "bf_w": "0", "bf_m": "0", "bf_oc": "10", "p1_frame": "1594", "p1_oc": "19", "p2_hot": "2287", "p2_oc": "10", "p2_down": "0", "p3_cold": "90", "p3_oc": "3", "cts_sloy": "1630", "cts_wrap": "1584", "w_hot": "1", "w_cold": "0", "w_sloy": "0", "cts_oc": "23", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "20", "pl_oc": "4", "wh_in": "3346", "wh_in_ag": "3222", "wh_in_cp": "124", "wh_out": "1698", "wh_out_ag": "1519", "wh_out_cp": "179", "wh_oc": "6"},
-    'door_2026-07-31': {"s1_enter": "38.18", "s1_door": "684.44", "s1_pal": "79.13", "s1_oc": "37", "s2_enter": "13.15", "s2_saw": "219.01", "s2_oc": "10", "d1_cf": "760.28", "d1_pl": "35", "d2_cf": "12551.02", "d2_pl": "294", "dry_oc": "5", "bk_pr": "0", "bk_h": "0", "bk_k": "0", "bc_cuft": "0", "bc_rate": "0", "bj_6": "360", "bj_45": "0", "bj_3": "630", "bs_h1": "1929", "bs_k1": "3202", "bs_k2": "2122", "bs_lvl": "1080", "b8_oc": "30", "bf_w": "118", "bf_m": "0", "bf_oc": "9", "p1_frame": "2277", "p1_oc": "19", "p2_hot": "1760", "p2_oc": "10", "p2_down": "120", "p3_cold": "103", "p3_oc": "3", "cts_sloy": "2390", "cts_wrap": "1815", "w_hot": "3", "w_cold": "0", "w_sloy": "0", "cts_oc": "24", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "25", "pl_oc": "6", "wh_in": "1771", "wh_in_ag": "1618", "wh_in_cp": "153", "wh_out": "1309", "wh_out_ag": "1094", "wh_out_cp": "215", "wh_oc": "6"},
-    'door_2026-08-01': {"s1_enter": "30.83", "s1_door": "616.61", "s1_pal": "0", "s1_oc": "35", "s2_enter": "11", "s2_saw": "181.47", "s2_oc": "10", "d1_cf": "901.74", "d1_pl": "17", "d2_cf": "12545.27", "d2_pl": "294", "dry_oc": "5", "bk_pr": "0", "bk_h": "2408", "bk_k": "64193", "bc_cuft": "0", "bc_rate": "0", "bj_6": "396", "bj_45": "0", "bj_3": "590", "bs_h1": "2670", "bs_k1": "3938", "bs_k2": "3938", "bs_lvl": "0", "b8_oc": "28", "bf_w": "154", "bf_m": "0", "bf_oc": "8", "p1_frame": "1877", "p1_oc": "17", "p2_hot": "1652", "p2_oc": "10", "p2_down": "0", "p3_cold": "140", "p3_oc": "3", "cts_sloy": "2185", "cts_wrap": "2025", "w_hot": "8", "w_cold": "0", "w_sloy": "1", "cts_oc": "21", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "20", "pl_oc": "4", "wh_in": "2019", "wh_in_ag": "1982", "wh_in_cp": "37", "wh_out": "440", "wh_out_ag": "380", "wh_out_cp": "60", "wh_oc": "6"},
   };
   for (const [k,v] of Object.entries(bulk)) {
     if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify(v));
   }
   // Set date to most recent data day
-  currentIso = '2026-07-31';
+  currentIso = '2026-07-23';
   const di = document.getElementById('date-input');
-  if (di) di.value = '31/07/2026';
-  document.getElementById('hdr-date-text').textContent = fmtDate('2026-07-31');
+  if (di) di.value = '23/07/2026';
+  document.getElementById('hdr-date-text').textContent = fmtDate('2026-07-23');
 })();
 
 /* ══════════════════════════════
@@ -2017,9 +2010,8 @@ async function getMonthData(yearMonthPrefix) {
   }
   // localStorage fallback
   const result = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith(yearMonthPrefix)) {
+  for (let k in localStorage) {
+    if (k.startsWith(yearMonthPrefix)) {
       try { result[k.replace('door_','')] = JSON.parse(localStorage.getItem(k)); } catch(e){}
     }
   }
@@ -2085,7 +2077,7 @@ async function buildMonthly() {
   const daysWithData = days.length;
   const totalPallet = ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+tot[f],0);
   const totalWaste = tot['w_hot']+tot['w_cold']+tot['w_sloy'];
-  const wasteBase = tot['p2_hot']; // ฐาน = ยอดอัดร้อน
+  const wasteBase = tot['p2_hot']+tot['p3_cold']+tot['cts_sloy'];
   const wastePct = wasteBase>0 ? (totalWaste/wasteBase*100) : 0;
 
   // ── KPI Cards ──
@@ -2147,7 +2139,7 @@ async function buildMonthly() {
         {l:'ไม้ LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),u:'pcs.'},
-        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,1):'—',u:`คน / OC 30`},
+        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,1):'—',u:`คน / OC 26`},
         {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,1):'—',u:`คน / OC 10`},
       ]
     },
@@ -2293,59 +2285,21 @@ goPage = function(id, btn) {
 ══════════════════════════════════════════════════ */
 
 const WK_METRICS = [
-  // ── โรงเลื่อยไทรน้อย ──
-  { label:'ยอดเข้าเลื่อย (ไทรน้อย)', unit:'Ton.',   fn: d => toNum(d.s1_enter)                              },
-  { label:'ชิ้นส่วนประตู',            unit:'Cu.ft.', fn: d => toNum(d.s1_door)                               },
-  { label:'พาเลท/ทั่วไป',             unit:'Cu.ft.', fn: d => toNum(d.s1_pal)                                },
-  { label:'รวมยอดเลื่อย (ไทรน้อย)',  unit:'Cu.ft.', fn: d => toNum(d.s1_door)+toNum(d.s1_pal)              },
-  // ── โรงเลื่อยปราจีน ──
-  { label:'ยอดเข้าเลื่อย (ปราจีน)',  unit:'Ton.',   fn: d => toNum(d.s2_enter)                              },
-  { label:'ยอดเลื่อย (ปราจีน)',       unit:'Cu.ft.', fn: d => toNum(d.s2_saw)                                },
-  // ── โรงอบ ──
-  { label:'ส่งโรง 8 ใบ',             unit:'Cu.ft.', fn: d => toNum(d.d1_cf)                                  },
-  { label:'ส่งโรง 8 ใบ (พาเลท)',     unit:'Pallet', fn: d => toNum(d.d1_pl)                                  },
-  // ── โรง 8 ใบ ──
-  { label:'ยอดตัดไม้',               unit:'Cu.ft.', fn: d => toNum(d.bc_cuft)                                },
-  { label:'ยอดต่อ 6"',               unit:'pcs.',   fn: d => toNum(d.bj_6)                                   },
-  { label:'ยอดต่อ 4.5"',             unit:'pcs.',   fn: d => toNum(d.bj_45)                                  },
-  { label:'ยอดต่อ 3"',               unit:'pcs.',   fn: d => toNum(d.bj_3)                                   },
-  { label:'ซอยไม้หัว',               unit:'pcs.',   fn: d => toNum(d.bs_h1)                                  },
-  { label:'ซอยไม้ข้าง',              unit:'pcs.',   fn: d => toNum(d.bs_k1)                                  },
-  { label:'ไม้ LVL',                 unit:'pcs.',   fn: d => toNum(d.bs_lvl)                                  },
-  { label:'ยิงโครงไม้',              unit:'pcs.',   fn: d => toNum(d.bf_w)                                   },
-  { label:'ยิงโครง มอก.',            unit:'pcs.',   fn: d => toNum(d.bf_m)                                   },
-  // ── อัดร้อน/อัดเย็น ──
-  { label:'ยิงโครงกระดาษ',           unit:'pcs.',   fn: d => toNum(d.p1_frame)                               },
-  { label:'อัดร้อน',                 unit:'บาน',    fn: d => toNum(d.p2_hot)                                  },
-  { label:'Downtime',                unit:'นาที',   fn: d => toNum(d.p2_down)                                 },
-  { label:'อัดเย็น',                 unit:'บาน',    fn: d => toNum(d.p3_cold)                                 },
-  // ── CTS & คัดเกรด ──
-  { label:'ซอยประตู',                unit:'บาน',    fn: d => toNum(d.cts_sloy)                                },
-  { label:'ห่อประตู',                unit:'บาน',    fn: d => toNum(d.cts_wrap)                                },
-  { label:'ของเสีย อัดร้อน',         unit:'บาน',    fn: d => toNum(d.w_hot)                                   },
-  { label:'ของเสีย อัดเย็น',         unit:'บาน',    fn: d => toNum(d.w_cold)                                  },
-  { label:'ของเสีย เครื่องซอย',      unit:'บาน',    fn: d => toNum(d.w_sloy)                                  },
-  // ── พาเลท ──
-  { label:'พาเลท 3"×6"',             unit:'Pcs.',   fn: d => toNum(d.pl_3x6)                                  },
-  { label:'พาเลท 4"×6"',             unit:'Pcs.',   fn: d => toNum(d.pl_4x6)                                  },
-  { label:'พาเลท 4"×8" SPD',         unit:'Pcs.',   fn: d => toNum(d.pl_4x8s)                                 },
-  { label:'พาเลท 4"×8" SPD ใหม่',   unit:'Pcs.',   fn: d => toNum(d.pl_4x8sn)                                },
-  { label:'พาเลท 4"×8" HPL',         unit:'Pcs.',   fn: d => toNum(d.pl_4x8h)                                 },
-  { label:'พาเลท 4"×9"',             unit:'Pcs.',   fn: d => toNum(d.pl_4x9)                                  },
-  { label:'พาเลท 4"×10"',            unit:'Pcs.',   fn: d => toNum(d.pl_4x10)                                 },
-  { label:'พาเลท 4"×12"',            unit:'Pcs.',   fn: d => toNum(d.pl_4x12)                                 },
-  { label:'พาเลท 7"×9"',             unit:'Pcs.',   fn: d => toNum(d.pl_7x9)                                  },
-  { label:'พาเลท รวม',               unit:'Pcs.',   fn: d => ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0) },
-  // ── คลังสินค้า ──
-  { label:'เข้าคลัง FG รวม',         unit:'บาน',    fn: d => toNum(d.wh_in)                                   },
-  { label:'เข้าคลัง Ag',             unit:'บาน',    fn: d => toNum(d.wh_in_ag)                                },
-  { label:'เข้าคลัง C+',             unit:'บาน',    fn: d => toNum(d.wh_in_cp)                                },
-  { label:'โหลดสินค้า รวม',          unit:'บาน',    fn: d => toNum(d.wh_out)                                  },
-  { label:'โหลดสินค้า Ag',           unit:'บาน',    fn: d => toNum(d.wh_out_ag)                               },
-  { label:'โหลดสินค้า C+',           unit:'บาน',    fn: d => toNum(d.wh_out_cp)                               },
+  { label:'เลื่อยไทรน้อย', unit:'Cu.ft.',  fn: d => toNum(d.s1_door)+toNum(d.s1_pal) },
+  { label:'เลื่อยปราจีน',  unit:'Cu.ft.',  fn: d => toNum(d.s2_saw)               },
+  { label:'ส่งโรง 8 ใบ',  unit:'Cu.ft.',  fn: d => toNum(d.d1_cf)+toNum(d.d2_cf)      },
+  { label:'ยอดตัดไม้',    unit:'Cu.ft.',  fn: d => toNum(d.bc_cuft)               },
+  { label:'ยิงโครงกระดาษ',unit:'ชิ้น',   fn: d => toNum(d.p1_frame)              },
+  { label:'อัดร้อน',      unit:'บาน',    fn: d => toNum(d.p2_hot)                 },
+  { label:'อัดเย็น',      unit:'บาน',    fn: d => toNum(d.p3_cold)                },
+  { label:'ห่อประตู',     unit:'บาน',    fn: d => toNum(d.cts_wrap)               },
+  { label:'สลอย/ขัด',    unit:'บาน',    fn: d => toNum(d.cts_sloy)               },
+  { label:'พาเลท',        unit:'Pcs.',   fn: d => ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0) },
+  { label:'เข้าคลัง FG', unit:'บาน',    fn: d => toNum(d.wh_in)                  },
+  { label:'โหลดสินค้า',  unit:'บาน',    fn: d => toNum(d.wh_out)                 },
 ];
 
-// Get Mon–Sat ISO dates of the week containing `iso`
+// Get Mon–Fri ISO dates of the week containing `iso`
 function weekDates(iso) {
   const d = new Date(iso + 'T12:00:00');
   const dow = d.getDay(); // 0=Sun
@@ -2353,7 +2307,7 @@ function weekDates(iso) {
   const mon = new Date(d);
   mon.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
   const dates = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 5; i++) {
     const dd = new Date(mon);
     dd.setDate(mon.getDate() + i);
     dates.push(`${dd.getFullYear()}-${pad(dd.getMonth()+1)}-${pad(dd.getDate())}`);
@@ -2363,7 +2317,7 @@ function weekDates(iso) {
 
 function weekLabel(dates) {
   const fmtShort = iso => { const [y,m,d]=iso.split('-'); return `${d}/${m}/${parseInt(y)+543}`; };
-  return `${fmtShort(dates[0])} – ${fmtShort(dates[5])}`;
+  return `${fmtShort(dates[0])} – ${fmtShort(dates[4])}`;
 }
 
 async function getWeekData(dates) {
@@ -2505,7 +2459,7 @@ async function buildWeekly() {
   tblHtml += '</tr></thead><tbody>';
 
   // Build rows side-by-side (prev col | sep | curr col)
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 5; i++) {
     const p = prevDays[i], c = currDays[i];
     const pDate = p ? (() => { const dt=new Date(p.iso+'T12:00:00'); return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; })() : '—';
     const cDate = c ? (() => { const dt=new Date(c.iso+'T12:00:00'); return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)}`; })() : '—';
