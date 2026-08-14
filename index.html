@@ -2436,8 +2436,12 @@ async function buildMonthly() {
   const tot = {};
   const sumFields = ['s1_enter','s1_door','s1_pal','s1_oc',
     's2_enter','s2_saw','s2_oc',
-    'd1_cf','d1_pl','dry_oc',
-    'bc_cuft','bj_6','bj_45','bj_3','bs_h1','bs_k1','bs_lvl','b8_oc','bf_w','bf_m','bf_oc',
+    'd1_cf','d1_pl','d2_cf','d2_pl','dry_oc',
+    'bc_cuft','bc_rate',
+    'bk_pr','bk_h','bk_k','bk_ben','bk_lvl','bk_h_ben','bk_h_mok',
+    'bj_6','bj_45','bj_3',
+    'bs_h1','bs_h1_ben','bs_h1_mok','bs_k1','bs_k2','bs_mok','bs_lvl',
+    'b8_oc','bf_w','bf_m','bf_oc',
     'p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
     'cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy',
     'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_oc',
@@ -2499,24 +2503,38 @@ async function buildMonthly() {
     {
       icon:'🌡️', title:'โรงอบ',
       metrics:[
-        {l:'ยอดไม้อบส่งโรง 8 ใบ',v:fmtN(tot.d1_cf,0),u:'Cu.ft.'},
-        {l:'จำนวนพาเลท',v:fmtN(tot.d1_pl,0),u:'Pallet'},
+        {l:'ไม้อบส่งโรง 8 ใบ (Cu.ft.)',v:fmtN(tot.d1_cf,2),u:'Cu.ft.'},
+        {l:'จำนวนพาเลท (โรงอบ 1)',v:fmtN(tot.d1_pl,0),u:'Pallet'},
+        {l:'ไม้อบรวม (Cu.ft.)',v:fmtN(tot.d2_cf,2),u:'Cu.ft.'},
+        {l:'จำนวนพาเลท (โรงอบ 2)',v:fmtN(tot.d2_pl,0),u:'Pallet'},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.dry_oc/daysWithData,0):'—',u:`คน / OC 5`},
       ]
     },
     {
       icon:'⚙️', title:'โรง 8 ใบ',
       metrics:[
-        {l:'ยอดตัด',v:fmtN(tot.bc_cuft,0),u:'Cu.ft.'},
-        {l:'ยอดต่อ 6"',v:fmtN(tot.bj_6,0),u:'pcs.'},
-        {l:'ยอดต่อ 4.5"',v:fmtN(tot.bj_45,0),u:'pcs.'},
-        {l:'ยอดต่อ 3"',v:fmtN(tot.bj_3,0),u:'pcs.'},
-        {l:'ไม้หัว',v:fmtN(tot.bs_h1,0),u:'pcs.'},
-        {l:'ไม้ข้าง',v:fmtN(tot.bs_k1,0),u:'pcs.'},
+        {l:'ยอดตัดไม้',v:fmtN(tot.bc_cuft,2),u:'Cu.ft.'},
+        {l:'อัตราตัด (เฉลี่ย)',v:daysWithData?fmtN(tot.bc_rate/daysWithData,2):'—',u:'Cu.ft./ชม.'},
+        {l:'บาก (ไม้หน้า)',v:fmtN(tot.bk_h,0),u:'pcs.'},
+        {l:'บาก (ไม้ข้าง)',v:fmtN(tot.bk_k,0),u:'pcs.'},
+        {l:'บาก (เบ้น)',v:fmtN(tot.bk_ben,0),u:'pcs.'},
+        {l:'บาก (LVL)',v:fmtN(tot.bk_lvl,0),u:'pcs.'},
+        {l:'บาก หน้า-เบ้น',v:fmtN(tot.bk_h_ben,0),u:'pcs.'},
+        {l:'บาก หน้า-โมก',v:fmtN(tot.bk_h_mok,0),u:'pcs.'},
+        {l:'ยอดบากรวม (bk_pr)',v:fmtN(tot.bk_pr,2),u:'Cu.ft.'},
+        {l:'ต่อ 6"',v:fmtN(tot.bj_6,0),u:'pcs.'},
+        {l:'ต่อ 4.5"',v:fmtN(tot.bj_45,0),u:'pcs.'},
+        {l:'ต่อ 3"',v:fmtN(tot.bj_3,0),u:'pcs.'},
+        {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),u:'pcs.'},
+        {l:'ไม้หัว (เบ้น)',v:fmtN(tot.bs_h1_ben,0),u:'pcs.'},
+        {l:'ไม้หัว (โมก)',v:fmtN(tot.bs_h1_mok,0),u:'pcs.'},
+        {l:'ไม้ข้าง (k1)',v:fmtN(tot.bs_k1,0),u:'pcs.'},
+        {l:'ไม้ข้าง (k2)',v:fmtN(tot.bs_k2,0),u:'pcs.'},
+        {l:'ไม้โมก',v:fmtN(tot.bs_mok,0),u:'pcs.'},
         {l:'ไม้ข้าง LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),u:'pcs.'},
-        {l:'เฉลี่ยกำลังคน (8ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
+        {l:'เฉลี่ยกำลังคน (8 ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
         {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
       ]
     },
@@ -3105,46 +3123,91 @@ async function buildWeekly() {
   // ── Render cards ──
   const groups = [...new Set(CM.map(m => m.grp))];
 
-  const cardsHtml = weekCards.map((w, i) => {
-    const bodyHtml = groups.map(grp => {
-      const rows = CM.filter(m => m.grp === grp).map(m => {
-        const v      = w.totals[m.label] || 0;
-        const isMax  = !m.isAvg && v > 0 && v === maxByLabel[m.label];
-        const dec    = m.isAvg ? 0 : 0;
-        const days_  = m.isAvg ? (w.totals[m.label + '__days'] || 0) : null;
-        const sub    = m.isAvg && days_ > 0 ? `<span style="font-size:10px;color:#94a3b8;"> (${days_} วัน)</span>` : '';
+  // Build selected state (default: all selected)
+  const selKey = `wk_sel_${year}_${month}`;
+  let selected = JSON.parse(localStorage.getItem(selKey) || 'null');
+  if (!selected || selected.length !== weekCards.length) {
+    selected = weekCards.map(() => true);
+  }
+
+  function renderWeeklyCards() {
+    // re-read selected from DOM checkboxes if exist
+    document.querySelectorAll('.wk-sel-cb').forEach((cb, i) => { selected[i] = cb.checked; });
+    localStorage.setItem(selKey, JSON.stringify(selected));
+
+    // compute max only across selected cards
+    const maxByLabelSel = {};
+    CM.forEach(m => {
+      if (!m.isAvg) {
+        maxByLabelSel[m.label] = Math.max(...weekCards
+          .filter((_, i) => selected[i])
+          .map(w => w.totals[m.label] || 0));
+      }
+    });
+
+    const cardsHtml = weekCards.map((w, i) => {
+      const col = WK_COL[i % WK_COL.length];
+      const bg  = WK_BG[i  % WK_BG.length];
+      const bd  = WK_BD[i  % WK_BD.length];
+
+      const headerHtml = `
+        <div style="padding:12px 16px;background:${bg};border-bottom:1.5px solid ${bd};display:flex;align-items:center;gap:10px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;">
+            <input type="checkbox" class="wk-sel-cb" data-wi="${i}" ${selected[i]?'checked':''} onchange="renderWeeklyCards()"
+              style="width:16px;height:16px;accent-color:${col};cursor:pointer;">
+            <span style="font-size:14px;font-weight:800;color:${col};">สัปดาห์ที่ ${i+1}</span>
+          </label>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:#64748b;">${weekLabel(w.dates)}</div>
+            <div style="font-size:10px;color:#94a3b8;">${w.hasDays} วันที่มีข้อมูล</div>
+          </div>
+        </div>`;
+
+      if (!selected[i]) {
         return `
-          <div style="display:flex;justify-content:space-between;align-items:center;
-            padding:5px 6px;border-radius:6px;gap:8px;
-            ${isMax ? `background:${WK_BG[i]};` : m.isAvg ? 'background:#f8faff;border-bottom:1px solid #e8eef8;' : 'border-bottom:1px solid #f8fafc;'}">
-            <span style="font-size:11.5px;color:${m.isAvg?'#3b5bdb':'#64748b'};font-weight:${m.isAvg?'700':'400'};flex:1;">${m.label}</span>
-            <span style="font-size:13px;font-weight:${isMax||m.isAvg?'800':'600'};color:${isMax?WK_COL[i]:m.isAvg?'#3b5bdb':'#334155'};white-space:nowrap;">
-              ${fmtNum(v,dec)}&thinsp;<span style="font-size:10px;font-weight:400;color:#94a3b8;">${m.unit}</span>${sub}
-            </span>
+          <div style="background:#fafafa;border:1.5px solid ${bd};border-radius:14px;overflow:hidden;opacity:.6;">
+            ${headerHtml}
           </div>`;
+      }
+
+      const bodyHtml = groups.map(grp => {
+        const rows = CM.filter(m => m.grp === grp).map(m => {
+          const v     = w.totals[m.label] || 0;
+          const isMax = !m.isAvg && v > 0 && v === maxByLabelSel[m.label];
+          const days_ = m.isAvg ? (w.totals[m.label + '__days'] || 0) : null;
+          const sub   = m.isAvg && days_ > 0 ? `<span style="font-size:10px;color:#94a3b8;"> (${days_} วัน)</span>` : '';
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;
+              padding:5px 6px;border-radius:6px;gap:8px;
+              ${isMax ? `background:${bg};` : m.isAvg ? 'background:#f8faff;border-bottom:1px solid #e8eef8;' : 'border-bottom:1px solid #f8fafc;'}">
+              <span style="font-size:11.5px;color:${m.isAvg?'#3b5bdb':'#64748b'};font-weight:${m.isAvg?'700':'400'};flex:1;">${m.label}</span>
+              <span style="font-size:13px;font-weight:${isMax||m.isAvg?'800':'600'};color:${isMax?col:m.isAvg?'#3b5bdb':'#334155'};white-space:nowrap;">
+                ${fmtNum(v,0)}&thinsp;<span style="font-size:10px;font-weight:400;color:#94a3b8;">${m.unit}</span>${sub}
+              </span>
+            </div>`;
+        }).join('');
+        return `
+          <div style="font-size:10px;font-weight:800;color:${col};letter-spacing:.5px;
+            background:${bg};padding:5px 6px;border-radius:6px;margin:10px 0 3px;">${grp}</div>
+          ${rows}`;
       }).join('');
+
       return `
-        <div style="font-size:10px;font-weight:800;color:${WK_COL[i]};letter-spacing:.5px;
-          background:${WK_BG[i]};padding:5px 6px;border-radius:6px;margin:10px 0 3px;">${grp}</div>
-        ${rows}`;
+        <div style="background:#fff;border:1.5px solid ${bd};border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(15,23,42,.05);display:flex;flex-direction:column;">
+          ${headerHtml}
+          <div style="padding:8px 10px 14px;overflow-y:auto;max-height:70vh;">${bodyHtml}</div>
+        </div>`;
     }).join('');
 
-    return `
-      <div style="background:#fff;border:1.5px solid ${WK_BD[i]};border-radius:14px;
-        overflow:hidden;box-shadow:0 1px 6px rgba(15,23,42,.05);display:flex;flex-direction:column;">
-        <div style="padding:12px 16px;background:${WK_BG[i]};border-bottom:1.5px solid ${WK_BD[i]};">
-          <div style="font-size:14px;font-weight:800;color:${WK_COL[i]};">สัปดาห์ที่ ${i+1}</div>
-          <div style="font-size:11px;color:#64748b;margin-top:3px;">${weekLabel(w.dates)}</div>
-          <div style="font-size:10px;color:#94a3b8;margin-top:1px;">${w.hasDays} วันที่มีข้อมูล</div>
-        </div>
-        <div style="padding:8px 10px 14px;overflow-y:auto;max-height:70vh;">${bodyHtml}</div>
+    document.getElementById('wk-compare').innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;">
+        ${cardsHtml}
       </div>`;
-  }).join('');
+  }
 
-  document.getElementById('wk-compare').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;">
-      ${cardsHtml}
-    </div>`;
+  // expose globally so checkbox onchange can call it
+  window.renderWeeklyCards = renderWeeklyCards;
+  renderWeeklyCards();
 }
 
 /* ══════════════════════════════════════════════════
