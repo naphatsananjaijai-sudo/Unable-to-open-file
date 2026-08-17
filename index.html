@@ -219,6 +219,9 @@ body {
 }
 .auth-btn:hover { background: var(--g100); border-color: var(--g200); color: var(--g500); }
 .auth-btn.admin-mode { background: var(--g400); border-color: var(--g400); color: #fff; }
+.auth-btn.admin-mode:hover { background: var(--g500); border-color: var(--g500); color: #fff; }
+.logout-btn { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+.logout-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 
 /* ── Auth Modal ── */
 #auth-overlay {
@@ -909,6 +912,7 @@ body.view-only .view-only-badge { display: flex; }
   <button class="import-fab admin-only-nav" onclick="showImportModal()" title="นำเข้าข้อมูลจากฟอร์มเลื่อยเครื่องอื่น">📥 นำเข้า</button>
   <button class="save-btn" onclick="saveData()">💾 บันทึก</button>
   <button class="auth-btn" id="auth-btn" onclick="authToggle()">🔒 เข้าสู่ระบบ</button>
+  <button class="auth-btn logout-btn" id="logout-btn" onclick="authLogout()" style="display:none;" title="ออกจากโหมดแก้ไข กลับไปโหมดดูอย่างเดียว">🚪 ออกจากระบบ</button>
 </div>
 
 <!-- Auth modal -->
@@ -3303,7 +3307,7 @@ async function buildMCompare() {
   const curDays  = _wd(curData);
   const prevDays = _wd(prevData);
   document.getElementById('mc-subtitle').textContent =
-    `เปรียบเทียบ ${prevLabel} (${prevDays} วัน) กับ ${curLabel} (${curDays} วัน) · คอลัมน์ "เปลี่ยน" คิดจากค่าเฉลี่ยต่อวัน`;
+    `เปรียบเทียบ ${prevLabel} (${prevDays} วัน) กับ ${curLabel} (${curDays} วัน) · คอลัมน์ "ค่าเฉลี่ย" คิดจากค่าเฉลี่ยต่อวัน`;
   const palF = ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'];
   const palC = palF.reduce((s,f)=>s+tC[f],0);
   const palP = palF.reduce((s,f)=>s+tP[f],0);
@@ -3385,7 +3389,7 @@ async function buildMCompare() {
             <th style="padding:8px 14px;text-align:left;font-weight:700;">รายการ</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${prevLabel}</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${curLabel}</th>
-            <th style="padding:8px 14px;text-align:right;font-weight:700;" title="เทียบจากค่าเฉลี่ยต่อวัน จึงไม่ถูกบิดจากจำนวนวันทำงานที่ต่างกัน">เปลี่ยน<div style="font-size:9px;font-weight:600;color:#cbd5e1;">เฉลี่ย/วัน</div></th>
+            <th style="padding:8px 14px;text-align:right;font-weight:700;" title="เทียบจากค่าเฉลี่ยต่อวัน จึงไม่ถูกบิดจากจำนวนวันทำงานที่ต่างกัน">ค่าเฉลี่ย<div style="font-size:9px;font-weight:600;color:#cbd5e1;">เทียบ/วัน</div></th>
           </tr>
         </thead>
         <tbody>
@@ -3626,16 +3630,19 @@ let isAdmin = false;
 
 function applyMode() {
   const btn = document.getElementById('auth-btn');
+  const outBtn = document.getElementById('logout-btn');
   const shareBtn = document.getElementById('share-guide-btn');
   if (isAdmin) {
     document.body.classList.remove('view-only');
     btn.textContent = '🔓 Admin';
     btn.classList.add('admin-mode');
+    if (outBtn) outBtn.style.display = '';
     if (shareBtn) shareBtn.style.display = '';
   } else {
     document.body.classList.add('view-only');
     btn.textContent = '🔒 เข้าสู่ระบบ';
     btn.classList.remove('admin-mode');
+    if (outBtn) outBtn.style.display = 'none';
     if (shareBtn) shareBtn.style.display = 'none';
     // Redirect to overview if currently on an admin-only page
     const adminPages = ['saw1','saw2','dry','blade8','frame','press','cts','pallet','warehouse'];
@@ -3646,12 +3653,16 @@ function applyMode() {
   }
 }
 
+function authLogout() {
+  isAdmin = false;
+  sessionStorage.removeItem(SESSION_KEY);
+  applyMode();
+  goPage('overview', document.querySelector('.nav-item'));
+}
+
 function authToggle() {
   if (isAdmin) {
-    // Logout
-    isAdmin = false;
-    sessionStorage.removeItem(SESSION_KEY);
-    applyMode();
+    authLogout();
   } else {
     // Open login modal
     document.getElementById('auth-overlay').classList.add('open');
