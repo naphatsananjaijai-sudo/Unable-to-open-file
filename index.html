@@ -95,6 +95,15 @@ body {
 .topbar-spacer { flex: 1; }
 .date-input-wrap { display: flex; align-items: center; gap: 8px; position: relative; }
 .date-input-wrap label { font-size: 14px; color: #64748b; }
+.date-nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--g200); background: #fff; color: var(--g500);
+  font-size: 12px; cursor: pointer; transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.date-nav-btn:hover { background: var(--g100); color: var(--g800); }
+.date-nav-btn:active { transform: scale(0.94); }
 #date-input {
   border: 1.5px solid #cbd5e1;
   background: #f8fafc;
@@ -541,6 +550,126 @@ body.view-only .view-only-badge { display: flex; }
 /* ── Pallet grid ── */
 .pallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; }
 
+/* ── Overview dept cards: collapsed by default, click header to reveal ── */
+.ov-card {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(15,23,42,.06);
+  overflow: hidden;
+}
+.ov-card-head { cursor: pointer; user-select: none; transition: filter .15s; }
+.ov-card-head:hover { filter: brightness(0.97); }
+.ov-card-body {
+  display: none;
+}
+.ov-card.ov-open .ov-card-body {
+  display: block;
+}
+.ov-toggle-all-btn {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  background: #fff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.ov-toggle-all-btn:hover { background: #f1f5f9; }
+
+/* ── Popup รายละเอียดแผนก ── */
+.ov-modal-wrap {
+  display: none; position: fixed; inset: 0; z-index: 9000;
+  background: rgba(15,23,42,.55);
+  backdrop-filter: blur(2px);
+  align-items: center; justify-content: center; padding: 24px;
+}
+.ov-modal-wrap.show { display: flex; animation: ovFade .15s ease; }
+@keyframes ovFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ovPop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+.ov-modal-box {
+  background: #fff; border-radius: 18px; width: min(680px, 100%);
+  max-height: 88vh; display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(15,23,42,.35);
+  animation: ovPop .18s ease;
+}
+.ov-modal-head {
+  padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; border-bottom: 1.5px solid #e2e8f0; flex-shrink: 0;
+}
+.ov-modal-title { font-size: 18px; font-weight: 800; flex: 1; min-width: 0; display: flex; }
+.ov-modal-title, .ov-modal-title * { font-size: inherit !important; font-weight: 800 !important; margin: 0 !important; }
+.ov-modal-title .mo-days-badge, .ov-modal-title span[style*="border-radius:12px"] {
+  font-size: 12px !important; font-weight: 700 !important;
+}
+.ov-modal-title div[style*="text-align:right"], .ov-modal-title div[style*="text-align:right"] * {
+  font-size: 11px !important; font-weight: 600 !important;
+}
+.ov-modal-x {
+  border: none; background: rgba(255,255,255,.75); color: #475569;
+  width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: 700;
+  cursor: pointer; line-height: 1; transition: background .15s;
+}
+.ov-modal-x:hover { background: #fff; color: #0f172a; }
+.ov-modal-content { padding: 8px 22px 14px; overflow-y: auto; font-size: 15px; }
+.ov-modal-content .ov-card-body { display: block !important; padding: 6px 0 !important; }
+.ov-modal-content .ov-card-body > div { padding-top: 9px !important; padding-bottom: 9px !important; }
+.ov-modal-content .ov-card-body span { font-size: 14px !important; }
+.ov-modal-content .ov-card-body b { font-size: 19px !important; }
+.ov-modal-box.wide { width: min(1150px, 100%); }
+.ov-pane-row { display: block; }
+.ov-pane-row.dual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.ov-pane-row.dual .ov-pane {
+  border: 1.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff;
+}
+.ov-pane-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-bottom: 1.5px solid #e2e8f0;
+}
+.ov-pane-head, .ov-pane-head * { font-size: 14px !important; font-weight: 800 !important; }
+.ov-pane-head div[style*="text-align:right"], .ov-pane-head div[style*="text-align:right"] * {
+  font-size: 10px !important; font-weight: 600 !important;
+}
+.ov-pane-x {
+  border: none; background: rgba(255,255,255,.8); color: #64748b; cursor: pointer;
+  width: 22px; height: 22px; border-radius: 50%; font-size: 11px !important; line-height: 1; flex-shrink: 0;
+}
+.ov-pane-x:hover { background: #fff; color: #0f172a; }
+.ov-pane-row.dual .ov-card-body b { font-size: 16px !important; }
+.ov-pane-row.dual .ov-card-body span { font-size: 12px !important; }
+.ov-chipbar {
+  position: sticky; top: 0; z-index: 2; background: #fff;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 8px 0 10px; margin-bottom: 4px; border-bottom: 1px solid #f1f5f9;
+}
+.ov-chipbar-label { font-size: 11px; font-weight: 700; color: #94a3b8; margin-right: 2px; }
+.ov-chip {
+  font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer;
+  border: 1.5px solid #cbd5e1; background: #fff; color: #475569;
+  border-radius: 999px; padding: 4px 12px; transition: all .15s;
+}
+.ov-chip:hover { background: #f1f5f9; }
+.ov-chip.on { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.ov-modal-hint {
+  font-size: 12px; color: #6366f1; background: #eef2ff; border: 1px solid #c7d2fe;
+  border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; text-align: center;
+}
+.ov-modal-foot { padding: 12px 20px 16px; border-top: 1px solid #f1f5f9; flex-shrink: 0; }
+.ov-modal-back {
+  width: 100%; padding: 11px; border-radius: 10px; border: 1.5px solid #cbd5e1;
+  background: #f8fafc; color: #334155; font-size: 14px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: background .15s;
+}
+.ov-modal-back:hover { background: #e2e8f0; }
+@media (max-width: 600px) {
+  .ov-modal-wrap { padding: 0; align-items: flex-end; }
+  .ov-modal-box { width: 100%; max-height: 92vh; border-radius: 18px 18px 0 0; }
+  .ov-pane-row.dual { grid-template-columns: 1fr; }
+}
+@media print { .ov-modal-wrap { display: none !important; } }
+
 /* ── KPI overview ── */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 14px; margin-bottom: 22px; }
 .kpi-card {
@@ -691,8 +820,9 @@ body.view-only .view-only-badge { display: flex; }
   .topbar-date-label,
   .topbar-date-value { display: none; }
   .topbar-spacer { flex: 1; }
-  #date-input { width: 115px; font-size: 13px; padding: 6px 8px; }
+  #date-input { width: 92px; font-size: 13px; padding: 6px 8px; }
   .date-input-wrap label { display: none; }
+  .date-nav-btn { width: 26px; height: 26px; font-size: 11px; }
   .auth-btn { font-size: 12px; padding: 6px 10px; }
   .save-btn { font-size: 13px; padding: 7px 12px; }
   .view-only-badge { display: none !important; }
@@ -771,8 +901,10 @@ body.view-only .view-only-badge { display: flex; }
   <div class="topbar-spacer"></div>
   <div class="view-only-badge">🔒 โหมดดูอย่างเดียว</div>
   <div class="date-input-wrap">
+    <button type="button" class="date-nav-btn" onclick="shiftDay(-1)" title="วันก่อนหน้า">◀</button>
     <label for="date-input">📅</label>
     <input type="text" id="date-input" placeholder="วว/ดด/ปปปป" maxlength="10" autocomplete="off" readonly />
+    <button type="button" class="date-nav-btn" onclick="shiftDay(1)" title="วันถัดไป">▶</button>
   </div>
   <button class="import-fab admin-only-nav" onclick="showImportModal()" title="นำเข้าข้อมูลจากฟอร์มเลื่อยเครื่องอื่น">📥 นำเข้า</button>
   <button class="save-btn" onclick="saveData()">💾 บันทึก</button>
@@ -812,7 +944,7 @@ body.view-only .view-only-badge { display: flex; }
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-section-label">เมนูหลัก</div>
   <button class="nav-item active" onclick="goPage('overview',this)">
-    <span class="nav-icon">📊</span> ภาพรวม
+    <span class="nav-icon">📊</span> ภาพรวมประจำวัน
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">การผลิต</div>
@@ -861,7 +993,7 @@ body.view-only .view-only-badge { display: flex; }
     <span class="nav-icon">📈</span> เปรียบเทียบเดือน
   </button>
   <button class="nav-item" onclick="goPage('weekly',this);buildWeekly()">
-    <span class="nav-icon">📊</span> เปรียบสัปดาห์
+    <span class="nav-icon">📊</span> เปรียบเทียบรายสัปดาห์
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">อื่น ๆ</div>
@@ -944,13 +1076,13 @@ body.view-only .view-only-badge { display: flex; }
 
   <!-- ───── OVERVIEW ───── -->
   <div class="page active" id="page-overview">
-    <div class="page-header">
+    <div class="page-header" style="display:none;">
       <div>
         <div class="page-title">📊 ภาพรวมประจำวัน</div>
         <div class="page-subtitle">สรุปยอดการผลิตและกำลังคนทุกแผนก</div>
       </div>
     </div>
-    <div class="kpi-row">
+    <div class="kpi-row" style="display:none;">
       <div class="kpi-card green">
         <div class="kpi-label">อัดร้อน</div>
         <div class="kpi-value" id="ov_hot">—</div>
@@ -987,7 +1119,7 @@ body.view-only .view-only-badge { display: flex; }
       </div>
     </div>
 
-    <div class="g2">
+    <div class="g2" style="display:none;">
       <div class="card">
         <div class="card-title"><span class="title-bar" style="background:var(--blue-500)"></span>ยอดผลิต vs เป้าหมาย</div>
         <div id="ov_bar_chart" style="display:flex;flex-direction:column;gap:12px;"></div>
@@ -997,7 +1129,7 @@ body.view-only .view-only-badge { display: flex; }
         <div id="ov_oc_chart" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
     </div>
-    <div id="ov-dept-wrap" style="margin-top:18px;"></div>
+    <div id="ov-dept-wrap" style="margin-top:0;"></div>
   </div>
 
   <!-- ───── โรงเลื่อยไทรน้อย ───── -->
@@ -1582,7 +1714,7 @@ body.view-only .view-only-badge { display: flex; }
     </div>
 
     <!-- KPI Summary row -->
-    <div id="mo-kpi" class="kpi-row" style="margin-bottom:22px;"></div>
+    <div id="mo-kpi" class="kpi-row" style="margin-bottom:22px;display:none;"></div>
 
     <!-- Section cards -->
     <div id="mo-sections" style="display:flex;flex-direction:column;gap:18px;"></div>
@@ -1751,8 +1883,18 @@ function calRender() {
   // pulling Firebase for every calendar render would be expensive; dots use local cache)
   const prefix = `door_${calYear}-${pad(calMonth+1)}-`;
   const dataKeys = new Set();
+  const completeKeys = new Set();
+  const COMPLETE_FIELDS = ['s1_enter','s1_door','s1_pal','s1_oc','s2_enter','s2_saw','s2_oc','d1_cf','d1_pl','d2_cf','d2_pl','dry_oc','bk_pr','bk_h_ben','bk_h_mok','bk_ben','bk_lvl','bc_cuft','bc_rate','bj_6','bj_45','bj_3','bs_h1','bs_h1_ben','bs_h1_mok','bs_k1','bs_k2','bs_mok','bs_lvl','bf_w','bf_m','bf_oc','b8_oc','p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc','cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy','pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_oc','wh_in','wh_in_ag','wh_in_cp','wh_out','wh_out_ag','wh_out_cp','wh_oc'];
   for (let k in localStorage) {
-    if (k.startsWith(prefix)) dataKeys.add(k.replace('door_',''));
+    if (k.startsWith(prefix)) {
+      const iso = k.replace('door_','');
+      dataKeys.add(iso);
+      try {
+        const d = JSON.parse(localStorage.getItem(k));
+        if (COMPLETE_FIELDS.every(f => d[f] !== '' && d[f] !== null && d[f] !== undefined))
+          completeKeys.add(iso);
+      } catch(e) {}
+    }
   }
 
   const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
@@ -1790,6 +1932,19 @@ function calRender() {
 }
 
 function calSelect(iso) {
+  currentIso = iso;
+  dateEl.value = isoToDisplay(iso);
+  hdrDate.textContent = fmtDate(iso);
+  loadData();
+  updateOverview();
+  calClose();
+}
+
+/* ── Prev/Next day buttons (no calendar needed) ── */
+function shiftDay(delta) {
+  const d = new Date(currentIso + 'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   currentIso = iso;
   dateEl.value = isoToDisplay(iso);
   hdrDate.textContent = fmtDate(iso);
@@ -1955,13 +2110,166 @@ function _ovRow(label, val, unit, opts) {
 function _ovCard(emoji, title, color, bg, border, body, ocA, ocM) {
   const op = ocM > 0 ? (parseFloat(ocA) || 0) / ocM * 100 : 0;
   const oc = op >= 90 ? '#16a34a' : op >= 70 ? '#d97706' : '#dc2626';
-  return `<div style="background:#fff;border:1.5px solid ${border};border-radius:14px;box-shadow:0 1px 4px rgba(15,23,42,.06);overflow:hidden;">
-    <div style="padding:10px 14px;background:${bg};border-bottom:1.5px solid ${border};display:flex;justify-content:space-between;align-items:center;">
+  return `<div class="ov-card" style="border-color:${border};">
+    <div class="ov-card-head" style="padding:10px 14px;background:${bg};border-bottom:1.5px solid ${border};display:flex;justify-content:space-between;align-items:center;" onclick="_ovToggle(this)">
       <span style="font-size:13px;font-weight:800;color:${color};">${emoji} ${title}</span>
-      <span style="font-size:11px;background:rgba(255,255,255,.85);border:1px solid ${border};border-radius:12px;padding:2px 8px;font-weight:700;color:${oc};">👷 ${parseFloat(ocA) || 0}/${ocM}</span>
+      <span style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;background:rgba(255,255,255,.85);border:1px solid ${border};border-radius:12px;padding:2px 8px;font-weight:700;color:${oc};">👷 ${parseFloat(ocA) || 0}/${ocM}</span>
+        <span class="ov-chevron" style="font-size:11px;color:${color};transition:transform .2s;">▾</span>
+      </span>
     </div>
-    <div style="padding:10px 14px;">${body}</div>
+    <div class="ov-card-body" style="padding:10px 14px;">${body}</div>
   </div>`;
+}
+/* ══ Popup detail: คลิกหัวข้อ → เด้งหน้าต่างใหญ่ / กดปิดกลับหน้าเดิม ══
+   หน้า "เปรียบเทียบสัปดาห์" เปิดได้พร้อมกัน 2 ใบเทียบกันซ้าย–ขวา            */
+let _ovPanes = [];   // [{card, body, parent, next, head}]
+
+function _ovHeadClone(headEl) {
+  const c = headEl.cloneNode(true);
+  c.classList.remove('ov-card-head');
+  c.removeAttribute('onclick');
+  c.querySelectorAll('.ov-chevron').forEach(n => n.remove());
+  c.querySelectorAll('input').forEach(n => n.remove());
+  c.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;' +
+                    'flex:1;min-width:0;padding:0;margin:0;background:none;border:none;pointer-events:none;';
+  return c;
+}
+function _ovHeadBg(headEl) {
+  const cs = getComputedStyle(headEl).backgroundColor;
+  return (cs && cs !== 'rgba(0, 0, 0, 0)' && cs !== 'transparent') ? cs : '#f8fafc';
+}
+// การ์ดในหน้าเปรียบเทียบสัปดาห์ → เปิดคู่ได้
+function _ovMultiOK(card) { return !!card.closest('#wk-compare'); }
+
+function _ovToggle(headEl) {
+  const card = headEl.closest('.ov-card');
+  if (!card) return;
+  const body = card.querySelector('.ov-card-body');
+  if (!body) return;
+  const wrap = document.getElementById('ov-modal-wrap');
+  const cEl  = document.getElementById('ov-modal-content');
+  if (!wrap || !cEl) return;                       // ไม่มี modal → ไม่ทำอะไร
+
+  const idx = _ovPanes.findIndex(p => p.card === card);
+  if (idx >= 0) { _ovClosePane(idx); return; }     // คลิกใบเดิมซ้ำ = เอาออก
+
+  const multi = _ovMultiOK(card) && _ovPanes.length > 0 && _ovPanes.every(p => _ovMultiOK(p.card));
+  if (!multi) _ovRestoreAll();                     // หน้าอื่น = ทีละใบ
+  else if (_ovPanes.length >= 2) _ovClosePane(1, true);  // ครบ 2 แล้ว → แทนที่ใบขวา
+
+  _ovPanes.push({ card, body, parent: body.parentNode, next: body.nextSibling, head: headEl });
+  _ovRender();
+  wrap.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+// แถบชิปเลือกสัปดาห์ในตัว popup (คลิกการ์ดข้างหลังไม่ได้ เพราะมีฉากหลังบัง)
+function _ovChipBar() {
+  const heads = [...document.querySelectorAll('#wk-compare .ov-card-head')];
+  if (heads.length < 2) return null;
+  const bar = document.createElement('div');
+  bar.className = 'ov-chipbar';
+  const lab = document.createElement('span');
+  lab.className = 'ov-chipbar-label';
+  lab.textContent = 'เลือกเทียบคู่:';
+  bar.appendChild(lab);
+  heads.forEach(h => {
+    const card = h.closest('.ov-card');
+    const on   = _ovPanes.some(p => p.card === card);
+    if (!on && !card.querySelector('.ov-card-body')) return;   // สัปดาห์ที่ไม่ได้ติ๊กเลือกไว้
+    const tEl = h.querySelector('label span:not(:has(*))') || h.querySelector('label span') || h.querySelector('span');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ov-chip' + (on ? ' on' : '');
+    btn.textContent = (tEl ? tEl.textContent : '').trim() || 'สัปดาห์';
+    btn.onclick = () => _ovToggle(h);
+    bar.appendChild(btn);
+  });
+  return bar;
+}
+
+function _ovRender() {
+  const cEl = document.getElementById('ov-modal-content');
+  const tEl = document.getElementById('ov-modal-title');
+  const hEl = document.getElementById('ov-modal-head');
+  const box = document.querySelector('.ov-modal-box');
+  const hint = document.getElementById('ov-modal-hint');
+  if (!cEl) return;
+  const dual = _ovPanes.length > 1;
+
+  const row = document.createElement('div');
+  row.className = 'ov-pane-row' + (dual ? ' dual' : '');
+  _ovPanes.forEach((p, i) => {
+    const pane = document.createElement('div');
+    pane.className = 'ov-pane';
+    if (dual) {                                    // 2 ใบ → ใส่หัวข้อในแต่ละคอลัมน์
+      const ph = document.createElement('div');
+      ph.className = 'ov-pane-head';
+      ph.style.background = _ovHeadBg(p.head);
+      ph.appendChild(_ovHeadClone(p.head));
+      const x = document.createElement('button');
+      x.type = 'button'; x.className = 'ov-pane-x'; x.textContent = '✕';
+      x.title = 'เอาใบนี้ออก';
+      x.onclick = () => _ovClosePane(i);
+      ph.appendChild(x);
+      pane.appendChild(ph);
+    }
+    pane.appendChild(p.body);                      // ย้ายของจริง ไม่ clone
+    row.appendChild(pane);
+  });
+  const isWk = _ovPanes.length > 0 && _ovPanes.every(p => _ovMultiOK(p.card));
+  const chips = isWk ? _ovChipBar() : null;
+  cEl.replaceChildren(...(chips ? [chips, row] : [row]));
+
+  if (dual) {
+    tEl.innerHTML = '<span style="color:#334155;">⚖️ เปรียบเทียบ 2 สัปดาห์</span>';
+    hEl.style.background = '#f8fafc';
+    hEl.style.borderBottomColor = '#e2e8f0';
+  } else if (_ovPanes.length === 1) {
+    const p = _ovPanes[0];
+    tEl.innerHTML = '';
+    tEl.appendChild(_ovHeadClone(p.head));
+    hEl.style.background = _ovHeadBg(p.head);
+    hEl.style.borderBottomColor = p.card.style.borderColor || '#e2e8f0';
+  }
+  if (box) box.classList.toggle('wide', dual);
+  if (hint) hint.style.display = (!dual && _ovPanes.length === 1 && _ovMultiOK(_ovPanes[0].card)) ? 'block' : 'none';
+}
+
+function _ovClosePane(i, keepOpen) {
+  const p = _ovPanes[i];
+  if (!p) return;
+  p.parent.insertBefore(p.body, p.next);           // คืน body กลับการ์ดเดิม
+  _ovPanes.splice(i, 1);
+  if (_ovPanes.length === 0 && !keepOpen) _ovModalClose();
+  else _ovRender();
+}
+function _ovRestoreAll() {
+  for (let i = _ovPanes.length - 1; i >= 0; i--) {
+    const p = _ovPanes[i];
+    p.parent.insertBefore(p.body, p.next);
+  }
+  _ovPanes = [];
+}
+function _ovModalClose() {
+  _ovRestoreAll();
+  const wrap = document.getElementById('ov-modal-wrap');
+  if (wrap) wrap.classList.remove('show');
+  const box = document.querySelector('.ov-modal-box');
+  if (box) box.classList.remove('wide');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') _ovModalClose(); });
+
+function _ovToggleAll(show, containerSel) {
+  _ovModalClose();
+  const sel = (containerSel || '#ov-dept-wrap') + ' .ov-card';
+  document.querySelectorAll(sel).forEach(card => {
+    card.classList.toggle('ov-open', show);
+    const chev = card.querySelector('.ov-chevron');
+    if (chev) chev.style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)';
+  });
 }
 
 /* ── Overview KPIs ── */
@@ -2116,6 +2424,8 @@ function updateOverview() {
   const prt = g('p2_oc') + g('p3_oc');
   const wt  = g('w_hot') + g('w_cold') + g('w_sloy');
   const plt = g('pl_3x6')+g('pl_4x6')+g('pl_4x8s')+g('pl_4x8sn')+g('pl_4x8h')+g('pl_4x9')+g('pl_4x10')+g('pl_4x12')+g('pl_7x9');
+  const s1Avg = _sawMonthlyAvg(['s1_door','s1_pal']);
+  const s2Avg = _sawMonthlyAvg(['s2_saw']);
 
   const miniGrid = (items, bg2, border2, textColor) =>
     `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px;">
@@ -2130,12 +2440,14 @@ function updateOverview() {
       R('เข้าเลื่อย', g('s1_enter'), 'Ton.') +
       R('ยอดเลื่อยรวม', s1t, 'Cu.ft.', {vc:'#16a34a', dec:2}) +
       R('ไม้เลื่อยส่งโรงประตู', g('s1_door'), 'Cu.ft.', {sm:true, dec:2}) +
-      R('ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', g('s1_pal'), 'Cu.ft.', {sm:true, dec:2}),
+      R('ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', g('s1_pal'), 'Cu.ft.', {sm:true, dec:2}) +
+      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s1Avg.avg, 'Cu.ft./วัน', {vc:'#16a34a', dec:2}),
       g('s1_oc'), 40),
 
     C('🪵','โรงเลื่อยปราจีน','#ea580c','linear-gradient(135deg,#fff7ed,#ffedd5)','#fdba74',
       R('เข้าเลื่อย', g('s2_enter'), 'Ton.') +
-      R('ยอดเลื่อย', g('s2_saw'), 'Cu.ft.', {vc:'#ea580c', dec:2}),
+      R('ยอดเลื่อย', g('s2_saw'), 'Cu.ft.', {vc:'#ea580c', dec:2}) +
+      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s2Avg.avg, 'Cu.ft./วัน', {vc:'#ea580c', dec:2}),
       g('s2_oc'), 17),
 
     C('🌡️','โรงอบ','#0284c7','linear-gradient(135deg,#e0f2fe,#bae6fd)','#7dd3fc',
@@ -2149,7 +2461,7 @@ function updateOverview() {
       R('Stock ไม้แปรรูป', g('bk_pr'), 'Cu.ft.', {vc:'#475569', dec:2}) +
       R('Stock ไม้หัว', g('bk_h'), 'รวม', {sm:true}) +
       miniGrid([['เบญ-ยาง',g('bk_h_ben')],['มอก.',g('bk_h_mok')]],'#f0fdf4','#86efac','#16a34a') +
-      R('Stock ไม้ข้าง (เบญ-ยาง)', g('bk_k'), 'Cu.ft.', {sm:true, dec:2}) +
+      R('Stock ไม้ข้าง', g('bk_k'), 'Cu.ft.', {sm:true, dec:2}) +
       R('Stock ไม้ข้าง (มอก.)', g('bs_mok'), 'pcs.', {sm:true}) +
       R('Stock ไม้ข้าง (เบญจพรรณ)', g('bk_ben'), 'Cu.ft.', {sm:true, dec:2}) +
       R('Stock ไม้ข้าง LVL', g('bk_lvl'), 'pcs.', {sm:true}) +
@@ -2200,8 +2512,12 @@ function updateOverview() {
   ];
 
   dw.innerHTML = `
-    <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:12px;letter-spacing:.3px;display:flex;align-items:center;gap:8px;">
-      <span>📋 รายละเอียดแต่ละแผนก</span>
+    <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:12px;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <span>📋 รายละเอียดแต่ละแผนก <span style="font-weight:500;color:#94a3b8;font-size:11px;">(คลิกที่หัวข้อเพื่อดูข้อมูล)</span></span>
+      <span style="display:flex;gap:6px;">
+        <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(true)">ขยายทั้งหมด</button>
+        <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(false)">ย่อทั้งหมด</button>
+      </span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
       ${cards.join('')}
@@ -2242,6 +2558,24 @@ async function saveData() {
   const toast = document.getElementById('toast');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function _sawMonthlyAvg(fields) {
+  if (!currentIso) return { avg: 0, days: 0 };
+  const [yr, mo] = currentIso.split('-');
+  const prefix = `door_${yr}-${mo}-`;
+  let total = 0, days = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(prefix)) continue;
+    try {
+      const d = JSON.parse(localStorage.getItem(k));
+      if (!d) continue;
+      const v = fields.reduce((s, f) => s + toNum(d[f]), 0);
+      if (v > 0) { total += v; days++; }
+    } catch (e) {}
+  }
+  return { avg: days > 0 ? total / days : 0, days };
 }
 
 function calcSawMonthlyAvg() {
@@ -2344,18 +2678,18 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     'door_2026-08-01': {"s1_enter": "30.854", "s1_door": "617.07", "s1_pal": "0.00", "s1_oc": "35", "s2_enter": "11", "s2_saw": "181.47", "s2_oc": "10", "d1_cf": "901.74", "d1_pl": "17", "d2_cf": "12545.27", "d2_pl": "294", "dry_oc": "5", "bk_pr": "3520.32", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "25572", "bk_lvl": "18360", "bc_cuft": "310.26", "bc_rate": "19.39", "bj_6": "396", "bj_45": "0", "bj_3": "590", "bs_h1": "2670", "bs_h1_ben": "2670", "bs_h1_mok": "0", "bs_k1": "3938", "bs_k2": "3938", "bs_mok": "20745", "bs_lvl": "0", "bf_w": "154", "bf_m": "0", "bf_oc": "8", "b8_oc": "28", "p1_frame": "1877", "p1_oc": "17", "p2_hot": "1652", "p2_oc": "10", "p2_down": "0", "p3_cold": "149", "p3_oc": "3", "cts_sloy": "2185", "cts_wrap": "2025", "cts_oc": "21", "w_hot": "8", "w_cold": "0", "w_sloy": "1", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "20", "pl_oc": "4", "wh_in": "2019", "wh_in_ag": "1982", "wh_in_cp": "37", "wh_out": "440", "wh_out_ag": "380", "wh_out_cp": "60", "wh_oc": "6"},
     'door_2026-08-03': {"s1_enter": "28.617", "s1_door": "551.89", "s1_pal": "20.45", "s1_oc": "32", "s2_enter": "8.83", "s2_saw": "146.92", "s2_oc": "12", "d1_cf": "816.68", "d1_pl": "20", "d2_cf": "12576.33", "d2_pl": "294", "dry_oc": "5", "bk_pr": "3384.19", "bk_h": "2408", "bk_h_ben": "2408", "bk_h_mok": "0", "bk_ben": "28328", "bk_lvl": "15120", "bc_cuft": "265.94", "bc_rate": "16.62", "bj_6": "600", "bj_45": "0", "bj_3": "600", "bs_h1": "712", "bs_h1_ben": "712", "bs_h1_mok": "0", "bs_k1": "2820", "bs_k2": "2820", "bs_mok": "20745", "bs_lvl": "0", "bf_w": "233", "bf_m": "", "bf_oc": "10", "b8_oc": "28", "p1_frame": "2406", "p1_oc": "19", "p2_hot": "1528", "p2_oc": "8", "p2_down": "0", "p3_cold": "103", "p3_oc": "3", "cts_sloy": "2074", "cts_wrap": "2161", "cts_oc": "24", "w_hot": "9", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "4", "wh_in": "2586", "wh_in_ag": "2539", "wh_in_cp": "47", "wh_out": "222", "wh_out_ag": "174", "wh_out_cp": "48", "wh_oc": "6"},
     'door_2026-08-04': {"s1_enter": "37.287", "s1_door": "657.35", "s1_pal": "88.39", "s1_oc": "36", "s2_enter": "15.10", "s2_saw": "254.49", "s2_oc": "13", "d1_cf": "1642.78", "d1_pl": "37", "d2_cf": "12628.02", "d2_pl": "308", "dry_oc": "5", "bk_pr": "3605.79", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "24950", "bk_lvl": "15418", "bc_cuft": "223", "bc_rate": "10.62", "bj_6": "1170", "bj_45": "0", "bj_3": "0", "bs_h1": "4748", "bs_h1_ben": "4748", "bs_h1_mok": "0", "bs_k1": "4062", "bs_k2": "4062", "bs_mok": "23565", "bs_lvl": "0", "bf_w": "190", "bf_m": "", "bf_oc": "10", "b8_oc": "30", "p1_frame": "1993", "p1_oc": "20", "p2_hot": "1695", "p2_oc": "10", "p2_down": "0", "p3_cold": "162", "p3_oc": "3", "cts_sloy": "1539", "cts_wrap": "1078", "cts_oc": "23", "w_hot": "3", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "2152", "wh_in_ag": "2152", "wh_in_cp": "0", "wh_out": "85", "wh_out_ag": "23", "wh_out_cp": "62", "wh_oc": "6"},
-    'door_2026-08-05': {"s1_enter": "28.617", "s1_door": "551.89", "s1_pal": "20.45", "s1_oc": "32", "s2_enter": "10.90", "s2_saw": "181.96", "s2_oc": "13", "d1_cf": "716.96", "d1_pl": "16", "d2_cf": "14240.47", "d2_pl": "344", "dry_oc": "5", "bk_pr": "4506.09", "bk_h": "0", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "24035", "bk_lvl": "14040", "bc_cuft": "398.91", "bc_rate": "19.00", "bj_6": "920", "bj_45": "100", "bj_3": "360", "bs_h1": "5518", "bs_h1_ben": "5518", "bs_h1_mok": "0", "bs_k1": "5829", "bs_k2": "5829", "bs_mok": "25365", "bs_lvl": "0", "bf_w": "184", "bf_m": "", "bf_oc": "10", "b8_oc": "30", "p1_frame": "1989", "p1_oc": "20", "p2_hot": "1531", "p2_oc": "10", "p2_down": "30", "p3_cold": "12", "p3_oc": "3", "cts_sloy": "1635", "cts_wrap": "1344", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "5", "wh_in": "1515", "wh_in_ag": "1404", "wh_in_cp": "111", "wh_out": "531", "wh_out_ag": "332", "wh_out_cp": "199", "wh_oc": "6"},
+    'door_2026-08-05': {"s1_enter": "28.617", "s1_door": "551.89", "s1_pal": "20.45", "s1_oc": "32", "s2_enter": "10.90", "s2_saw": "181.96", "s2_oc": "13", "d1_cf": "716.96", "d1_pl": "16", "d2_cf": "14240.47", "d2_pl": "344", "dry_oc": "5", "bk_pr": "4506.09", "bk_h": "0", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "24035", "bk_lvl": "14040", "bc_cuft": "398.91", "bc_rate": "19.00", "bj_6": "920", "bj_45": "100", "bj_3": "360", "bs_h1": "5518", "bs_h1_ben": "5518", "bs_h1_mok": "0", "bs_k1": "5829", "bs_k2": "5829", "bs_mok": "25365", "bs_lvl": "0", "bf_w": "184", "bf_m": "", "bf_oc": "10", "b8_oc": "30", "p1_frame": "1989", "p1_oc": "20", "p2_hot": "1531", "p2_oc": "10", "p2_down": "30", "p3_cold": "87", "p3_oc": "3", "cts_sloy": "1635", "cts_wrap": "1344", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "5", "wh_in": "1515", "wh_in_ag": "1404", "wh_in_cp": "111", "wh_out": "531", "wh_out_ag": "332", "wh_out_cp": "199", "wh_oc": "6"},
     'door_2026-08-06': {"s1_enter": "29.844", "s1_door": "446.19", "s1_pal": "150.69", "s1_oc": "33", "s2_enter": "13.15", "s2_saw": "217.30", "s2_oc": "12", "d1_cf": "651.73", "d1_pl": "14", "d2_cf": "14270.47", "d2_pl": "344", "dry_oc": "5", "bk_pr": "4329.81", "bk_h": "0", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "26268", "bk_lvl": "14040", "bc_cuft": "224.39", "bc_rate": "21.37", "bj_6": "565", "bj_45": "0", "bj_3": "0", "bs_h1": "4205", "bs_h1_ben": "4205", "bs_h1_mok": "0", "bs_k1": "8280", "bs_k2": "1800", "bs_mok": "25365", "bs_lvl": "6480", "bf_w": "222", "bf_m": "", "bf_oc": "10", "b8_oc": "28", "p1_frame": "2128", "p1_oc": "20", "p2_hot": "1626", "p2_oc": "10", "p2_down": "0", "p3_cold": "51", "p3_oc": "3", "cts_sloy": "1585", "cts_wrap": "1671", "cts_oc": "24", "w_hot": "3", "w_cold": "0", "w_sloy": "0", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "6", "wh_in": "1852", "wh_in_ag": "1693", "wh_in_cp": "159", "wh_out": "1954", "wh_out_ag": "1780", "wh_out_cp": "174", "wh_oc": "6"},
-    'door_2026-08-10': {"s1_enter": "68.650", "s1_door": "1191.61", "s1_pal": "181.40", "s1_oc": "35", "s2_enter": "14.48", "s2_saw": "248.03", "s2_oc": "12", "d1_cf": "912.31", "d1_pl": "22", "d2_cf": "12196.31", "d2_pl": "280", "dry_oc": "5", "bk_pr": "479.15", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "160", "bj_45": "800", "bj_3": "270", "bs_h1": "3500", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "4335", "bs_k2": "2175", "bs_mok": "27971", "bs_lvl": "2160", "bf_w": "110", "bf_m": "", "bf_oc": "9", "b8_oc": "28", "p1_frame": "2237", "p1_oc": "19", "p2_hot": "1783", "p2_oc": "10", "p2_down": "0", "p3_cold": "54", "p3_oc": "3", "cts_sloy": "1575", "cts_wrap": "1550", "cts_oc": "24", "w_hot": "0", "w_cold": "", "w_sloy": "", "pl_3x6": "20", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "5", "wh_in": "1965", "wh_in_ag": "1894", "wh_in_cp": "71", "wh_out": "631", "wh_out_ag": "631", "wh_out_cp": "0", "wh_oc": "6"},
+    'door_2026-08-10': {"s1_enter": "45.546", "s1_door": "820.22", "s1_pal": "90.70", "s1_oc": "0", "s2_enter": "14.48", "s2_saw": "248.03", "s2_oc": "12", "d1_cf": "912.31", "d1_pl": "22", "d2_cf": "12196.31", "d2_pl": "280", "dry_oc": "5", "bk_pr": "479.15", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "160", "bj_45": "800", "bj_3": "270", "bs_h1": "3500", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "4335", "bs_k2": "2175", "bs_mok": "27971", "bs_lvl": "2160", "bf_w": "110", "bf_m": "", "bf_oc": "9", "b8_oc": "28", "p1_frame": "2237", "p1_oc": "19", "p2_hot": "1783", "p2_oc": "10", "p2_down": "0", "p3_cold": "54", "p3_oc": "3", "cts_sloy": "1575", "cts_wrap": "1550", "cts_oc": "24", "w_hot": "0", "w_cold": "", "w_sloy": "", "pl_3x6": "20", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "5", "wh_in": "1965", "wh_in_ag": "1894", "wh_in_cp": "71", "wh_out": "631", "wh_out_ag": "631", "wh_out_cp": "0", "wh_oc": "6"},
     'door_2026-08-11': {"s1_enter": "36.783", "s1_door": "655.29", "s1_pal": "80.38", "s1_oc": "35", "s2_enter": "8.12", "s2_saw": "145.17", "s2_oc": "12", "d1_cf": "893.06", "d1_pl": "22", "d2_cf": "12598.25", "d2_pl": "280", "dry_oc": "5", "bk_pr": "3983.17", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26317", "bk_lvl": "10800", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "0", "bj_45": "1342", "bj_3": "0", "bs_h1": "3943", "bs_h1_ben": "3943", "bs_h1_mok": "0", "bs_k1": "4130", "bs_k2": "1366", "bs_mok": "27277", "bs_lvl": "0", "bf_w": "175", "bf_m": "0", "bf_oc": "9", "b8_oc": "28", "p1_frame": "2317", "p1_oc": "20", "p2_hot": "1747", "p2_oc": "10", "p2_down": "265", "p3_cold": "111", "p3_oc": "3", "cts_sloy": "1881", "cts_wrap": "1428", "cts_oc": "24", "w_hot": "24", "w_cold": "0", "w_sloy": "0", "pl_3x6": "10", "pl_4x6": "20", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "1687", "wh_in_ag": "1667", "wh_in_cp": "20", "wh_out": "747", "wh_out_ag": "605", "wh_out_cp": "142", "wh_oc": "6"},
     'door_2026-08-12': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "17.38", "s2_saw": "306.52", "s2_oc": "13", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": ""},
     'door_2026-08-13': {"s1_enter": "37.996", "s1_door": "759.92", "s1_pal": "0.00", "s1_oc": "35", "s2_enter": "14.39", "s2_saw": "244.22", "s2_oc": "11", "d1_cf": "911.53", "d1_pl": "23", "d2_cf": "10995.46", "d2_pl": "244", "dry_oc": "5", "bk_pr": "3935.18", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26317", "bk_lvl": "10800", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "0", "bj_45": "700", "bj_3": "550", "bs_h1": "4740", "bs_h1_ben": "2870", "bs_h1_mok": "1870", "bs_k1": "4130", "bs_k2": "4130", "bs_mok": "27277", "bs_lvl": "0", "bf_w": "194", "bf_m": "0", "bf_oc": "10", "b8_oc": "28", "p1_frame": "2131", "p1_oc": "19", "p2_hot": "1705", "p2_oc": "8", "p2_down": "0", "p3_cold": "99", "p3_oc": "3", "cts_sloy": "1748", "cts_wrap": "1452", "cts_oc": "24", "w_hot": "11", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "1488", "wh_in_ag": "1319", "wh_in_cp": "169", "wh_out": "2801", "wh_out_ag": "2667", "wh_out_cp": "134", "wh_oc": "6"},
-    'door_2026-08-14': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "3839.20", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "274.25", "bc_rate": "17.14", "bj_6": "", "bj_45": "", "bj_3": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": ""},
-    'door_2026-08-15': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "4319.10", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": ""},
+    'door_2026-08-14': {"s1_enter": "43.453", "s1_door": "869.05", "s1_pal": "0.00", "s1_oc": "38", "s2_enter": "14.96", "s2_saw": "258.40", "s2_oc": "11", "d1_cf": "734.10", "d1_pl": "16", "d2_cf": "11440.85", "d2_pl": "266", "dry_oc": "5", "bk_pr": "3839.20", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "274.25", "bc_rate": "17.14", "bj_6": "0", "bj_45": "1500", "bj_3": "0", "bs_h1": "4038", "bs_h1_ben": "4038", "bs_h1_mok": "0", "bs_k1": "2880", "bs_k2": "2880", "bs_mok": "", "bs_lvl": "0", "bf_w": "194", "bf_m": "0", "bf_oc": "10", "b8_oc": "29", "p1_frame": "2362", "p1_oc": "20", "p2_hot": "2253", "p2_oc": "10", "p2_down": "50", "p3_cold": "115", "p3_oc": "3", "cts_sloy": "1712", "cts_wrap": "1417", "cts_oc": "24", "w_hot": "6", "w_cold": "", "w_sloy": "3", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "1536", "wh_in_ag": "1435", "wh_in_cp": "101", "wh_out": "165", "wh_out_ag": "0", "wh_out_cp": "165", "wh_oc": "6"},
+    'door_2026-08-15': {"s1_enter": "44.031", "s1_door": "880.61", "s1_pal": "0.00", "s1_oc": "31", "s2_enter": "11.22", "s2_saw": "198.92", "s2_oc": "12", "d1_cf": "669.86", "d1_pl": "15", "d2_cf": "12798.29", "d2_pl": "309", "dry_oc": "5", "bk_pr": "4319.10", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "27945", "bk_lvl": "10800", "bc_cuft": "664.85", "bc_rate": "21.11", "bj_6": "306", "bj_45": "540", "bj_3": "375", "bs_h1": "3660", "bs_h1_ben": "2722", "bs_h1_mok": "938", "bs_k1": "2987", "bs_k2": "2987", "bs_mok": "26327", "bs_lvl": "0", "bf_w": "231", "bf_m": "0", "bf_oc": "9", "b8_oc": "29", "p1_frame": "2410", "p1_oc": "19", "p2_hot": "2466", "p2_oc": "10", "p2_down": "0", "p3_cold": "86", "p3_oc": "3", "cts_sloy": "1465", "cts_wrap": "1957", "cts_oc": "24", "w_hot": "2", "w_cold": "", "w_sloy": "25", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "1636", "wh_in_ag": "1485", "wh_in_cp": "151", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": "6"},
     'door_2026-08-08': {"s1_enter": "29.652", "s1_door": "374.79", "s1_pal": "218.25", "s1_oc": "32", "s2_enter": "4.74", "s2_saw": "80.13", "s2_oc": "11", "d1_cf": "689.39", "d1_pl": "20", "d2_cf": "11434.02", "d2_pl": "266", "dry_oc": "5", "bk_pr": "4319.10", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26056", "bk_lvl": "12960", "bc_cuft": "365.67", "bc_rate": "22.85", "bj_6": "600", "bj_45": "0", "bj_3": "0", "bs_h1": "3522", "bs_h1_ben": "3522", "bs_h1_mok": "0", "bs_k1": "7887", "bs_k2": "1479", "bs_mok": "27971", "bs_lvl": "6408", "bf_w": "55", "bf_m": "88", "bf_oc": "8", "b8_oc": "26", "p1_frame": "1419", "p1_oc": "16", "p2_hot": "1728", "p2_oc": "10", "p2_down": "0", "p3_cold": "114", "p3_oc": "3", "cts_sloy": "1629", "cts_wrap": "1726", "cts_oc": "23", "w_hot": "0", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "4", "wh_in": "1500", "wh_in_ag": "1377", "wh_in_cp": "123", "wh_out": "1651", "wh_out_ag": "1520", "wh_out_cp": "131", "wh_oc": "6"},
     'door_2026-08-07': {"s1_enter": "33.102", "s1_door": "662.04", "s1_pal": "0.00", "s1_oc": "31", "s2_enter": "8.15", "s2_saw": "138.47", "s2_oc": "11", "d1_cf": "861.68", "d1_pl": "20", "d2_cf": "11434.02", "d2_pl": "266", "dry_oc": "5", "bk_pr": "4818.05", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26056", "bk_lvl": "12960", "bc_cuft": "224.39", "bc_rate": "21.37", "bj_6": "480", "bj_45": "260", "bj_3": "0", "bs_h1": "3775", "bs_h1_ben": "3775", "bs_h1_mok": "0", "bs_k1": "4762", "bs_k2": "4762", "bs_mok": "27971", "bs_lvl": "0", "bf_w": "168", "bf_m": "0", "bf_oc": "10", "b8_oc": "29", "p1_frame": "2121", "p1_oc": "20", "p2_hot": "1713", "p2_oc": "10", "p2_down": "0", "p3_cold": "100", "p3_oc": "3", "cts_sloy": "1534", "cts_wrap": "1519", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1433", "wh_in_ag": "1413", "wh_in_cp": "20", "wh_out": "1090", "wh_out_ag": "115", "wh_out_cp": "975", "wh_oc": "6"}
   };
-  const DATA_VERSION = '2026-08-07';
+  const DATA_VERSION = '2026-08-17';
   const storedVersion = localStorage.getItem('door_data_version');
   for (const [k,v] of Object.entries(bulk)) {
     if (!localStorage.getItem(k) || storedVersion !== DATA_VERSION) {
@@ -2363,11 +2697,33 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     }
   }
   localStorage.setItem('door_data_version', DATA_VERSION);
-  // Set date to most recent data day
-  currentIso = '2026-08-07';
-  const di = document.getElementById('date-input');
-  if (di) di.value = '07/08/2026';
-  document.getElementById('hdr-date-text').textContent = fmtDate('2026-07-31');
+
+  // ── Set date to the most recent day that actually has data ──
+  function _findLatestDataIso() {
+    let latest = null;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !/^door_\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+      let d;
+      try { d = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; }
+      if (!d) continue;
+      const hasData = ['p2_hot','cts_wrap','s1_enter','s2_saw','wh_in','p1_frame']
+        .some(f => parseFloat(d[f]) > 0);
+      if (!hasData) continue;
+      const iso = k.slice(5);
+      if (!latest || iso > latest) latest = iso;
+    }
+    return latest;
+  }
+  const latestIso = _findLatestDataIso();
+  if (latestIso) {
+    currentIso = latestIso;
+    const [ly, lm, ld] = latestIso.split('-');
+    const di = document.getElementById('date-input');
+    if (di) di.value = `${ld}/${lm}/${ly}`;
+    const hdrEl = document.getElementById('hdr-date-text');
+    if (hdrEl) hdrEl.textContent = fmtDate(latestIso);
+  }
 })();
 
 /* ══════════════════════════════
@@ -2486,7 +2842,7 @@ async function buildMonthly() {
 
   // ── Section Cards ──
   // วันล่าสุดที่มี Stock รอผลิต
-  const _lastStock = days.slice().reverse().find(({data:r})=>toNum(r.bk_pr)||toNum(r.bk_h)||toNum(r.bk_k));
+  const _lastStock = days.slice().reverse().find(({data:r})=>toNum(r.bk_pr)||toNum(r.bk_h)||toNum(r.bk_k)||toNum(r.bk_ben)||toNum(r.bk_lvl)||toNum(r.bs_mok));
   const _sk = _lastStock ? _lastStock.data : {};
   const _skDate = _lastStock ? (()=>{const d=new Date(_lastStock.iso);return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}`;})() : '—';
   const sections = [
@@ -2526,13 +2882,13 @@ async function buildMonthly() {
         {l:'ยอดตัดไม้',v:fmtN(tot.bc_cuft,2),u:'Cu.ft.'},
         {l:'อัตราตัด (เฉลี่ย)',v:daysWithData?fmtN(tot.bc_rate/daysWithData,2):'—',u:'Cu.ft./ชม.'},
         {l:'— Stock รอผลิต —',v:_skDate,u:''},
-        {l:'ไม้แปรรูป',v:_sk.bk_pr?fmtN(toNum(_sk.bk_pr),2):'—',u:'Cu.ft.'},
-        {l:'ไม้หัว (รวม)',v:_sk.bk_h?fmtN(toNum(_sk.bk_h),0):'—',u:'pcs.'},
-        {l:'ไม้หัว (เบญ-ยาง)',v:_sk.bk_ben?fmtN(toNum(_sk.bk_ben),0):'—',u:'pcs.'},
-        {l:'ไม้หัว มอก.',v:_sk.bk_lvl?fmtN(toNum(_sk.bk_lvl),0):'—',u:'pcs.'},
-        {l:'ไม้ข้าง (รวม)',v:_sk.bk_k?fmtN(toNum(_sk.bk_k),0):'—',u:'pcs.'},
-        {l:'ไม้ข้าง (มอก.)',v:_sk.bk_h_ben?fmtN(toNum(_sk.bk_h_ben),0):'—',u:'pcs.'},
-        {l:'ไม้ข้าง (เบญจพรรณ)',v:_sk.bk_h_mok?fmtN(toNum(_sk.bk_h_mok),0):'—',u:'pcs.'},
+        {l:'ไม้แปรรูป',v:toNum(_sk.bk_pr)?fmtN(toNum(_sk.bk_pr),2):'—',u:'Cu.ft.'},
+        {l:'ไม้หัว (รวม)',v:toNum(_sk.bk_h)?fmtN(toNum(_sk.bk_h),0):'—',u:'pcs.'},
+        {l:'ไม้หัว (เบญ-ยาง)',v:toNum(_sk.bk_h_ben)?fmtN(toNum(_sk.bk_h_ben),0):'—',u:'pcs.'},
+        {l:'ไม้หัว มอก.',v:toNum(_sk.bk_h_mok)?fmtN(toNum(_sk.bk_h_mok),0):'—',u:'pcs.'},
+        {l:'ไม้ข้าง (รวม)',v:(()=>{const t=toNum(_sk.bk_k)||(toNum(_sk.bk_ben)+toNum(_sk.bs_mok)+toNum(_sk.bk_lvl));return t?fmtN(t,0):'—';})(),u:'pcs.'},
+        {l:'ไม้ข้าง (เบญจพรรณ)',v:toNum(_sk.bk_ben)?fmtN(toNum(_sk.bk_ben),0):'—',u:'pcs.'},
+        {l:'ไม้ข้าง LVL',v:toNum(_sk.bk_lvl)?fmtN(toNum(_sk.bk_lvl),0):'—',u:'pcs.'},
         {l:'— ยอดต่อ —',v:`${daysWithData} วัน`,u:''},
         {l:'ต่อ 6"',v:fmtN(tot.bj_6,0),u:'pcs.'},
         {l:'ต่อ 4.5"',v:fmtN(tot.bj_45,0),u:'pcs.'},
@@ -2606,12 +2962,21 @@ async function buildMonthly() {
     },
   ];
 
-  document.getElementById('mo-sections').innerHTML = sections.map(s=>`
-    <div class="mo-section-card">
-      <div class="mo-section-title">
-        <span>${s.icon}</span> ${s.title}
-        <span class="mo-days-badge">${daysWithData} วัน</span>
+  document.getElementById('mo-sections').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;gap:6px;">
+      <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(true,'#mo-sections')">ขยายทั้งหมด</button>
+      <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(false,'#mo-sections')">ย่อทั้งหมด</button>
+    </div>` +
+    sections.map(s=>`
+    <div class="mo-section-card ov-card" style="padding:0;">
+      <div class="ov-card-head" style="padding:16px 20px;" onclick="_ovToggle(this)">
+        <div class="mo-section-title" style="margin-bottom:0;">
+          <span>${s.icon}</span> ${s.title}
+          <span class="mo-days-badge">${daysWithData} วัน</span>
+          <span class="ov-chevron" style="font-size:11px;color:var(--g400);transition:transform .2s;">▾</span>
+        </div>
       </div>
+      <div class="ov-card-body" style="padding:0 20px 20px;">
       <div class="mo-metrics">
         ${s.metrics.map(m=> m.l.startsWith('—') ? `
           <div style="grid-column:1/-1;display:flex;align-items:center;gap:6px;margin-top:8px;">
@@ -2630,6 +2995,7 @@ async function buildMonthly() {
             <div class="mo-metric-value" ${m.highlight?'style="color:var(--green-700,#15803d);"':''}>${m.v}</div>
             <div class="mo-metric-unit">${m.u}</div>
           </div>`).join('')}
+      </div>
       </div>
     </div>`).join('');
 
@@ -2932,8 +3298,12 @@ async function buildMCompare() {
   Object.values(curData).forEach(d  => SF.forEach(f => { tC[f] += toNum(d[f]); }));
   Object.values(prevData).forEach(d => SF.forEach(f => { tP[f] += toNum(d[f]); }));
 
-  const curDays  = Object.keys(curData).length;
-  const prevDays = Object.keys(prevData).length;
+  // นับเฉพาะ "วันที่มีข้อมูลจริง" (ตัดวันหยุด/วันที่กรอกเป็น 0 ทั้งหมดออก)
+  const _wd = obj => Object.values(obj).filter(d => SF.some(f => toNum(d[f]) > 0)).length;
+  const curDays  = _wd(curData);
+  const prevDays = _wd(prevData);
+  document.getElementById('mc-subtitle').textContent =
+    `เปรียบเทียบ ${prevLabel} (${prevDays} วัน) กับ ${curLabel} (${curDays} วัน) · คอลัมน์ "เปลี่ยน" คิดจากค่าเฉลี่ยต่อวัน`;
   const palF = ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'];
   const palC = palF.reduce((s,f)=>s+tC[f],0);
   const palP = palF.reduce((s,f)=>s+tP[f],0);
@@ -2942,8 +3312,13 @@ async function buildMCompare() {
   const wPctC = tC.p2_hot>0 ? wTotC/tC.p2_hot*100 : 0;
   const wPctP = tP.p2_hot>0 ? wTotP/tP.p2_hot*100 : 0;
 
-  // % change badge
-  function chg(vC, vP, lowerIsBetter=false) {
+  // % change badge — เทียบบนฐาน "เฉลี่ยต่อวัน" เพื่อไม่ให้จำนวนวันที่ต่างกันทำให้ %​ เพี้ยน
+  // (แถวที่เป็น % อยู่แล้ว เช่น % ของเสีย เป็นอัตราส่วน ไม่ต้องหารวัน)
+  function chg(vC, vP, lowerIsBetter=false, isRatio=false) {
+    if (!isRatio) {
+      if (curDays > 0)  vC = vC / curDays;
+      if (prevDays > 0) vP = vP / prevDays;
+    }
     if (vP===0 && vC===0) return '<span style="color:#94a3b8;font-size:12px;">—</span>';
     if (vP===0) return '<span style="color:var(--teal-500);font-size:12px;font-weight:700;">ใหม่</span>';
     const diff = vC - vP;
@@ -2992,34 +3367,25 @@ async function buildMCompare() {
   const lblStyle = 'padding:10px 14px;color:var(--g700);font-size:13px;';
 
   const html = `
-    <!-- Summary KPI bar -->
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
-      ${[
-        {l:'วันทำงาน', vC:curDays,  vP:prevDays,  u:'วัน', neutral:true},
-        {l:'อัดร้อน',  vC:tC.p2_hot,vP:tP.p2_hot, u:'บาน'},
-        {l:'ห่อประตู', vC:tC.cts_wrap,vP:tP.cts_wrap,u:'บาน'},
-        {l:'เข้าคลัง', vC:tC.wh_in_ag+tC.wh_in_cp,vP:tP.wh_in_ag+tP.wh_in_cp,u:'บาน'},
-        {l:'โหลดสินค้า',vC:tC.wh_out_ag+tC.wh_out_cp,vP:tP.wh_out_ag+tP.wh_out_cp,u:'บาน'},
-        {l:'% ของเสีย', vC:wPctC,vP:wPctP,u:'%',dec:3,lowerBetter:true},
-      ].map(k=>`
-        <div style="background:#fff;border-radius:10px;border:1px solid var(--g100);padding:14px 18px;flex:1;min-width:110px;box-shadow:0 1px 4px #0001;">
-          <div style="font-size:11px;color:var(--g300);font-weight:700;margin-bottom:4px;">${k.l}</div>
-          <div style="font-size:22px;font-weight:800;color:var(--g800);">${k.dec?k.vC.toFixed(k.dec)+'%':fmtNum(k.vC,0)}<span style="font-size:12px;font-weight:400;color:var(--g300);margin-left:3px;">${k.u!='%'?k.u:''}</span></div>
-          <div style="font-size:12px;margin-top:4px;">${k.neutral?'<span style="color:#94a3b8">'+fmtNum(k.vP,0)+' '+k.u+' (ก่อนหน้า)</span>':chg(k.vC,k.vP,k.lowerBetter)} <span style="color:#94a3b8;font-size:11px;">${k.neutral?'':fmtNum(k.vP,0)+' '+k.u}</span></div>
-        </div>`).join('')}
-    </div>
-
     <!-- Detail groups -->
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px;">
+      <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(true,'#mc-body')">ขยายทั้งหมด</button>
+      <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(false,'#mc-body')">ย่อทั้งหมด</button>
+    </div>
     ${groups.map(g=>`
-    <div style="background:#fff;border-radius:12px;border:1px solid var(--g100);margin-bottom:14px;overflow:hidden;box-shadow:0 1px 4px #0001;">
-      <div style="padding:12px 16px;background:var(--g50);border-bottom:1px solid var(--g100);font-weight:800;font-size:14px;color:var(--g700);">${g.title}</div>
+    <div class="ov-card" style="margin-bottom:14px;">
+      <div class="ov-card-head" style="padding:12px 16px;background:var(--g50);border-bottom:1px solid var(--g100);font-weight:800;font-size:14px;color:var(--g700);display:flex;justify-content:space-between;align-items:center;" onclick="_ovToggle(this)">
+        <span>${g.title}</span>
+        <span class="ov-chevron" style="font-size:11px;color:var(--g400);transition:transform .2s;">▾</span>
+      </div>
+      <div class="ov-card-body">
       <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr style="background:#f8fafc;font-size:11px;font-weight:700;color:var(--g300);">
             <th style="padding:8px 14px;text-align:left;font-weight:700;">รายการ</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${prevLabel}</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${curLabel}</th>
-            <th style="padding:8px 14px;text-align:right;font-weight:700;">เปลี่ยน</th>
+            <th style="padding:8px 14px;text-align:right;font-weight:700;" title="เทียบจากค่าเฉลี่ยต่อวัน จึงไม่ถูกบิดจากจำนวนวันทำงานที่ต่างกัน">เปลี่ยน<div style="font-size:9px;font-weight:600;color:#cbd5e1;">เฉลี่ย/วัน</div></th>
           </tr>
         </thead>
         <tbody>
@@ -3028,10 +3394,11 @@ async function buildMCompare() {
             <td style="${lblStyle}${r.bold?'font-weight:700;color:var(--g800)':''}">${r.l}</td>
             <td style="${colStyle}font-size:14px;color:var(--g600);">${r.isPct?fmtPct(r.vP):fmt(r.vP,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span></td>
             <td style="${colStyle}font-size:15px;font-weight:${r.bold?'800':'600'};color:var(--g800);">${r.isPct?fmtPct(r.vC):fmt(r.vC,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span></td>
-            <td style="${colStyle}">${chg(r.vC,r.vP,r.lowerBetter)}</td>
+            <td style="${colStyle}">${chg(r.vC,r.vP,r.lowerBetter,r.isPct)}</td>
           </tr>`).join('')}
         </tbody>
       </table>
+      </div>
     </div>`).join('')}
   `;
 
@@ -3156,6 +3523,7 @@ async function buildWeekly() {
   }
 
   function renderWeeklyCards() {
+    _ovModalClose();   // การ์ดกำลังจะถูกวาดใหม่ → คืน body ที่ยืมไปอยู่ใน popup ก่อน
     // re-read selected from DOM checkboxes if exist
     document.querySelectorAll('.wk-sel-cb').forEach((cb, i) => { selected[i] = cb.checked; });
     localStorage.setItem(selKey, JSON.stringify(selected));
@@ -3176,8 +3544,8 @@ async function buildWeekly() {
       const bd  = WK_BD[i  % WK_BD.length];
 
       const headerHtml = `
-        <div style="padding:12px 16px;background:${bg};border-bottom:1.5px solid ${bd};display:flex;align-items:center;gap:10px;">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;">
+        <div class="ov-card-head" style="padding:12px 16px;background:${bg};border-bottom:1.5px solid ${bd};display:flex;align-items:center;gap:10px;" onclick="_ovToggle(this)">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;" onclick="event.stopPropagation()">
             <input type="checkbox" class="wk-sel-cb" data-wi="${i}" ${selected[i]?'checked':''} onchange="renderWeeklyCards()"
               style="width:16px;height:16px;accent-color:${col};cursor:pointer;">
             <span style="font-size:14px;font-weight:800;color:${col};">สัปดาห์ที่ ${i+1}</span>
@@ -3186,11 +3554,12 @@ async function buildWeekly() {
             <div style="font-size:11px;color:#64748b;">${weekLabel(w.dates)}</div>
             <div style="font-size:10px;color:#94a3b8;">${w.hasDays} วันที่มีข้อมูล</div>
           </div>
+          <span class="ov-chevron" style="font-size:11px;color:${col};transition:transform .2s;">▾</span>
         </div>`;
 
       if (!selected[i]) {
         return `
-          <div style="background:#fafafa;border:1.5px solid ${bd};border-radius:14px;overflow:hidden;opacity:.6;">
+          <div class="ov-card" style="background:#fafafa;border-color:${bd};opacity:.6;">
             ${headerHtml}
           </div>`;
       }
@@ -3218,13 +3587,17 @@ async function buildWeekly() {
       }).join('');
 
       return `
-        <div style="background:#fff;border:1.5px solid ${bd};border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(15,23,42,.05);display:flex;flex-direction:column;">
+        <div class="ov-card" style="border-color:${bd};display:flex;flex-direction:column;">
           ${headerHtml}
-          <div style="padding:8px 10px 14px;overflow-y:auto;max-height:70vh;">${bodyHtml}</div>
+          <div class="ov-card-body" style="padding:8px 10px 14px;overflow-y:auto;max-height:70vh;">${bodyHtml}</div>
         </div>`;
     }).join('');
 
     document.getElementById('wk-compare').innerHTML = `
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:2px;">
+        <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(true,'#wk-compare')">ขยายทั้งหมด</button>
+        <button type="button" class="ov-toggle-all-btn" onclick="_ovToggleAll(false,'#wk-compare')">ย่อทั้งหมด</button>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;">
         ${cardsHtml}
       </div>`;
@@ -3521,5 +3894,23 @@ function _applyImportCode(raw, fromHash) {
   }
 }
 </script>
+
+<!-- ── Popup รายละเอียดแผนก ── -->
+<div class="ov-modal-wrap" id="ov-modal-wrap" onclick="if(event.target===this)_ovModalClose()">
+  <div class="ov-modal-box">
+    <div class="ov-modal-head" id="ov-modal-head">
+      <span class="ov-modal-title" id="ov-modal-title"></span>
+      <span style="display:flex;align-items:center;gap:10px;">
+        <span id="ov-modal-oc"></span>
+        <button type="button" class="ov-modal-x" onclick="_ovModalClose()" title="ปิด (Esc)">✕</button>
+      </span>
+    </div>
+    <div class="ov-modal-content" id="ov-modal-content"></div>
+    <div class="ov-modal-foot">
+      <div class="ov-modal-hint" id="ov-modal-hint" style="display:none;">💡 กดชิปสัปดาห์ด้านบนเพิ่มอีกหนึ่งใบ เพื่อเปิดเทียบคู่กันซ้าย–ขวา</div>
+      <button type="button" class="ov-modal-back" onclick="_ovModalClose()">← ปิด / กลับไปเลือกแผนก</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
