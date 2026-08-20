@@ -659,6 +659,15 @@ body.view-only .view-only-badge { display: flex; }
   font-size: 12px; color: #6366f1; background: #eef2ff; border: 1px solid #c7d2fe;
   border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; text-align: center;
 }
+.ov-nav-row { display: flex; align-items: stretch; gap: 8px; }
+.ov-nav-row .ov-modal-back { flex: 1; }
+.ov-nav-btn {
+  width: 46px; flex-shrink: 0; border-radius: 10px; border: 1.5px solid #cbd5e1;
+  background: #fff; color: #475569; font-size: 15px; font-weight: 800;
+  font-family: inherit; cursor: pointer; transition: background .15s, color .15s;
+}
+.ov-nav-btn:hover { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; }
+.ov-nav-btn[disabled] { opacity: .35; cursor: default; }
 .ov-modal-foot { padding: 12px 20px 16px; border-top: 1px solid #f1f5f9; flex-shrink: 0; }
 .ov-modal-back {
   width: 100%; padding: 11px; border-radius: 10px; border: 1.5px solid #cbd5e1;
@@ -750,6 +759,21 @@ body.view-only .view-only-badge { display: flex; }
 .mo-metric-label { font-size: 11px; color: var(--g400); font-weight: 700; margin-bottom: 5px; }
 .mo-metric-value { font-size: 22px; font-weight: 900; color: var(--g800); line-height: 1; }
 .mo-metric-unit { font-size: 11px; color: var(--g300); font-weight: 600; margin-top: 2px; }
+.tg-line {
+  margin-top: 5px; padding-top: 4px; border-top: 1px dashed #e2e8f0;
+  font-size: 10.5px; line-height: 1.5;
+  display: flex; flex-wrap: nowrap; justify-content: space-between;
+  align-items: baseline; gap: 6px; white-space: nowrap;
+}
+.tg-goal { color: #94a3b8; white-space: nowrap; }
+.tg-src  { color: #cbd5e1; }
+.tg-diff { font-weight: 800; white-space: nowrap; margin-left: auto; }
+/* ในไทล์แคบ ๆ ของหน้าสรุปรายเดือน ตัดส่วนที่ไม่จำเป็นออกให้อยู่บรรทัดเดียว
+   (รายละเอียดเต็มยังอ่านได้จาก tooltip เมื่อชี้เมาส์) */
+.mo-metric .tg-src, .mo-metric .tg-word { display: none; }
+.mo-metric .tg-line { font-size: 10px; gap: 4px; }
+.tg-goal { overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 640px) { .tg-src { display: none; } }
 .mo-days-badge {
   margin-left: auto; font-size: 11px; background: var(--g100);
   color: var(--g500); border-radius: 10px; padding: 3px 10px; font-weight: 700;
@@ -1001,6 +1025,9 @@ body.view-only .view-only-badge { display: flex; }
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">อื่น ๆ</div>
+  <button class="nav-item admin-only-nav" onclick="goPage('targets',this);buildTargets()">
+    <span class="nav-icon">🎯</span> ตั้งค่าเป้า
+  </button>
   <button class="nav-item admin-only-nav" id="share-guide-btn" onclick="showShareGuide()" style="display:none;">
     <span class="nav-icon">📤</span> วิธีแชร์แดชบอร์ด
   </button>
@@ -1383,7 +1410,7 @@ body.view-only .view-only-badge { display: flex; }
           <div class="metric-item-label">อัตรา <span class="target-chip">เป้า 30 Cu.ft/Hr.</span></div>
           <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="bc_rate" placeholder="0" step="0.1" oninput="calcCutRate()"><span class="metric-unit">Cu.ft/Hr.</span></div>
           <div class="progress-wrap">
-            <div class="progress-meta"><span>vs เป้า 30</span><span class="progress-pct" id="bc_rate_pct">0%</span></div>
+            <div class="progress-meta"><span id="bc_rate_lbl">vs เป้า 30</span><span class="progress-pct" id="bc_rate_pct">0%</span></div>
             <div class="progress-bg"><div class="progress-fill" id="bc_rate_bar" style="width:0%"></div></div>
           </div>
           <div style="margin-top:8px;" id="cut_badge"></div>
@@ -1494,8 +1521,8 @@ body.view-only .view-only-badge { display: flex; }
         </div>
         <div class="metric-item">
           <div class="metric-item-label">ยอดยิงโครง มอก.</div>
-          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--pink-500)" type="number" id="bf_m" placeholder="0" oninput="calcProg('bf_m',300,'bf_mp','bf_mb')"><span class="metric-unit">pcs.</span></div>
-          <div class="progress-wrap"><div class="progress-meta"><span>vs 300</span><span class="progress-pct" id="bf_mp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bf_mb" style="width:0%"></div></div></div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--pink-500)" type="number" id="bf_m" placeholder="0" oninput="calcProg('bf_m',0,'bf_mp','bf_mb')"><span class="metric-unit">pcs.</span></div>
+          <div class="progress-wrap" style="display:none;"><div class="progress-meta"><span>vs —</span><span class="progress-pct" id="bf_mp">0%</span></div><div class="progress-bg"><div class="progress-fill" id="bf_mb" style="width:0%"></div></div></div>
         </div>
       </div>
       <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-color:#fbcfe8;">
@@ -1795,6 +1822,21 @@ body.view-only .view-only-badge { display: flex; }
     </div>
   </div>
 
+  <!-- ───── ตั้งค่าเป้า ───── -->
+  <div class="page" id="page-targets">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🎯 ตั้งค่าเป้า (Target ต่อวัน)</div>
+        <div class="page-subtitle">กรอก <b>เป้าต่อวัน</b> ของแต่ละหัวข้อ — หน้าภาพรวมประจำวันเทียบกับเป้า/วันตรง ๆ ส่วนหน้าสรุปรายเดือน / เปรียบเทียบเดือน / รายสัปดาห์ จะคูณจำนวนวันที่มีข้อมูลให้อัตโนมัติ (เว้นว่างหรือ 0 = ไม่ตั้งเป้า)</div>
+      </div>
+      <span style="display:flex;gap:8px;">
+        <button type="button" class="ov-toggle-all-btn" onclick="tgReset()">↺ ค่าเริ่มต้น</button>
+        <button type="button" class="save-btn" onclick="tgSave()">💾 บันทึกเป้า</button>
+      </span>
+    </div>
+    <div id="tg-body"></div>
+  </div>
+
 </div><!-- /content -->
 </div><!-- /layout -->
 
@@ -2016,6 +2058,8 @@ function updOC(inId, oc, valId, pctId, barId) {
 
 /* ── Generic progress ── */
 function calcProg(inId, target, pctId, barId) {
+  // ถ้ามีเป้าที่ตั้งไว้ในหน้า "ตั้งค่าเป้า" ให้ใช้ค่านั้นแทนค่าที่ hard-code ไว้
+  if (typeof TARGETS !== 'undefined' && tg(inId) > 0) target = tg(inId);
   const v = g(inId);
   const pct = target > 0 ? (v/target)*100 : 0;
   document.getElementById(pctId).textContent = pct.toFixed(1)+'%';
@@ -2066,16 +2110,19 @@ function calcSaw1Total() {
 /* ── Cut rate ── */
 function calcCutRate() {
   const r = parseFloat(document.getElementById('bc_rate').value)||0;
-  calcProg('bc_rate',30,'bc_rate_pct','bc_rate_bar'); // reuse with manual set
-  const pct = (r/30)*100;
+  const T = (typeof TARGETS !== 'undefined' && tg('bc_rate') > 0) ? tg('bc_rate') : 30;
+  const lbl = document.getElementById('bc_rate_lbl');
+  if (lbl) lbl.textContent = 'vs เป้า ' + T;
+  calcProg('bc_rate',T,'bc_rate_pct','bc_rate_bar'); // reuse with manual set
+  const pct = (r/T)*100;
   document.getElementById('bc_rate_pct').textContent = pct.toFixed(1)+'%';
   const bar = document.getElementById('bc_rate_bar');
   bar.style.width = Math.min(pct,100)+'%';
   bar.style.background = barColor(pct);
   const badge = document.getElementById('cut_badge');
   if (r > 0) {
-    if (r >= 30) badge.innerHTML = '<span class="status-badge sb-ok">✓ ตามเป้า</span>';
-    else if (r >= 20) badge.innerHTML = '<span class="status-badge sb-warn">⚠ ต่ำกว่าเป้า</span>';
+    if (r >= T) badge.innerHTML = '<span class="status-badge sb-ok">✓ ตามเป้า</span>';
+    else if (r >= T*0.67) badge.innerHTML = '<span class="status-badge sb-warn">⚠ ต่ำกว่าเป้า</span>';
     else badge.innerHTML = '<span class="status-badge sb-bad">✗ ต่ำมาก</span>';
   } else badge.innerHTML = '';
 }
@@ -2094,17 +2141,179 @@ function calcWaste() {
   updateOverview();
 }
 
+/* ══ ระบบเป้า (Target) — ตั้งค่าได้เองในหน้า "ตั้งค่าเป้า" ══ */
+const TG_DEF = [
+  { grp:'🪵 โรงเลื่อยไทรน้อย', items:[
+    {k:'s1_enter', l:'เข้าเลื่อย', u:'Ton.'},
+    {k:'s1_total', l:'ยอดเลื่อยรวม', u:'Cu.ft.'},
+    {k:'s1_door',  l:'ไม้เลื่อยส่งโรงประตู', u:'Cu.ft.'},
+    {k:'s1_pal',   l:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', u:'Cu.ft.'},
+    {k:'s1_avg',   l:'ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', u:'Cu.ft./วัน'},
+  ]},
+  { grp:'🪵 โรงเลื่อยปราจีน', items:[
+    {k:'s2_enter', l:'เข้าเลื่อย', u:'Ton.'},
+    {k:'s2_saw',   l:'ยอดเลื่อย', u:'Cu.ft.'},
+    {k:'s2_avg',   l:'ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', u:'Cu.ft./วัน'},
+  ]},
+  { grp:'🌡️ โรงอบ', items:[
+    {k:'d1_cf', l:'ยอดไม้อบส่งโรง 8 ใบ', u:'Cu.ft.'},
+    {k:'d1_pl', l:'จำนวนพาเลท (ส่งโรง 8 ใบ)', u:'พาเลท'},
+    {k:'d2_cf', l:'ยอดไม้ในเตาอบ', u:'Cu.ft.'},
+    {k:'d2_pl', l:'จำนวนพาเลท (ในเตาอบ)', u:'พาเลท'},
+  ]},
+  { grp:'⚙️ โรง 8 ใบ', items:[
+    {k:'bk_pr',    l:'Stock ไม้แปรรูป', u:'Cu.ft.'},
+    {k:'bk_h',     l:'Stock ไม้หัว', u:'รวม'},
+    {k:'bk_k',     l:'Stock ไม้ข้าง', u:'Cu.ft.'},
+    {k:'bs_mok',   l:'Stock ไม้ข้าง (มอก.)', u:'pcs.'},
+    {k:'bk_ben',   l:'Stock ไม้ข้าง (เบญจพรรณ)', u:'Cu.ft.'},
+    {k:'bk_lvl',   l:'Stock ไม้ข้าง LVL', u:'pcs.'},
+    {k:'bc_cuft',  l:'ยอดตัดไม้', u:'Cu.ft.'},
+    {k:'bc_rate',  l:'อัตราตัดไม้', u:'Cu.ft/Hr.'},
+    {k:'bj_total', l:'ยอดต่อ (รวมทุกขนาด)', u:'pcs.'},
+    {k:'bs_h1',    l:'ซอยไม้หัว', u:'pcs.'},
+    {k:'bs_k1',    l:'ซอยไม้ข้าง', u:'pcs.'},
+  ]},
+  { grp:'🔨 ยิงโครง', items:[
+    {k:'p1_frame', l:'ยิงโครงกระดาษ', u:'pcs.'},
+    {k:'bf_w',     l:'โครงไม้', u:'pcs.'},
+    {k:'bf_m',     l:'มอก.', u:'pcs.'},
+  ]},
+  { grp:'🔥 อัดประตู', items:[
+    {k:'p2_hot',  l:'อัดร้อน', u:'บาน'},
+    {k:'p3_cold', l:'อัดเย็น', u:'บาน'},
+  ]},
+  { grp:'✂️ CTS & คัดเกรด', items:[
+    {k:'cts_sloy', l:'ซอย', u:'บาน'},
+    {k:'cts_wrap', l:'ห่อประตู', u:'บาน'},
+    {k:'w_total',  l:'ของเสียรวม (ยิ่งน้อยยิ่งดี)', u:'บาน', lower:true},
+    {k:'w_pct',    l:'% ของเสีย (ต่อเดือน)', u:'%', lower:true, ratio:true},
+  ]},
+  { grp:'📦 พาเลท', items:[
+    {k:'pl_total', l:'พาเลทรวมทั้งหมด', u:'แผ่น'},
+  ]},
+  { grp:'🏭 คลัง FG', items:[
+    {k:'wh_in',  l:'เข้าคลัง', u:'บาน'},
+    {k:'wh_out', l:'โหลดสินค้า', u:'บาน'},
+  ]},
+];
+const TG_DEFAULT = { p1_frame:2000, bf_w:300, p2_hot:2000, p3_cold:160, cts_wrap:1300, bc_rate:30, bs_h1:4000, bs_k1:4000, w_pct:0.15 };
+const TG_KEY = 'door_targets';
+const TG_MONTH_DAYS = 25;   // เป้ารายเดือน = เป้า/วัน × 25 วันทำงานมาตรฐาน
+let TARGETS = (() => {
+  try { return Object.assign({}, TG_DEFAULT, JSON.parse(localStorage.getItem(TG_KEY) || '{}')); }
+  catch(e) { return Object.assign({}, TG_DEFAULT); }
+})();
+(function _tgMigrate() {           // ยิงโครง มอก. ไม่ใช้เป้า
+  if (localStorage.getItem('door_tg_mig_bf') === '2') return;
+  delete TARGETS.bf_m;
+  if (TARGETS.bf_w == null) TARGETS.bf_w = 300;
+  try { localStorage.setItem(TG_KEY, JSON.stringify(TARGETS)); } catch(e) {}
+  localStorage.setItem('door_tg_mig_bf', '2');
+})();
+function tg(k) { const v = TARGETS[k]; return (v === '' || v == null) ? 0 : (parseFloat(v) || 0); }
+function tgLower(k) {
+  for (const g of TG_DEF) for (const it of g.items) if (it.k === k) return !!it.lower;
+  return false;
+}
+
+/* ── บรรทัดเทียบเป้า (ใช้ในหน้าสรุปรายเดือน / เปรียบเทียบสัปดาห์) ──
+   เทียบบนฐาน "ต่อวัน" เสมอ เพื่อไม่ให้จำนวนวันทำงานที่ต่างกันทำให้ % เพี้ยน */
+function tgNum(txt) {
+  if (typeof txt === 'number') return txt;
+  const n = parseFloat(String(txt).replace(/,/g, ''));
+  return isNaN(n) ? null : n;
+}
+function tgLine(m, days) {
+  if (!m || !m.tk) return '';
+  const T = tg(m.tk);
+  if (!(T > 0)) return '';
+  const raw = tgNum(m.raw != null ? m.raw : m.v);
+  if (raw == null) return '';
+  // เป้าของช่วงนั้น = เป้า/วัน × จำนวนวันที่มีข้อมูล (แถวที่เป็นค่าเฉลี่ยต่อวันอยู่แล้ว ใช้เป้า/วันตรง ๆ)
+  const goal = (m.perDay || m.ratio) ? T : (days > 0 ? T * days : T);
+  const lower = tgLower(m.tk);
+  const pct = goal > 0 ? (raw / goal) * 100 : 0;
+  const ok = lower ? raw <= goal : raw >= goal;
+  const near = lower ? raw <= goal * 1.25 : raw >= goal * 0.75;
+  const c = ok ? '#16a34a' : near ? '#d97706' : '#dc2626';
+  const dec = goal < 1 ? 3 : ((Number.isInteger(goal) && Number.isInteger(raw)) ? 0 : 2);
+  const f = v => v.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+  const diff = raw - goal;
+  const src = m.ratio
+    ? 'เป้าคงที่ ไม่คูณจำนวนวัน'
+    : ((!m.perDay && days > 0)
+        ? `${T.toLocaleString('en-US')}/วัน × ${days} วัน${days === TG_MONTH_DAYS ? ' ทำงาน' : ''}`
+        : `${T.toLocaleString('en-US')}/วัน`);
+  return `<div class="tg-line" title="เป้า ${src}">
+    <span class="tg-goal">🎯<span class="tg-word"> เป้า</span> ${f(goal)}${m.unit ? ' ' + m.unit : ''}${m.ratio ? '' : `<span class="tg-src"> (${src})</span>`}</span>
+    <span class="tg-diff" style="color:${c};">${diff >= 0 ? '+' : ''}${f(diff)} · ${pct.toFixed(0)}%</span>
+  </div>`;
+}
+
+/* ══ หน้าตั้งค่าเป้า ══ */
+function buildTargets() {
+  const html = TG_DEF.map(gr => `
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--purple-500)"></span>${gr.grp}</div>
+      <div class="g3">
+        ${gr.items.map(it => `
+          <div class="metric-item">
+            <div class="metric-item-label">${it.l}${it.lower ? ' 🔻' : ''}</div>
+            <div class="metric-item-input-row">
+              <input class="metric-item-input" style="color:#7c3aed" type="number" step="any" min="0"
+                     id="tg_${it.k}" value="${tg(it.k) || ''}" placeholder="0">
+              <span class="metric-unit">${(it.ratio || /\/วัน/.test(it.u)) ? it.u : it.u + '/วัน'}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('tg-body').innerHTML = html;
+}
+function tgSave() {
+  const out = {};
+  TG_DEF.forEach(gr => gr.items.forEach(it => {
+    const el = document.getElementById('tg_' + it.k);
+    const v = el ? parseFloat(el.value) : NaN;
+    if (!isNaN(v) && v > 0) out[it.k] = v;
+  }));
+  TARGETS = out;
+  localStorage.setItem(TG_KEY, JSON.stringify(out));
+  updateOverview();
+  const btn = document.querySelector('#page-targets .save-btn');
+  if (btn) { const t = btn.textContent; btn.textContent = '✅ บันทึกแล้ว'; setTimeout(() => btn.textContent = t, 1400); }
+}
+function tgReset() {
+  TARGETS = Object.assign({}, TG_DEFAULT);
+  localStorage.setItem(TG_KEY, JSON.stringify(TARGETS));
+  buildTargets();
+  updateOverview();
+}
+
 /* ── Overview dept card helpers ── */
 function _ovRow(label, val, unit, opts) {
   opts = opts || {};
   const v = parseFloat(val) || 0;
   const _dec = opts.dec != null ? opts.dec : (Number.isInteger(v) ? 0 : 2);
   const disp = v.toLocaleString('en-US', {minimumFractionDigits: _dec, maximumFractionDigits: _dec});
+  const tgt = opts.target || (opts.tk ? tg(opts.tk) : 0);
+  const lower = opts.lower || (opts.tk ? tgLower(opts.tk) : false);
   let bar = '';
-  if (opts.target) {
-    const pct = Math.min((v / opts.target) * 100, 100);
-    const bc = v >= opts.target ? '#22c55e' : v >= opts.target * 0.75 ? '#f59e0b' : '#ef4444';
-    bar = `<div style="height:3px;background:#f1f5f9;border-radius:2px;margin:2px 0;"><div style="height:100%;width:${pct.toFixed(1)}%;background:${bc};border-radius:2px;transition:width .4s;"></div></div>`;
+  if (tgt > 0) {
+    const ratio = v / tgt;
+    const pctRaw = ratio * 100;
+    const pct = Math.min(pctRaw, 100);
+    const ok = lower ? (v <= tgt) : (v >= tgt);
+    const near = lower ? (v <= tgt * 1.25) : (v >= tgt * 0.75);
+    const bc = ok ? '#22c55e' : near ? '#f59e0b' : '#ef4444';
+    const tDec = tgt < 1 ? 3 : (Number.isInteger(tgt) ? 0 : 2);
+    const diff = v - tgt;
+    const sign = diff > 0 ? '+' : '';
+    bar = `<div style="height:3px;background:#f1f5f9;border-radius:2px;margin:3px 0 2px;"><div style="height:100%;width:${pct.toFixed(1)}%;background:${bc};border-radius:2px;transition:width .4s;"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;line-height:1.5;">
+        <span style="color:#b0b8c9;">🎯 เป้า ${tgt.toLocaleString('en-US',{minimumFractionDigits:tDec,maximumFractionDigits:tDec})} ${unit}</span>
+        <span style="color:${bc};font-weight:700;">${pctRaw.toFixed(0)}% · ${sign}${diff.toLocaleString('en-US',{minimumFractionDigits:tDec,maximumFractionDigits:tDec})}</span>
+      </div>`;
   }
   const sm = opts.sm;
   return `<div style="padding:${sm ? '2px' : '5px'} 0;border-bottom:1px dashed #f1f5f9;">
@@ -2242,6 +2451,10 @@ function _ovRender() {
     hEl.style.borderBottomColor = p.card.style.borderColor || '#e2e8f0';
   }
   if (box) box.classList.toggle('wide', dual);
+  ['ov-nav-prev','ov-nav-next'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = dual ? 'none' : '';
+  });
   if (hint) hint.style.display = (!dual && _ovPanes.length === 1 && _ovMultiOK(_ovPanes[0].card)) ? 'block' : 'none';
 }
 
@@ -2268,7 +2481,28 @@ function _ovModalClose() {
   if (box) box.classList.remove('wide');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') _ovModalClose(); });
+/* ── เลื่อนไปแผนกก่อนหน้า/ถัดไป (ปุ่มบนจอ หรือ ลูกศรซ้าย-ขวา) ── */
+function _ovNav(dir) {
+  if (_ovPanes.length !== 1) return;                 // โหมดเทียบคู่ ไม่ต้องเลื่อน
+  const cur = _ovPanes[0].card;
+  const scope = cur.closest('#ov-dept-wrap, #mo-sections, #mc-body, #wk-compare') || cur.parentElement;
+  const cards = [...scope.querySelectorAll('.ov-card')]
+    .filter(c => c === cur || c.querySelector('.ov-card-body'));   // ข้ามใบที่ไม่มีเนื้อหา
+  if (cards.length < 2) return;
+  const i = cards.indexOf(cur);
+  const next = cards[(i + dir + cards.length) % cards.length];
+  const head = next && next.querySelector('.ov-card-head');
+  if (head) { _ovToggle(head); document.getElementById('ov-modal-content').scrollTop = 0; }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { _ovModalClose(); return; }
+  const wrap = document.getElementById('ov-modal-wrap');
+  if (!wrap || !wrap.classList.contains('show')) return;
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); _ovNav(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); _ovNav(1); }
+});
 
 function _ovToggleAll(show, containerSel) {
   _ovModalClose();
@@ -2383,13 +2617,14 @@ function updateOverview() {
     {l:'อัดเย็น',          v:g('p3_cold'),   t:160,  c:'#06b6d4',  u:'บาน'},
     {l:'ห่อประตู',         v:g('cts_wrap'),  t:1300, c:'#7c3aed',  u:'บาน'},
     {l:'ยิงโครงกระดาษ',   v:g('p1_frame'),  t:2000, c:'#ea580c',  u:'pcs.'},
-    {l:'ยิงโครงไม้',       v:g('bf_w'),      t:300,  c:'#db2777',  u:'pcs.'},
-    {l:'ยิงโครง มอก.',     v:g('bf_m'),      t:300,  c:'#be185d',  u:'pcs.'},
-    {l:'ซอยไม้หัว',        v:g('bs_h1'),     t:4000, c:'#0284c7',  u:'pcs.'},
-    {l:'ซอยไม้ข้าง',       v:g('bs_k1'),     t:4000, c:'#0369a1',  u:'pcs.'},
-    {l:'อัตราตัดไม้',       v:g('bc_rate'),   t:30,   c:'#ca8a04',  u:'Cu.ft/Hr.'},
+    {l:'ยิงโครงไม้',       v:g('bf_w'),      t:tg('bf_w'),  c:'#db2777',  u:'pcs.'},
+    {l:'ยิงโครง มอก.',     v:g('bf_m'),      t:tg('bf_m'),  c:'#be185d',  u:'pcs.'},
+    {l:'ซอยไม้หัว',        v:g('bs_h1'),     t:tg('bs_h1')||4000, c:'#0284c7',  u:'pcs.'},
+    {l:'ซอยไม้ข้าง',       v:g('bs_k1'),     t:tg('bs_k1')||4000, c:'#0369a1',  u:'pcs.'},
+    {l:'อัตราตัดไม้',       v:g('bc_rate'),   t:tg('bc_rate')||30, c:'#ca8a04',  u:'Cu.ft/Hr.'},
+    {l:'ยอดตัดไม้',        v:g('bc_cuft'),   t:tg('bc_cuft'),     c:'#2563eb',  u:'Cu.ft.'},
   ];
-  document.getElementById('ov_bar_chart').innerHTML = items.map(i=>{
+  document.getElementById('ov_bar_chart').innerHTML = items.filter(i=>i.t>0).map(i=>{
     const pct = Math.min(i.t>0?(i.v/i.t)*100:0,100);
     const pctTxt = pct.toFixed(1)+'%';
     const barColor = pct>=100?'#22c55e':pct>=75?i.c:pct>=50?i.c+'cc':'#f87171';
@@ -2445,77 +2680,114 @@ function updateOverview() {
 
   const cards = [
     C('🪵','โรงเลื่อยไทรน้อย','#16a34a','linear-gradient(135deg,#f0fdf4,#dcfce7)','#86efac',
-      R('เข้าเลื่อย', g('s1_enter'), 'Ton.') +
-      R('ยอดเลื่อยรวม', s1t, 'Cu.ft.', {vc:'#16a34a', dec:2}) +
-      R('ไม้เลื่อยส่งโรงประตู', g('s1_door'), 'Cu.ft.', {sm:true, dec:2}) +
-      R('ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', g('s1_pal'), 'Cu.ft.', {sm:true, dec:2}) +
-      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s1Avg.avg, 'Cu.ft./วัน', {vc:'#16a34a', dec:2}),
+      R('เข้าเลื่อย', g('s1_enter'), 'Ton.', {tk:'s1_enter'}) +
+      R('ยอดเลื่อยรวม', s1t, 'Cu.ft.', {vc:'#16a34a', dec:2, tk:'s1_total'}) +
+      R('ไม้เลื่อยส่งโรงประตู', g('s1_door'), 'Cu.ft.', {sm:true, dec:2, tk:'s1_door'}) +
+      R('ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', g('s1_pal'), 'Cu.ft.', {sm:true, dec:2, tk:'s1_pal'}) +
+      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s1Avg.avg, 'Cu.ft./วัน', {vc:'#16a34a', dec:2, tk:'s1_avg'}) +
+      groupBarChart([
+        {name:'ยอดเลื่อยรวม', color:'#16a34a', fields:['s1_door','s1_pal']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('s1_total')},
+      ], {title:'ยอดเลื่อยรายวัน เทียบเป้า', unit:'Cu.ft.', target:tg('s1_total'), targetAsBar:true}),
       g('s1_oc'), 40),
 
     C('🪵','โรงเลื่อยปราจีน','#ea580c','linear-gradient(135deg,#fff7ed,#ffedd5)','#fdba74',
-      R('เข้าเลื่อย', g('s2_enter'), 'Ton.') +
-      R('ยอดเลื่อย', g('s2_saw'), 'Cu.ft.', {vc:'#ea580c', dec:2}) +
-      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s2Avg.avg, 'Cu.ft./วัน', {vc:'#ea580c', dec:2}),
+      R('เข้าเลื่อย', g('s2_enter'), 'Ton.', {tk:'s2_enter'}) +
+      R('ยอดเลื่อย', g('s2_saw'), 'Cu.ft.', {vc:'#ea580c', dec:2, tk:'s2_saw'}) +
+      R('ยอดเลื่อยเฉลี่ยต่อวัน (เดือนนี้)', s2Avg.avg, 'Cu.ft./วัน', {vc:'#ea580c', dec:2, tk:'s2_avg'}) +
+      groupBarChart([
+        {name:'ยอดเลื่อย', color:'#ea580c', fields:['s2_saw']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('s2_saw')},
+      ], {title:'ยอดเลื่อยรายวัน เทียบเป้า', unit:'Cu.ft.', target:tg('s2_saw'), targetAsBar:true}),
       g('s2_oc'), 17),
 
     C('🌡️','โรงอบ','#0284c7','linear-gradient(135deg,#e0f2fe,#bae6fd)','#7dd3fc',
-      R('ยอดไม้อบส่งโรง 8 ใบ', g('d1_cf'), 'Cu.ft.', {vc:'#0284c7', dec:2}) +
-      R('จำนวนพาเลท', g('d1_pl'), 'พาเลท', {sm:true}) +
-      R('ยอดไม้ในเตาอบ', g('d2_cf'), 'Cu.ft.', {vc:'#0284c7', dec:2}) +
-      R('จำนวนพาเลท', g('d2_pl'), 'พาเลท', {sm:true}),
+      R('ยอดไม้อบส่งโรง 8 ใบ', g('d1_cf'), 'Cu.ft.', {vc:'#0284c7', dec:2, tk:'d1_cf'}) +
+      R('จำนวนพาเลท', g('d1_pl'), 'พาเลท', {sm:true, tk:'d1_pl'}) +
+      R('ยอดไม้ในเตาอบ', g('d2_cf'), 'Cu.ft.', {vc:'#0284c7', dec:2, tk:'d2_cf'}) +
+      R('จำนวนพาเลท', g('d2_pl'), 'พาเลท', {sm:true, tk:'d2_pl'}) +
+      groupBarChart([
+        {name:'ไม้อบส่งโรง 8 ใบ', color:'#0284c7', fields:['d1_cf']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('d1_cf')},
+      ], {title:'ยอดไม้อบรายวัน เทียบเป้า', unit:'Cu.ft.', target:tg('d1_cf'), targetAsBar:true}),
       g('dry_oc'), 5),
 
     C('⚙️','โรง 8 ใบ','#475569','linear-gradient(135deg,#f8fafc,#f1f5f9)','#cbd5e1',
-      R('Stock ไม้แปรรูป', g('bk_pr'), 'Cu.ft.', {vc:'#475569', dec:2}) +
-      R('Stock ไม้หัว', g('bk_h'), 'รวม', {sm:true}) +
+      R('Stock ไม้แปรรูป', g('bk_pr'), 'Cu.ft.', {vc:'#475569', dec:2, tk:'bk_pr'}) +
+      R('Stock ไม้หัว', g('bk_h'), 'รวม', {sm:true, tk:'bk_h'}) +
       miniGrid([['เบญ-ยาง',g('bk_h_ben')],['มอก.',g('bk_h_mok')]],'#f0fdf4','#86efac','#16a34a') +
-      R('Stock ไม้ข้าง', g('bk_k'), 'Cu.ft.', {sm:true, dec:2}) +
-      R('Stock ไม้ข้าง (มอก.)', g('bs_mok'), 'pcs.', {sm:true}) +
-      R('Stock ไม้ข้าง (เบญจพรรณ)', g('bk_ben'), 'Cu.ft.', {sm:true, dec:2}) +
-      R('Stock ไม้ข้าง LVL', g('bk_lvl'), 'pcs.', {sm:true}) +
-      R('ยอดต่อ', g('bj_6')+g('bj_45')+g('bj_3')+g('bj_fj'), 'pcs.', {vc:'#7c3aed'}) +
+      R('Stock ไม้ข้าง', g('bk_k'), 'Cu.ft.', {sm:true, dec:2, tk:'bk_k'}) +
+      R('Stock ไม้ข้าง (มอก.)', g('bs_mok'), 'pcs.', {sm:true, tk:'bs_mok'}) +
+      R('Stock ไม้ข้าง (เบญจพรรณ)', g('bk_ben'), 'Cu.ft.', {sm:true, dec:2, tk:'bk_ben'}) +
+      R('Stock ไม้ข้าง LVL', g('bk_lvl'), 'pcs.', {sm:true, tk:'bk_lvl'}) +
+      R('ยอดตัดไม้', g('bc_cuft'), 'Cu.ft.', {vc:'#2563eb', dec:2, tk:'bc_cuft'}) +
+      R('อัตราตัดไม้', g('bc_rate'), 'Cu.ft/Hr.', {vc:'#ca8a04', dec:2, tk:'bc_rate'}) +
+      R('ยอดต่อ', g('bj_6')+g('bj_45')+g('bj_3')+g('bj_fj'), 'pcs.', {vc:'#7c3aed', tk:'bj_total'}) +
       miniGrid([['6"',g('bj_6')],['4.5"',g('bj_45')],['3"',g('bj_3')],['FJ',g('bj_fj')]],'#faf5ff','#e9d5ff','#7c3aed') +
-      R('ยอดซอย', g('bs_h1')+g('bs_k1')+g('bs_k2')+g('bs_lvl'), 'pcs.', {vc:'#0284c7'}) +
-      miniGrid([['ไม้หัว',g('bs_h1')],['ไม้ข้าง',g('bs_k1')],['เบญ-ยาง',g('bs_k2')],['LVL',g('bs_lvl')]],'#f0f9ff','#bae6fd','#0284c7') +
-      miniGrid([['หัว เบญ-ยาง',g('bs_h1_ben')],['หัว มอก.',g('bs_h1_mok')]],'#e0f2fe','#bae6fd','#0369a1'),
+      R('ซอยไม้หัว', g('bs_h1'), 'pcs.', {vc:'#0284c7', tk:'bs_h1'}) +
+      miniGrid([['หัว เบญ-ยาง',g('bs_h1_ben')],['หัว มอก.',g('bs_h1_mok')]],'#e0f2fe','#bae6fd','#0369a1') +
+      R('ซอยไม้ข้าง', g('bs_k1'), 'pcs.', {vc:'#0369a1', tk:'bs_k1'}) +
+      miniGrid([['เบญ-ยาง',g('bs_k2')],['LVL',g('bs_lvl')]],'#f0f9ff','#bae6fd','#0284c7') +
+      groupBarChart([
+        {name:'ยอดต่อรวม', color:'#7c3aed', fields:['bj_6','bj_45','bj_3','bj_fj']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('bj_total')},
+      ], {title:'ยอดต่อรายวัน เทียบเป้า', unit:'pcs.', target:tg('bj_total'), targetAsBar:true}),
       b8t, 30),
 
     C('🔨','ยิงโครง','#db2777','linear-gradient(135deg,#fdf2f8,#fce7f3)','#fbcfe8',
-      R('ยิงโครงกระดาษ', g('p1_frame'), 'pcs.', {vc:'#ea580c', target:2000}) +
-      R('โครงไม้', g('bf_w'), 'pcs.', {vc:'#db2777', target:300}) +
-      R('มอก.', g('bf_m'), 'pcs.', {vc:'#db2777', target:300}),
+      R('ยิงโครงกระดาษ', g('p1_frame'), 'pcs.', {vc:'#ea580c', tk:'p1_frame'}) +
+      R('โครงไม้', g('bf_w'), 'pcs.', {vc:'#db2777', tk:'bf_w'}) +
+      R('มอก.', g('bf_m'), 'pcs.', {vc:'#db2777', tk:'bf_m'}) +
+      groupBarChart([
+        {name:'ยิงโครงกระดาษ', color:'#ea580c', fields:['p1_frame']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('p1_frame')},
+      ], {title:'ยิงโครงรายวัน เทียบเป้า', unit:'pcs.', target:tg('p1_frame'), targetAsBar:true}),
       frt, 30),
 
     C('🔥','อัดประตู','#dc2626','linear-gradient(135deg,#fef2f2,#fee2e2)','#fca5a5',
-      R('อัดร้อน', g('p2_hot'), 'บาน', {vc:'#dc2626', target:2000}) +
-      R('อัดเย็น', g('p3_cold'), 'บาน', {vc:'#0d9488', target:160}),
+      R('อัดร้อน', g('p2_hot'), 'บาน', {vc:'#dc2626', tk:'p2_hot'}) +
+      R('อัดเย็น', g('p3_cold'), 'บาน', {vc:'#0d9488', tk:'p3_cold'}) +
+      groupBarChart([
+        {name:'อัดร้อน', color:'#dc2626', fields:['p2_hot']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('p2_hot')},
+      ], {title:'ยอดอัดร้อนรายวัน เทียบเป้า', unit:'บาน', target:tg('p2_hot'), targetAsBar:true}),
       prt, 14),
 
     C('✂️','CTS & คัดเกรด','#7c3aed','linear-gradient(135deg,#faf5ff,#ede9fe)','#c4b5fd',
-      R('ซอย', g('cts_sloy'), 'บาน') +
-      R('ห่อประตู', g('cts_wrap'), 'บาน', {vc:'#7c3aed', target:1300}) +
-      R('ของเสียรวม', wt, 'บาน', {vc: wt>0 ? '#ef4444' : '#334155'}),
+      R('ซอย', g('cts_sloy'), 'บาน', {tk:'cts_sloy'}) +
+      R('ห่อประตู', g('cts_wrap'), 'บาน', {vc:'#7c3aed', tk:'cts_wrap'}) +
+      R('ของเสียรวม', wt, 'บาน', {vc: wt>0 ? '#ef4444' : '#334155', tk:'w_total', lower:true}) +
+      R('% ของเสีย', g('p2_hot')>0 ? wt/g('p2_hot')*100 : 0, '%', {sm:true, dec:3, vc:'#ef4444', tk:'w_pct', lower:true}) +
+      groupBarChart([
+        {name:'ห่อประตู', color:'#7c3aed', fields:['cts_wrap']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('cts_wrap')},
+      ], {title:'ยอดห่อประตูรายวัน เทียบเป้า', unit:'บาน', target:tg('cts_wrap'), targetAsBar:true}),
       g('cts_oc'), 25),
 
     C('📦','พาเลท','#d97706','linear-gradient(135deg,#fffbeb,#fef3c7)','#fcd34d',
       miniGrid([['3×6',g('pl_3x6')],['4×6',g('pl_4x6')],['4×8S',g('pl_4x8s')],['4×8SN',g('pl_4x8sn')],['4×8H',g('pl_4x8h')],['4×9',g('pl_4x9')],['4×10',g('pl_4x10')],['4×12',g('pl_4x12')],['7×9',g('pl_7x9')]],'#fffbeb','#fde68a','#92400e') +
-      `<div style="margin-top:6px;display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-top:1.5px solid #fde68a;">
-        <span style="font-size:12px;color:#94a3b8;">รวมทั้งหมด</span>
-        <b style="font-size:18px;color:#d97706;">${plt.toLocaleString()} <span style="font-size:10px;font-weight:500;color:#fcd34d;">แผ่น</span></b>
-      </div>`,
+      R('รวมทั้งหมด', plt, 'แผ่น', {vc:'#d97706', tk:'pl_total'}) +
+      groupBarChart([
+        {name:'พาเลทรวม', color:'#d97706', fields:['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('pl_total')},
+      ], {title:'ยอดพาเลทรายวัน เทียบเป้า', unit:'แผ่น', target:tg('pl_total'), targetAsBar:true}),
       g('pl_oc'), 6),
 
     C('🏭','คลัง FG','#0d9488','linear-gradient(135deg,#f0fdfa,#ccfbf1)','#6ee7b7',
-      R('เข้าคลัง', g('wh_in'), 'บาน', {vc:'#0d9488'}) +
+      R('เข้าคลัง', g('wh_in'), 'บาน', {vc:'#0d9488', tk:'wh_in'}) +
       `<div style="display:flex;gap:6px;margin:2px 0 4px;">
         <span style="font-size:11px;color:#0d9488;background:#f0fdfa;border:1px solid #6ee7b7;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_in_ag')||0).toLocaleString('en-US')}</span>
         <span style="font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #c4b5fd;border-radius:6px;padding:2px 8px;">CP ${(g('wh_in_cp')||0).toLocaleString('en-US')}</span>
       </div>` +
-      R('โหลดสินค้า', g('wh_out'), 'บาน', {vc:'#ea580c'}) +
+      R('โหลดสินค้า', g('wh_out'), 'บาน', {vc:'#ea580c', tk:'wh_out'}) +
       `<div style="display:flex;gap:6px;margin-top:2px;">
         <span style="font-size:11px;color:#0d9488;background:#f0fdfa;border:1px solid #6ee7b7;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_out_ag')||0).toLocaleString('en-US')}</span>
         <span style="font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #c4b5fd;border-radius:6px;padding:2px 8px;">CP ${(g('wh_out_cp')||0).toLocaleString('en-US')}</span>
-      </div>`,
+      </div>` +
+      groupBarChart([
+        {name:'เข้าคลัง', color:'#0d9488', fields:['wh_in']},
+        {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('wh_in')},
+      ], {title:'ยอดเข้าคลังรายวัน เทียบเป้า', unit:'บาน', target:tg('wh_in'), targetAsBar:true}),
       g('wh_oc'), 6),
   ];
 
@@ -2566,6 +2838,142 @@ async function saveData() {
   const toast = document.getElementById('toast');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+/* ── ชุดข้อมูลรายวันของเดือนปัจจุบัน (วันที่ 1 → วันล่าสุดที่มีบันทึก) ── */
+function monthSeries(fields) {
+  if (!currentIso) return [];
+  const [yr, mo] = currentIso.split('-');
+  const dim = new Date(+yr, +mo, 0).getDate();
+  const out = [];
+  let lastWith = 0;
+  for (let d = 1; d <= dim; d++) {
+    const key = `door_${yr}-${mo}-${String(d).padStart(2,'0')}`;
+    let v = 0, has = false;
+    try {
+      const o = JSON.parse(localStorage.getItem(key) || 'null');
+      if (o) { v = fields.reduce((s,f) => s + toNum(o[f]), 0); has = true; }
+    } catch(e) {}
+    if (has && v > 0) lastWith = d;
+    out.push({ d, v });
+  }
+  return out.slice(0, lastWith);   // ตัดวันที่ยังไม่มีข้อมูลท้ายเดือนทิ้ง
+}
+
+/* ── กราฟแท่งรายวันแบบหลายชุดข้อมูล (grouped bar) ──
+   series: [{name, color, fields:[...] }]  → แท่งของแต่ละวัน เรียงชิดกันเป็นกลุ่ม   */
+function groupBarChart(series, opts) {
+  opts = opts || {};
+  if (!currentIso || !series || !series.length) return '';
+  const data = series.map(sr => sr.fields ? monthSeries(sr.fields) : []);
+  const n = Math.max(...data.map(d => d.length));
+  if (!n) return '';
+  const days = Array.from({length:n}, (_,i) => i + 1);
+  // ชุดที่เป็นค่าคงที่ (เช่น เป้า/วัน) → เติมค่าให้ครบทุกวัน
+  // วันไหนไม่มีการผลิตจริง (วันหยุด/ยังไม่กรอก) ไม่ต้องขึ้นแท่งเป้า
+  const hasData = days.map((d,i) =>
+    series.some((sr,j) => sr.constVal == null && ((data[j][i] || {v:0}).v > 0)));
+  series.forEach((sr,j) => {
+    if (sr.constVal != null) data[j] = days.map((d,i) => ({d, v: hasData[i] ? sr.constVal : 0}));
+  });
+  const vals = data.flat().map(o => o.v);
+  const target = opts.target || 0;
+  let max = Math.max(...vals, target, 1);
+
+  // แกน Y: ปัดขึ้นให้เป็นเลขสวย 4 ขั้น
+  const rough = max / 4;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const step = Math.ceil(rough / mag) * mag;
+  const top = step * 4;
+
+  const W = 340, H = 150, ML = 34, MR = 6, MT = 8, MB = 22;
+  const pw = W - ML - MR, ph = H - MT - MB;
+  const gw = pw / n;                       // ความกว้างต่อ 1 วัน
+  const bw = (gw * 0.78) / series.length;  // ความกว้างต่อ 1 แท่ง
+  const yOf = v => MT + ph - (v / top) * ph;
+  const fmt = v => v.toLocaleString('en-US', {maximumFractionDigits: v < 10 ? 1 : 0});
+
+  // เส้นกริด + ป้ายแกน Y
+  let grid = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = step * i, y = yOf(v);
+    grid += `<line x1="${ML}" y1="${y.toFixed(1)}" x2="${W-MR}" y2="${y.toFixed(1)}" stroke="#eef2f7" stroke-width="0.8"/>
+      <text x="${ML-4}" y="${(y+2.6).toFixed(1)}" text-anchor="end" font-size="6.5" fill="#b0b8c9">${fmt(v)}</text>`;
+  }
+  // แท่ง
+  let bars = '';
+  days.forEach((d, i) => {
+    series.forEach((sr, j) => {
+      const v = (data[j][i] || {v:0}).v;
+      if (!(v > 0)) return;
+      const x = ML + i*gw + gw*0.11 + j*bw;
+      const y = yOf(v), h = Math.max(MT + ph - y, 0.8);
+      bars += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(bw*0.92).toFixed(2)}" height="${h.toFixed(2)}" fill="${sr.color}" rx="0.7"><title>${d} — ${sr.name}: ${v.toLocaleString('en-US',{maximumFractionDigits:2})}${opts.unit?' '+opts.unit:''}</title></rect>`;
+    });
+  });
+  // ป้ายแกน X (เว้นระยะไม่ให้ทับกัน)
+  const skip = Math.ceil(n / 16);
+  const xlab = days.filter((d,i) => i % skip === 0 || i === n-1).map(d => {
+    const x = ML + (d-1)*gw + gw/2;
+    return `<text x="${x.toFixed(1)}" y="${H-MB+9}" text-anchor="middle" font-size="6.5" fill="#b0b8c9">${d}</text>`;
+  }).join('');
+  const tline = (target > 0 && target <= top && !opts.targetAsBar)
+    ? `<line x1="${ML}" y1="${yOf(target).toFixed(1)}" x2="${W-MR}" y2="${yOf(target).toFixed(1)}" stroke="#ef4444" stroke-width="0.9" stroke-dasharray="3 2"/>` : '';
+
+  const legend = series.map(sr =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#64748b;">
+      <span style="width:9px;height:9px;border-radius:2px;background:${sr.color};display:inline-block;"></span>${sr.name}</span>`
+  ).join('') + ((target > 0 && !opts.targetAsBar)
+    ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#ef4444;">
+        <span style="width:12px;border-top:2px dashed #ef4444;display:inline-block;"></span>เป้า ${fmt(target)}</span>` : '');
+
+  return `<div style="margin-top:10px;padding-top:9px;border-top:1px dashed #e2e8f0;">
+    <div style="font-size:10.5px;font-weight:700;color:#94a3b8;margin-bottom:5px;">📊 ${opts.title || 'รายวันเดือนนี้'} <span style="font-weight:500;color:#cbd5e1;">(วันที่ 1–${n}${opts.unit ? ' · ' + opts.unit : ''})</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;margin-bottom:4px;">${legend}</div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible;">
+      ${grid}${bars}${tline}
+      <line x1="${ML}" y1="${MT+ph}" x2="${W-MR}" y2="${MT+ph}" stroke="#e2e8f0" stroke-width="0.8"/>
+      ${xlab}
+    </svg>
+  </div>`;
+}
+
+/* ── กราฟแท่งรายวัน (SVG) พร้อมเส้นเป้าและเส้นค่าเฉลี่ย ── */
+function dayBarChart(series, opts) {
+  opts = opts || {};
+  if (!series.length) return '';
+  const color = opts.color || '#16a34a';
+  const target = opts.target || 0;
+  const W = 100, H = 34;                      // viewBox (สเกลตามความกว้างจริง)
+  const vals = series.map(s => s.v);
+  const avg  = vals.filter(v=>v>0).reduce((a,b)=>a+b,0) / (vals.filter(v=>v>0).length || 1);
+  const max  = Math.max(...vals, target, 1) * 1.12;
+  const n    = series.length;
+  const bw   = W / n;
+  const bars = series.map((s,i) => {
+    const h = Math.max((s.v / max) * H, s.v > 0 ? 0.6 : 0);
+    const x = i * bw, y = H - h;
+    const c = s.v === 0 ? '#e2e8f0' : (target > 0 ? (s.v >= target ? color : '#f59e0b') : color);
+    return `<rect x="${(x + bw*0.15).toFixed(2)}" y="${y.toFixed(2)}" width="${(bw*0.7).toFixed(2)}" height="${h.toFixed(2)}" fill="${c}" rx="${Math.min(bw*0.25,0.7).toFixed(2)}"><title>${s.d} — ${s.v.toLocaleString('en-US',{maximumFractionDigits:2})}</title></rect>`;
+  }).join('');
+  const line = (v, col, dash) => v > 0 && v <= max
+    ? `<line x1="0" y1="${(H - v/max*H).toFixed(2)}" x2="${W}" y2="${(H - v/max*H).toFixed(2)}" stroke="${col}" stroke-width="0.4" stroke-dasharray="${dash}" />` : '';
+  const fmt = v => v.toLocaleString('en-US',{maximumFractionDigits:0});
+  return `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:10.5px;margin-bottom:4px;">
+      <span style="color:#94a3b8;font-weight:700;">📈 ${opts.title || 'รายวันเดือนนี้'} (${n} วัน)</span>
+      <span style="color:#cbd5e1;">สูงสุด ${fmt(Math.max(...vals))}${opts.unit ? ' ' + opts.unit : ''}</span>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:64px;display:block;">
+      ${bars}${line(avg,'#64748b','1.5 1.5')}${line(target,'#ef4444','2 1.5')}
+    </svg>
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#cbd5e1;margin-top:3px;">
+      <span>1</span><span>วันที่</span><span>${series[n-1].d}</span>
+    </div>
+    <div style="display:flex;gap:10px;font-size:9.5px;color:#94a3b8;margin-top:3px;">
+      <span>― เฉลี่ย ${fmt(avg)}</span>${target > 0 ? `<span style="color:#ef4444;">--- เป้า ${fmt(target)}</span>` : ''}
+    </div>
+  </div>`;
 }
 
 function _sawMonthlyAvg(fields) {
@@ -2642,7 +3050,7 @@ async function loadData() {
     const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[30,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[25,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
     const m = maps[id]; if(m) updOC(id,...m);
   });
-  [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',300,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
+  [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',0,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
   updateOverview();
 }
 
@@ -2698,9 +3106,9 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     'door_2026-08-07': {"s1_enter": "33.102", "s1_door": "662.04", "s1_pal": "0.00", "s1_oc": "31", "s2_enter": "8.15", "s2_saw": "138.47", "s2_oc": "11", "d1_cf": "861.68", "d1_pl": "20", "d2_cf": "11434.02", "d2_pl": "266", "dry_oc": "5", "bk_pr": "4818.05", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26056", "bk_lvl": "12960", "bc_cuft": "224.39", "bc_rate": "21.37", "bj_6": "480", "bj_45": "260", "bj_3": "0", "bj_fj": "250", "bs_h1": "3775", "bs_h1_ben": "3775", "bs_h1_mok": "0", "bs_k1": "4762", "bs_k2": "4762", "bs_mok": "27971", "bs_lvl": "0", "bf_w": "168", "bf_m": "0", "bf_oc": "10", "b8_oc": "29", "p1_frame": "2121", "p1_oc": "20", "p2_hot": "1713", "p2_oc": "10", "p2_down": "0", "p3_cold": "100", "p3_oc": "3", "cts_sloy": "1534", "cts_wrap": "1519", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "0", "pl_4x6": "0", "pl_4x8s": "0", "pl_4x8sn": "0", "pl_4x8h": "0", "pl_4x9": "0", "pl_4x10": "0", "pl_4x12": "0", "pl_7x9": "0", "pl_oc": "5", "wh_in": "1433", "wh_in_ag": "1413", "wh_in_cp": "20", "wh_out": "1090", "wh_out_ag": "115", "wh_out_cp": "975", "wh_oc": "6"},
     'door_2026-08-17': {"s1_enter": "53.596", "s1_door": "1001.15", "s1_pal": "70.78", "s1_oc": "33", "s2_enter": "13.96", "s2_saw": "2458.84", "s2_oc": "7", "d1_cf": "811.66", "d1_pl": "18", "d2_cf": "11183.25", "d2_pl": "273", "dry_oc": "5", "bk_pr": "3887.19", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "", "bk_ben": "25650", "bk_lvl": "10800", "bc_cuft": "357.36", "bc_rate": "22.34", "bj_6": "740", "bj_45": "0", "bj_3": "150", "bj_fj": "0", "bs_h1": "1712", "bs_h1_ben": "1712", "bs_h1_mok": "", "bs_k1": "3387", "bs_k2": "1227", "bs_mok": "25969", "bs_lvl": "2160", "bf_w": "91", "bf_m": "", "bf_oc": "8", "b8_oc": "28", "p1_frame": "1341", "p1_oc": "18", "p2_hot": "1993", "p2_oc": "10", "p2_down": "", "p3_cold": "71", "p3_oc": "3", "cts_sloy": "1806", "cts_wrap": "1871", "cts_oc": "25", "w_hot": "3", "w_cold": "", "w_sloy": "11", "pl_3x6": "", "pl_4x6": "10", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "10", "pl_oc": "6", "wh_in": "2115", "wh_in_ag": "1883", "wh_in_cp": "232", "wh_out": "1262", "wh_out_ag": "1000", "wh_out_cp": "262", "wh_oc": "6"},
     'door_2026-08-18': {"s1_enter": "49.020", "s1_door": "895.03", "s1_pal": "85.37", "s1_oc": "33", "s2_enter": "7.34", "s2_saw": "127.51", "s2_oc": "7", "d1_cf": "798.27", "d1_pl": "20", "d2_cf": "12805.20", "d2_pl": "309", "dry_oc": "5", "bk_pr": "4271.11", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28185", "bk_lvl": "1080", "bc_cuft": "274.25", "bc_rate": "12.19", "bj_6": "314", "bj_45": "240", "bj_3": "160", "bj_fj": "0", "bs_h1": "1712", "bs_h1_ben": "1712", "bs_h1_mok": "0", "bs_k1": "", "bs_k2": "1227", "bs_mok": "25969", "bs_lvl": "2160", "bf_w": "159", "bf_m": "", "bf_oc": "8", "b8_oc": "29", "p1_frame": "956", "p1_oc": "16", "p2_hot": "2087", "p2_oc": "11", "p2_down": "0", "p3_cold": "47", "p3_oc": "3", "cts_sloy": "2434", "cts_wrap": "1367", "cts_oc": "25", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "20", "pl_oc": "5", "wh_in": "1710", "wh_in_ag": "1607", "wh_in_cp": "103", "wh_out": "3174", "wh_out_ag": "3078", "wh_out_cp": "96", "wh_oc": "6"},
-    'door_2026-08-19': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "4607.04", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26150", "bk_lvl": "10800", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "25969", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": ""}
+    'door_2026-08-19': {"s1_enter": "42.150", "s1_door": "731.72", "s1_pal": "111.27", "s1_oc": "38", "s2_enter": "16.90", "s2_saw": "288.82", "s2_oc": "11", "d1_cf": "301.95", "d1_pl": "7", "d2_cf": "12805.20", "d2_pl": "309", "dry_oc": "5", "bk_pr": "4607.04", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "26150", "bk_lvl": "10800", "bc_cuft": "", "bc_rate": "", "bj_6": "0", "bj_45": "800", "bj_3": "150", "bj_fj": "450", "bs_h1": "4681", "bs_h1_ben": "4181", "bs_h1_mok": "500", "bs_k1": "9655", "bs_k2": "1015", "bs_mok": "25969", "bs_lvl": "8640", "bf_w": "148", "bf_m": "0", "bf_oc": "9", "b8_oc": "29", "p1_frame": "2013", "p1_oc": "19", "p2_hot": "1579", "p2_oc": "8", "p2_down": "0", "p3_cold": "94", "p3_oc": "3", "cts_sloy": "3141", "cts_wrap": "1781", "cts_oc": "25", "w_hot": "7", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "15", "pl_oc": "6", "wh_in": "2154", "wh_in_ag": "2046", "wh_in_cp": "108", "wh_out": "1918", "wh_out_ag": "1906", "wh_out_cp": "12", "wh_oc": "6"}
   };
-  const DATA_VERSION = '2026-08-19b';
+  const DATA_VERSION = '2026-08-20';
   const storedVersion = localStorage.getItem('door_data_version');
   for (const [k,v] of Object.entries(bulk)) {
     if (!localStorage.getItem(k) || storedVersion !== DATA_VERSION) {
@@ -2861,10 +3269,10 @@ async function buildMonthly() {
       icon:'🪵', title:'โรงเลื่อยไทรน้อย',
       metrics:[
         {l:'ยอดเข้าเลื่อย',v:fmtN(tot.s1_enter,2),u:'Ton.'},
-        {l:'ไม้เลื่อยส่งโรงประตู',v:fmtN(tot.s1_door,0),u:'Cu.ft.'},
-        {l:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป',v:fmtN(tot.s1_pal,0),u:'Cu.ft.'},
-        {l:'รวมยอดเลื่อย',v:fmtN(tot.s1_door+tot.s1_pal,0),u:'Cu.ft.'},
-        {l:'เฉลี่ย/วัน',v:daysWithData?fmtN((tot.s1_door+tot.s1_pal)/daysWithData,2):'—',u:'Cu.ft./วัน', highlight:true},
+        {l:'ไม้เลื่อยส่งโรงประตู',v:fmtN(tot.s1_door,0),tk:'s1_door',u:'Cu.ft.'},
+        {l:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป',v:fmtN(tot.s1_pal,0),tk:'s1_pal',u:'Cu.ft.'},
+        {l:'รวมยอดเลื่อย',v:fmtN(tot.s1_door+tot.s1_pal,0),tk:'s1_total',u:'Cu.ft.'},
+        {l:'เฉลี่ย/วัน',v:daysWithData?fmtN((tot.s1_door+tot.s1_pal)/daysWithData,2):'—',tk:'s1_avg',perDay:true,u:'Cu.ft./วัน', highlight:true},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s1_oc/daysWithData,0):'—',u:`คน / OC 40`},
       ]
     },
@@ -2872,15 +3280,15 @@ async function buildMonthly() {
       icon:'🪵', title:'โรงเลื่อยปราจีน',
       metrics:[
         {l:'ยอดเข้าเลื่อย',v:fmtN(tot.s2_enter,2),u:'Ton.'},
-        {l:'ยอดเลื่อย',v:fmtN(tot.s2_saw,0),u:'Cu.ft.'},
-        {l:'เฉลี่ย/วัน',v:(()=>{const d2=days.filter(({data:r})=>toNum(r.s2_saw)>0).length;return d2?fmtN(tot.s2_saw/d2,2):'—';})(),u:'Cu.ft./วัน', highlight:true},
+        {l:'ยอดเลื่อย',v:fmtN(tot.s2_saw,0),tk:'s2_saw',u:'Cu.ft.'},
+        {l:'เฉลี่ย/วัน',v:(()=>{const d2=days.filter(({data:r})=>toNum(r.s2_saw)>0).length;return d2?fmtN(tot.s2_saw/d2,2):'—';})(),tk:'s2_avg',perDay:true,u:'Cu.ft./วัน', highlight:true},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s2_oc/daysWithData,0):'—',u:`คน / OC 17`},
       ]
     },
     {
       icon:'🌡️', title:'โรงอบ',
       metrics:[
-        {l:'ไม้อบส่งโรง 8 ใบ',v:fmtN(tot.d1_cf,2),u:'Cu.ft.'},
+        {l:'ไม้อบส่งโรง 8 ใบ',v:fmtN(tot.d1_cf,2),tk:'d1_cf',u:'Cu.ft.'},
         {l:'จำนวนพาเลท',v:fmtN(tot.d1_pl,0),u:'Pallet'},
         {l:'ไม้ในเตาอบ (ล่าสุด)',v:(()=>{const last=days.slice().reverse().find(({data:r})=>toNum(r.d2_cf)>0);return last?fmtN(toNum(last.data.d2_cf),2):'—';})(),u:'Cu.ft.'},
         {l:'พาเลทในเตาอบ (ล่าสุด)',v:(()=>{const last=days.slice().reverse().find(({data:r})=>toNum(r.d2_pl)>0);return last?fmtN(toNum(last.data.d2_pl),0):'—';})(),u:'Pallet'},
@@ -2890,8 +3298,8 @@ async function buildMonthly() {
     {
       icon:'⚙️', title:'โรง 8 ใบ',
       metrics:[
-        {l:'ยอดตัดไม้',v:fmtN(tot.bc_cuft,2),u:'Cu.ft.'},
-        {l:'อัตราตัด (เฉลี่ย)',v:daysWithData?fmtN(tot.bc_rate/daysWithData,2):'—',u:'Cu.ft./ชม.'},
+        {l:'ยอดตัดไม้',v:fmtN(tot.bc_cuft,2),tk:'bc_cuft',u:'Cu.ft.'},
+        {l:'อัตราตัด (เฉลี่ย)',v:daysWithData?fmtN(tot.bc_rate/daysWithData,2):'—',tk:'bc_rate',perDay:true,u:'Cu.ft./ชม.'},
         {l:'— Stock รอผลิต —',v:_skDate,u:''},
         {l:'ไม้แปรรูป',v:toNum(_sk.bk_pr)?fmtN(toNum(_sk.bk_pr),2):'—',u:'Cu.ft.'},
         {l:'ไม้หัว (รวม)',v:toNum(_sk.bk_h)?fmtN(toNum(_sk.bk_h),0):'—',u:'pcs.'},
@@ -2906,16 +3314,16 @@ async function buildMonthly() {
         {l:'ต่อ 3"',v:fmtN(tot.bj_3,0),u:'pcs.'},
         {l:'ต่อ FJ',v:fmtN(tot.bj_fj,0),u:'pcs.'},
         {l:'— ยอดซอย —',v:`${daysWithData} วัน`,u:''},
-        {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),u:'pcs.'},
+        {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),tk:'bs_h1',u:'pcs.'},
         {l:'ไม้หัว (เบญ-ยาง)',v:fmtN(tot.bs_h1_ben,0),u:'pcs.'},
         {l:'ไม้หัว มอก.',v:fmtN(tot.bs_h1_mok,0),u:'pcs.'},
-        {l:'ไม้ข้าง (รวม)',v:fmtN(tot.bs_k1,0),u:'pcs.'},
+        {l:'ไม้ข้าง (รวม)',v:fmtN(tot.bs_k1,0),tk:'bs_k1',u:'pcs.'},
         {l:'ไม้ข้าง (เบญจพรรณ)',v:fmtN(tot.bs_k2,0),u:'pcs.'},
         {l:'ไม้ข้าง (มอก.)',v:fmtN(tot.bs_mok,0),u:'pcs.'},
         {l:'ไม้ LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
         {l:'— ยิงโครง —',v:`${daysWithData} วัน`,u:''},
-        {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),u:'pcs.'},
-        {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),u:'pcs.'},
+        {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),tk:'bf_w',u:'pcs.'},
+        {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),tk:'bf_m',u:'pcs.'},
         {l:'เฉลี่ยกำลังคน (8 ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
         {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
       ]
@@ -2923,10 +3331,10 @@ async function buildMonthly() {
     {
       icon:'🔥', title:'อัดร้อน / อัดเย็น',
       metrics:[
-        {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),u:'pcs.'},
-        {l:'อัดร้อน',v:fmtN(tot.p2_hot,0),u:'บาน'},
+        {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),tk:'p1_frame',u:'pcs.'},
+        {l:'อัดร้อน',v:fmtN(tot.p2_hot,0),tk:'p2_hot',u:'บาน'},
         {l:'Downtime รวม',v:fmtN(tot.p2_down,0),u:'นาที'},
-        {l:'อัดเย็น',v:fmtN(tot.p3_cold,0),u:'บาน'},
+        {l:'อัดเย็น',v:fmtN(tot.p3_cold,0),tk:'p3_cold',u:'บาน'},
         {l:'เฉลี่ยกำลังคน (ยิงโครง)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
         {l:'เฉลี่ยกำลังคน (อัดร้อน)',v:daysWithData?fmtN(tot.p2_oc/daysWithData,0):'—',u:`คน / OC 11`},
         {l:'เฉลี่ยกำลังคน (อัดเย็น)',v:daysWithData?fmtN(tot.p3_oc/daysWithData,0):'—',u:`คน / OC 3`},
@@ -2935,12 +3343,12 @@ async function buildMonthly() {
     {
       icon:'✂️', title:'CTS & คัดเกรด',
       metrics:[
-        {l:'ยอดซอย',v:fmtN(tot.cts_sloy,0),u:'บาน'},
-        {l:'ยอดห่อประตู',v:fmtN(tot.cts_wrap,0),u:'บาน'},
+        {l:'ยอดซอย',v:fmtN(tot.cts_sloy,0),tk:'cts_sloy',u:'บาน'},
+        {l:'ยอดห่อประตู',v:fmtN(tot.cts_wrap,0),tk:'cts_wrap',u:'บาน'},
         {l:'ของเสีย อัดร้อน',v:fmtN(tot.w_hot,0),u:'บาน'},
         {l:'ของเสีย อัดเย็น',v:fmtN(tot.w_cold,0),u:'บาน'},
         {l:'ของเสีย เครื่องซอย',v:fmtN(tot.w_sloy,0),u:'บาน'},
-        {l:'% ของเสียรวม',v:wastePct.toFixed(3)+'%',u:'เป้า ≤0.15%'},
+        {l:'% ของเสียรวม',v:wastePct.toFixed(3)+'%',raw:wastePct,tk:'w_pct',ratio:true,u:'เทียบยอดอัดร้อน'},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.cts_oc/daysWithData,0):'—',u:`คน / OC 25`},
       ]
     },
@@ -2956,17 +3364,17 @@ async function buildMonthly() {
         {l:'4"×10"',v:fmtN(tot.pl_4x10,0),u:'Pcs.'},
         {l:'4"×12"',v:fmtN(tot.pl_4x12,0),u:'Pcs.'},
         {l:'7"×9"',v:fmtN(tot.pl_7x9,0),u:'Pcs.'},
-        {l:'รวมทุกขนาด',v:fmtN(totalPallet,0),u:'Pcs.'},
+        {l:'รวมทุกขนาด',v:fmtN(totalPallet,0),tk:'pl_total',u:'Pcs.'},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.pl_oc/daysWithData,0):'—',u:`คน / OC 6`},
       ]
     },
     {
       icon:'🏬', title:'คลังสินค้า',
       metrics:[
-        {l:'เข้าคลัง FG รวม',v:fmtN(tot.wh_in,0),u:'บาน'},
+        {l:'เข้าคลัง FG รวม',v:fmtN(tot.wh_in,0),tk:'wh_in',u:'บาน'},
         {l:'เข้าคลัง Ag',v:fmtN(tot.wh_in_ag,0),u:'บาน'},
         {l:'เข้าคลัง C+',v:fmtN(tot.wh_in_cp,0),u:'บาน'},
-        {l:'โหลดสินค้า รวม',v:fmtN(tot.wh_out,0),u:'บาน'},
+        {l:'โหลดสินค้า รวม',v:fmtN(tot.wh_out,0),tk:'wh_out',u:'บาน'},
         {l:'โหลดสินค้า Ag',v:fmtN(tot.wh_out_ag,0),u:'บาน'},
         {l:'โหลดสินค้า C+',v:fmtN(tot.wh_out_cp,0),u:'บาน'},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.wh_oc/daysWithData,0):'—',u:`คน / OC 6`},
@@ -3006,6 +3414,7 @@ async function buildMonthly() {
             <div class="mo-metric-label" ${m.highlight?'style="color:var(--green-700,#15803d);font-weight:800;"':''}>${m.l}</div>
             <div class="mo-metric-value" ${m.highlight?'style="color:var(--green-700,#15803d);"':''}>${m.v}</div>
             <div class="mo-metric-unit">${m.u}</div>
+            ${tgLine(m, TG_MONTH_DAYS)}
           </div>`).join('')}
       </div>
       </div>
@@ -3347,32 +3756,32 @@ async function buildMCompare() {
 
   const groups = [
     { title:'🪵 โรงเลื่อย', rows:[
-      {l:'เลื่อย ไทรน้อย', vC:tC.s1_door+tC.s1_pal, vP:tP.s1_door+tP.s1_pal, u:'Cu.ft.'},
-      {l:'เลื่อย ปราจีน',  vC:tC.s2_saw,             vP:tP.s2_saw,             u:'Cu.ft.'},
+      {l:'เลื่อย ไทรน้อย', tk:'s1_total', vC:tC.s1_door+tC.s1_pal, vP:tP.s1_door+tP.s1_pal, u:'Cu.ft.'},
+      {l:'เลื่อย ปราจีน', tk:'s2_saw',  vC:tC.s2_saw,             vP:tP.s2_saw,             u:'Cu.ft.'},
       {l:'รวมยอดเลื่อย',   vC:tC.s1_door+tC.s1_pal+tC.s2_saw, vP:tP.s1_door+tP.s1_pal+tP.s2_saw, u:'Cu.ft.', bold:true},
     ]},
     { title:'🚪 โรงประตู', rows:[
-      {l:'ยิงโครงกระดาษ', vC:tC.p1_frame, vP:tP.p1_frame, u:'pcs.'},
-      {l:'ยิงโครงไม้',    vC:tC.bf_w+tC.bf_m, vP:tP.bf_w+tP.bf_m, u:'pcs.'},
-      {l:'อัดร้อน',       vC:tC.p2_hot,  vP:tP.p2_hot,  u:'บาน', bold:true},
-      {l:'อัดเย็น',       vC:tC.p3_cold, vP:tP.p3_cold, u:'บาน'},
-      {l:'ซอย',           vC:tC.cts_sloy,vP:tP.cts_sloy,u:'บาน'},
-      {l:'ห่อประตู',      vC:tC.cts_wrap,vP:tP.cts_wrap,u:'บาน', bold:true},
+      {l:'ยิงโครงกระดาษ', tk:'p1_frame', vC:tC.p1_frame, vP:tP.p1_frame, u:'pcs.'},
+      {l:'ยิงโครงไม้', tk:'bf_w',    vC:tC.bf_w+tC.bf_m, vP:tP.bf_w+tP.bf_m, u:'pcs.'},
+      {l:'อัดร้อน', tk:'p2_hot',       vC:tC.p2_hot,  vP:tP.p2_hot,  u:'บาน', bold:true},
+      {l:'อัดเย็น', tk:'p3_cold',       vC:tC.p3_cold, vP:tP.p3_cold, u:'บาน'},
+      {l:'ซอย', tk:'cts_sloy',           vC:tC.cts_sloy,vP:tP.cts_sloy,u:'บาน'},
+      {l:'ห่อประตู', tk:'cts_wrap',      vC:tC.cts_wrap,vP:tP.cts_wrap,u:'บาน', bold:true},
     ]},
     { title:'⚠️ ของเสีย', rows:[
-      {l:'ของเสียรวม', vC:wTotC, vP:wTotP, u:'บาน', lowerBetter:true},
-      {l:'% ของเสีย',  vC:wPctC, vP:wPctP, u:'%', dec:3, isPct:true, lowerBetter:true, bold:true},
+      {l:'ของเสียรวม', tk:'w_total', vC:wTotC, vP:wTotP, u:'บาน', lowerBetter:true},
+      {l:'% ของเสีย',  vC:wPctC, vP:wPctP, u:'', dec:3, isPct:true, lowerBetter:true, bold:true, tk:'w_pct'},
     ]},
     { title:'📦 คลัง FG', rows:[
-      {l:'เข้าคลัง FG', vC:tC.wh_in_ag+tC.wh_in_cp, vP:tP.wh_in_ag+tP.wh_in_cp, u:'บาน', bold:true},
+      {l:'เข้าคลัง FG', tk:'wh_in', vC:tC.wh_in_ag+tC.wh_in_cp, vP:tP.wh_in_ag+tP.wh_in_cp, u:'บาน', bold:true},
       {l:'  ▸ Ag',       vC:tC.wh_in_ag, vP:tP.wh_in_ag, u:'บาน'},
       {l:'  ▸ C+',       vC:tC.wh_in_cp, vP:tP.wh_in_cp, u:'บาน'},
-      {l:'โหลดสินค้า',  vC:tC.wh_out_ag+tC.wh_out_cp, vP:tP.wh_out_ag+tP.wh_out_cp, u:'บาน', bold:true},
+      {l:'โหลดสินค้า', tk:'wh_out',  vC:tC.wh_out_ag+tC.wh_out_cp, vP:tP.wh_out_ag+tP.wh_out_cp, u:'บาน', bold:true},
       {l:'  ▸ Ag',       vC:tC.wh_out_ag, vP:tP.wh_out_ag, u:'บาน'},
       {l:'  ▸ C+',       vC:tC.wh_out_cp, vP:tP.wh_out_cp, u:'บาน'},
     ]},
     { title:'🔲 พาเลท', rows:[
-      {l:'รวมทุกขนาด', vC:palC, vP:palP, u:'Pcs.', bold:true},
+      {l:'รวมทุกขนาด', tk:'pl_total', vC:palC, vP:palP, u:'Pcs.', bold:true},
     ]},
   ];
 
@@ -3406,7 +3815,7 @@ async function buildMCompare() {
           <tr style="border-top:1px solid #f1f5f9;${i%2===0?'':'background:#fafafa'}">
             <td style="${lblStyle}${r.bold?'font-weight:700;color:var(--g800)':''}">${r.l}</td>
             <td style="${colStyle}font-size:14px;color:var(--g600);">${r.isPct?fmtPct(r.vP):fmt(r.vP,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span></td>
-            <td style="${colStyle}font-size:15px;font-weight:${r.bold?'800':'600'};color:var(--g800);">${r.isPct?fmtPct(r.vC):fmt(r.vC,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span></td>
+            <td style="${colStyle}font-size:15px;font-weight:${r.bold?'800':'600'};color:var(--g800);">${r.isPct?fmtPct(r.vC):fmt(r.vC,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span>${r.tk?tgLine({tk:r.tk, raw:r.vC, ratio:!!r.isPct}, TG_MONTH_DAYS):''}</td>
             <td style="${colStyle}">${chg(r.vC,r.vP,r.lowerBetter,r.isPct)}</td>
           </tr>`).join('')}
         </tbody>
@@ -3434,38 +3843,38 @@ async function buildWeekly() {
   // ── All metrics for card view (grouped) ──
   const CM = [
     // โรงเลื่อยไทรน้อย
-    { label:'ยอดเข้าเลื่อย (ไทรน้อย)',          unit:'Ton.',      fn: d=>toNum(d.s1_enter),                        grp:'🪵 โรงเลื่อยไทรน้อย' },
-    { label:'ไม้เลื่อยส่งโรงประตู',              unit:'Cu.ft.',    fn: d=>toNum(d.s1_door),                         grp:'🪵 โรงเลื่อยไทรน้อย' },
-    { label:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป',  unit:'Cu.ft.',    fn: d=>toNum(d.s1_pal),                          grp:'🪵 โรงเลื่อยไทรน้อย' },
-    { label:'รวมยอดเลื่อย (ไทรน้อย)',            unit:'Cu.ft.',    fn: d=>toNum(d.s1_door)+toNum(d.s1_pal),         grp:'🪵 โรงเลื่อยไทรน้อย' },
-    { label:'เฉลี่ย/วัน (ไทรน้อย)',              unit:'Cu.ft./วัน',fn: d=>toNum(d.s1_door)+toNum(d.s1_pal), isAvg:true, srcKey:'s1_saw_sum', grp:'🪵 โรงเลื่อยไทรน้อย' },
+    { label:'ยอดเข้าเลื่อย (ไทรน้อย)', tk:'s1_enter',          unit:'Ton.',      fn: d=>toNum(d.s1_enter),                        grp:'🪵 โรงเลื่อยไทรน้อย' },
+    { label:'ไม้เลื่อยส่งโรงประตู', tk:'s1_door',              unit:'Cu.ft.',    fn: d=>toNum(d.s1_door),                         grp:'🪵 โรงเลื่อยไทรน้อย' },
+    { label:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป', tk:'s1_pal',  unit:'Cu.ft.',    fn: d=>toNum(d.s1_pal),                          grp:'🪵 โรงเลื่อยไทรน้อย' },
+    { label:'รวมยอดเลื่อย (ไทรน้อย)', tk:'s1_total',            unit:'Cu.ft.',    fn: d=>toNum(d.s1_door)+toNum(d.s1_pal),         grp:'🪵 โรงเลื่อยไทรน้อย' },
+    { label:'เฉลี่ย/วัน (ไทรน้อย)', tk:'s1_avg',              unit:'Cu.ft./วัน',fn: d=>toNum(d.s1_door)+toNum(d.s1_pal), isAvg:true, srcKey:'s1_saw_sum', grp:'🪵 โรงเลื่อยไทรน้อย' },
     // โรงเลื่อยปราจีน
-    { label:'ยอดเข้าเลื่อย (ปราจีน)',            unit:'Ton.',      fn: d=>toNum(d.s2_enter),                        grp:'🪵 โรงเลื่อยปราจีน' },
-    { label:'ยอดเลื่อย (ปราจีน)',                unit:'Cu.ft.',    fn: d=>toNum(d.s2_saw),                          grp:'🪵 โรงเลื่อยปราจีน' },
-    { label:'เฉลี่ย/วัน (ปราจีน)',               unit:'Cu.ft./วัน',fn: d=>toNum(d.s2_saw), isAvg:true, srcKey:'s2_saw_days', grp:'🪵 โรงเลื่อยปราจีน' },
+    { label:'ยอดเข้าเลื่อย (ปราจีน)', tk:'s2_enter',            unit:'Ton.',      fn: d=>toNum(d.s2_enter),                        grp:'🪵 โรงเลื่อยปราจีน' },
+    { label:'ยอดเลื่อย (ปราจีน)', tk:'s2_saw',                unit:'Cu.ft.',    fn: d=>toNum(d.s2_saw),                          grp:'🪵 โรงเลื่อยปราจีน' },
+    { label:'เฉลี่ย/วัน (ปราจีน)', tk:'s2_avg',               unit:'Cu.ft./วัน',fn: d=>toNum(d.s2_saw), isAvg:true, srcKey:'s2_saw_days', grp:'🪵 โรงเลื่อยปราจีน' },
     // โรงอบ
-    { label:'ยอดไม้อบส่งโรง 8 ใบ',              unit:'Cu.ft.',    fn: d=>toNum(d.d1_cf),                           grp:'🌡️ โรงอบ' },
-    { label:'จำนวนพาเลท (โรงอบ)',                unit:'Pallet',    fn: d=>toNum(d.d1_pl),                           grp:'🌡️ โรงอบ' },
+    { label:'ยอดไม้อบส่งโรง 8 ใบ', tk:'d1_cf',              unit:'Cu.ft.',    fn: d=>toNum(d.d1_cf),                           grp:'🌡️ โรงอบ' },
+    { label:'จำนวนพาเลท (โรงอบ)', tk:'d1_pl',                unit:'Pallet',    fn: d=>toNum(d.d1_pl),                           grp:'🌡️ โรงอบ' },
     // โรง 8 ใบ
-    { label:'ยอดตัดไม้',                         unit:'Cu.ft.',    fn: d=>toNum(d.bc_cuft),                         grp:'⚙️ โรง 8 ใบ' },
+    { label:'ยอดตัดไม้', tk:'bc_cuft',                         unit:'Cu.ft.',    fn: d=>toNum(d.bc_cuft),                         grp:'⚙️ โรง 8 ใบ' },
     { label:'ยอดต่อ 6"',                         unit:'pcs.',      fn: d=>toNum(d.bj_6),                            grp:'⚙️ โรง 8 ใบ' },
     { label:'ยอดต่อ 4.5"',                       unit:'pcs.',      fn: d=>toNum(d.bj_45),                           grp:'⚙️ โรง 8 ใบ' },
     { label:'ยอดต่อ 3"',                         unit:'pcs.',      fn: d=>toNum(d.bj_3),                            grp:'⚙️ โรง 8 ใบ' },
     { label:'ยอดต่อ FJ',                        unit:'pcs.',      fn: d=>toNum(d.bj_fj),                           grp:'⚙️ โรง 8 ใบ' },
-    { label:'ไม้หัว',                            unit:'pcs.',      fn: d=>toNum(d.bs_h1),                           grp:'⚙️ โรง 8 ใบ' },
-    { label:'ไม้ข้าง',                           unit:'pcs.',      fn: d=>toNum(d.bs_k1),                           grp:'⚙️ โรง 8 ใบ' },
+    { label:'ไม้หัว', tk:'bs_h1',                            unit:'pcs.',      fn: d=>toNum(d.bs_h1),                           grp:'⚙️ โรง 8 ใบ' },
+    { label:'ไม้ข้าง', tk:'bs_k1',                           unit:'pcs.',      fn: d=>toNum(d.bs_k1),                           grp:'⚙️ โรง 8 ใบ' },
     { label:'ไม้ข้าง LVL',                       unit:'pcs.',      fn: d=>toNum(d.bs_lvl),                          grp:'⚙️ โรง 8 ใบ' },
     // ยิงโครง
-    { label:'ยิงโครงกระดาษ',                     unit:'pcs.',      fn: d=>toNum(d.p1_frame),                        grp:'🔧 ยิงโครง' },
-    { label:'ยิงโครงไม้',                        unit:'pcs.',      fn: d=>toNum(d.bf_w),                            grp:'🔧 ยิงโครง' },
-    { label:'ยิงโครง มอก.',                      unit:'pcs.',      fn: d=>toNum(d.bf_m),                            grp:'🔧 ยิงโครง' },
+    { label:'ยิงโครงกระดาษ', tk:'p1_frame',                     unit:'pcs.',      fn: d=>toNum(d.p1_frame),                        grp:'🔧 ยิงโครง' },
+    { label:'ยิงโครงไม้', tk:'bf_w',                        unit:'pcs.',      fn: d=>toNum(d.bf_w),                            grp:'🔧 ยิงโครง' },
+    { label:'ยิงโครง มอก.', tk:'bf_m',                      unit:'pcs.',      fn: d=>toNum(d.bf_m),                            grp:'🔧 ยิงโครง' },
     // อัดร้อน/อัดเย็น
-    { label:'อัดร้อน',                           unit:'บาน',       fn: d=>toNum(d.p2_hot),                          grp:'🔥 อัดร้อน/อัดเย็น' },
+    { label:'อัดร้อน', tk:'p2_hot',                           unit:'บาน',       fn: d=>toNum(d.p2_hot),                          grp:'🔥 อัดร้อน/อัดเย็น' },
     { label:'Downtime',                           unit:'นาที',      fn: d=>toNum(d.p2_down),                         grp:'🔥 อัดร้อน/อัดเย็น' },
-    { label:'อัดเย็น',                           unit:'บาน',       fn: d=>toNum(d.p3_cold),                         grp:'🔥 อัดร้อน/อัดเย็น' },
+    { label:'อัดเย็น', tk:'p3_cold',                           unit:'บาน',       fn: d=>toNum(d.p3_cold),                         grp:'🔥 อัดร้อน/อัดเย็น' },
     // CTS
-    { label:'ซอยประตู',                          unit:'บาน',       fn: d=>toNum(d.cts_sloy),                        grp:'✂️ CTS & คัดเกรด' },
-    { label:'ห่อประตู',                          unit:'บาน',       fn: d=>toNum(d.cts_wrap),                        grp:'✂️ CTS & คัดเกรด' },
+    { label:'ซอยประตู', tk:'cts_sloy',                          unit:'บาน',       fn: d=>toNum(d.cts_sloy),                        grp:'✂️ CTS & คัดเกรด' },
+    { label:'ห่อประตู', tk:'cts_wrap',                          unit:'บาน',       fn: d=>toNum(d.cts_wrap),                        grp:'✂️ CTS & คัดเกรด' },
     { label:'ของเสีย อัดร้อน',                   unit:'บาน',       fn: d=>toNum(d.w_hot),                           grp:'✂️ CTS & คัดเกรด' },
     { label:'ของเสีย อัดเย็น',                   unit:'บาน',       fn: d=>toNum(d.w_cold),                          grp:'✂️ CTS & คัดเกรด' },
     { label:'ของเสีย เครื่องซอย',                unit:'บาน',       fn: d=>toNum(d.w_sloy),                          grp:'✂️ CTS & คัดเกรด' },
@@ -3592,7 +4001,8 @@ async function buildWeekly() {
               <span style="font-size:13px;font-weight:${isMax||m.isAvg?'800':'600'};color:${isMax?col:m.isAvg?'#3b5bdb':'#334155'};white-space:nowrap;">
                 ${fmtNum(v,0)}&thinsp;<span style="font-size:10px;font-weight:400;color:#94a3b8;">${m.unit}</span>${sub}
               </span>
-            </div>`;
+            </div>
+            ${m.tk ? `<div style="padding:0 6px 4px;">${tgLine({tk:m.tk, raw:v, perDay:!!m.isAvg}, m.isAvg ? 0 : w.hasDays)}</div>` : ''}`;
         }).join('');
         return `
           <div style="font-size:10px;font-weight:800;color:${col};letter-spacing:.5px;
@@ -3929,7 +4339,11 @@ function _applyImportCode(raw, fromHash) {
     <div class="ov-modal-content" id="ov-modal-content"></div>
     <div class="ov-modal-foot">
       <div class="ov-modal-hint" id="ov-modal-hint" style="display:none;">💡 กดชิปสัปดาห์ด้านบนเพิ่มอีกหนึ่งใบ เพื่อเปิดเทียบคู่กันซ้าย–ขวา</div>
-      <button type="button" class="ov-modal-back" onclick="_ovModalClose()">← ปิด / กลับไปเลือกแผนก</button>
+      <div class="ov-nav-row">
+        <button type="button" class="ov-nav-btn" id="ov-nav-prev" onclick="_ovNav(-1)" title="แผนกก่อนหน้า (←)">◀</button>
+        <button type="button" class="ov-modal-back" onclick="_ovModalClose()">← ปิด / กลับไปเลือกแผนก</button>
+        <button type="button" class="ov-nav-btn" id="ov-nav-next" onclick="_ovNav(1)" title="แผนกถัดไป (→)">▶</button>
+      </div>
     </div>
   </div>
 </div>
