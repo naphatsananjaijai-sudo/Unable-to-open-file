@@ -4355,9 +4355,8 @@ function _applyImportCode(raw, fromHash) {
 fetch('data.json') // ใช้ชื่อไฟล์คงที่ เช่น data.json
   .then(res => res.json())
   .then(data => {
-    // หาวันล่าสุดจาก key ที่ขึ้นต้นด้วย "door_"
     const doorKeys = Object.keys(data).filter(k => k.startsWith('door_'));
-    const latestKey = doorKeys.sort().pop(); // เอา key ล่าสุด
+    const latestKey = doorKeys.sort().pop();
     const doorData = data[latestKey];
 
     const container = document.createElement('div');
@@ -4376,5 +4375,6 @@ fetch('data.json') // ใช้ชื่อไฟล์คงที่ เช่
   .catch(err => console.error('โหลด JSON ไม่สำเร็จ:', err));
 </script>
 </html>
+
 
 </html>
