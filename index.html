@@ -4348,4 +4348,27 @@ function _applyImportCode(raw, fromHash) {
   </div>
 </div>
 </body>
+  <!-- เนื้อหาเดิมของหน้าเว็บ -->
+...
+<!-- วางโค้ดนี้ตรงนี้ -->
+<script>
+fetch('door_factory_data_2026-08-21.json')
+  .then(res => res.json())
+  .then(data => {
+    const container = document.createElement('div');
+    container.style.padding = '20px';
+    container.innerHTML = `
+      <h1>ข้อมูลโรงงานประจำวัน</h1>
+      <p>วันที่: ${data.date || 'ไม่ระบุ'}</p>
+      <table border="1" cellpadding="8" style="border-collapse: collapse;">
+        <tr><th>ชื่อ</th><th>สถานะ</th></tr>
+        ${data.items.map(item => `<tr><td>${item.name}</td><td>${item.status}</td></tr>`).join('')}
+      </table>
+    `;
+    document.body.appendChild(container);
+  })
+  .catch(err => console.error('โหลด JSON ไม่สำเร็จ:', err));
+</script>
+</html>
+
 </html>
