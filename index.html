@@ -4352,17 +4352,23 @@ function _applyImportCode(raw, fromHash) {
 ...
 <!-- วางโค้ดนี้ตรงนี้ -->
 <script>
-fetch('data.json')
+fetch('data.json') // ใช้ชื่อไฟล์คงที่ เช่น data.json
   .then(res => res.json())
   .then(data => {
+    // หาวันล่าสุดจาก key ที่ขึ้นต้นด้วย "door_"
+    const doorKeys = Object.keys(data).filter(k => k.startsWith('door_'));
+    const latestKey = doorKeys.sort().pop(); // เอา key ล่าสุด
+    const doorData = data[latestKey];
+
     const container = document.createElement('div');
     container.style.padding = '20px';
     container.innerHTML = `
-      <h1>ข้อมูลโรงงานประจำวัน</h1>
-      <p>วันที่: ${data.date || 'ไม่ระบุ'}</p>
+      <h1>ข้อมูลโรงงาน (${latestKey})</h1>
       <table border="1" cellpadding="8" style="border-collapse: collapse;">
-        <tr><th>ชื่อ</th><th>สถานะ</th></tr>
-        ${data.items.map(item => `<tr><td>${item.name}</td><td>${item.status}</td></tr>`).join('')}
+        <tr><th>ตัวแปร</th><th>ค่า</th></tr>
+        ${Object.entries(doorData)
+          .map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`)
+          .join('')}
       </table>
     `;
     document.body.appendChild(container);
