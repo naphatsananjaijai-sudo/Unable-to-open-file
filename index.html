@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>โรงงานประตู</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <!-- ══ ติดตั้งเป็นแอปบนมือถือ (PWA) ══ -->
 <meta name="theme-color" content="#2563eb">
 <meta name="mobile-web-app-capable" content="yes">
@@ -231,6 +234,8 @@ body {
 .auth-btn:hover { background: var(--g100); border-color: var(--g200); color: var(--g500); }
 .auth-btn.admin-mode { background: var(--g400); border-color: var(--g400); color: #fff; }
 .auth-btn.admin-mode:hover { background: var(--g500); border-color: var(--g500); color: #fff; }
+.refresh-btn { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.refresh-btn:hover { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
 .logout-btn { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
 .logout-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 
@@ -951,6 +956,7 @@ body.view-only .view-only-badge { display: flex; }
     <input type="text" id="date-input" placeholder="วว/ดด/ปปปป" maxlength="10" autocomplete="off" readonly />
     <button type="button" class="date-nav-btn" onclick="shiftDay(1)" title="วันถัดไป">▶</button>
   </div>
+  <button class="auth-btn refresh-btn" id="refresh-btn" onclick="hardReload(this)" title="โหลดข้อมูลเวอร์ชันล่าสุดจากเซิร์ฟเวอร์">🔄 รีเฟรช</button>
   <button class="import-fab admin-only-nav" onclick="showImportModal()" title="นำเข้าข้อมูลจากฟอร์มเลื่อยเครื่องอื่น">📥 นำเข้า</button>
   <button class="save-btn" onclick="saveData()">💾 บันทึก</button>
   <button class="auth-btn" id="auth-btn" onclick="authToggle()">🔒 เข้าสู่ระบบ</button>
@@ -2221,10 +2227,10 @@ const TG_DEF = [
   { grp:'🏭 คลัง FG', items:[
     {k:'wh_in',  l:'เข้าคลัง', u:'บาน'},
     {k:'wh_out', l:'โหลดสินค้า', u:'บาน'},
-    {k:'wh_st',  l:'Stock คลังสินค้า (คงเหลือ)', u:'บาน', ratio:true},
+    {k:'wh_st',  l:'Stock คลังสินค้า — เป้าต่อเดือน', u:'บาน/เดือน', ratio:true},
   ]},
 ];
-const TG_DEFAULT = { p1_frame:2000, bf_w:300, p2_hot:2000, p3_cold:160, cts_wrap:1300, bc_rate:30, bs_h1:4000, bs_k1:4000, w_pct:0.15 };
+const TG_DEFAULT = { p1_frame:2000, bf_w:300, p2_hot:1800, p3_cold:160, cts_wrap:1300, bc_rate:30, bs_h1:4000, bs_k1:4000, w_pct:0.15, wh_in:1800, wh_st:35000 };
 const TG_KEY = 'door_targets';
 const TG_MONTH_DAYS = 25;   // เป้ารายเดือน = เป้า/วัน × 25 วันทำงานมาตรฐาน
 let TARGETS = (() => {
@@ -2268,7 +2274,7 @@ function tgLine(m, days) {
   const f = v => v.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
   const diff = raw - goal;
   const src = m.ratio
-    ? 'เป้าคงที่ ไม่คูณจำนวนวัน'
+    ? 'เป้าต่อเดือน — ไม่คูณจำนวนวัน'
     : ((!m.perDay && days > 0)
         ? `${T.toLocaleString('en-US')}/วัน × ${days} วัน${days === TG_MONTH_DAYS ? ' ทำงาน' : ''}`
         : `${T.toLocaleString('en-US')}/วัน`);
@@ -4223,6 +4229,31 @@ if (sessionStorage.getItem(SESSION_KEY) === '1') {
 
 // Apply mode on load
 applyMode();
+
+/* ══ รีเฟรช: ล้างแคชของเบราว์เซอร์/แอป แล้วโหลดไฟล์ใหม่จากเซิร์ฟเวอร์ ══
+   (ข้อมูลที่บันทึกไว้ใน localStorage ไม่ถูกลบ)                          */
+async function hardReload(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังโหลด...'; }
+  try {
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch (e) {}
+  try {
+    if (navigator.serviceWorker) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+  } catch (e) {}
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('v', Date.now());   // กันแคชของ GitHub Pages / WebView
+    location.replace(u.toString());
+  } catch (e) {
+    location.reload();
+  }
+}
 
 /* ══ Share guide ══ */
 function showShareGuide() {
