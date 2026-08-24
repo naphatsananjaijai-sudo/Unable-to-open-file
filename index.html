@@ -3450,13 +3450,13 @@ async function buildMonthly() {
     {
       icon:'🏬', title:'คลังสินค้า',
       metrics:[
-        {l:'เข้าคลัง FG รวม',v:fmtN(tot.wh_in,0),tk:'wh_in',u:'บาน'},
+        {l:'เข้าคลัง FG รวม',v:fmtN(tot.wh_in,0),tk:'wh_in',u:'บาน', highlight:true},
         {l:'เข้าคลัง Ag',v:fmtN(tot.wh_in_ag,0),u:'บาน'},
         {l:'เข้าคลัง C+',v:fmtN(tot.wh_in_cp,0),u:'บาน'},
-        {l:'โหลดสินค้า รวม',v:fmtN(tot.wh_out,0),tk:'wh_out',u:'บาน'},
+        {l:'โหลดสินค้า รวม',v:fmtN(tot.wh_out,0),tk:'wh_out',u:'บาน', highlight:true},
         {l:'โหลดสินค้า Ag',v:fmtN(tot.wh_out_ag,0),u:'บาน'},
         {l:'โหลดสินค้า C+',v:fmtN(tot.wh_out_cp,0),u:'บาน'},
-        {l:'Stock คลังสินค้า (ล่าสุด)',v:(()=>{const d=days.slice().reverse().find(({data:r})=>_whSt(r)>0);return d?fmtN(_whSt(d.data),0):'—';})(),u:'บาน'},
+        {l:'Stock คลังสินค้า (ล่าสุด)',v:(()=>{const d=days.slice().reverse().find(({data:r})=>_whSt(r)>0);return d?fmtN(_whSt(d.data),0):'—';})(),raw:(()=>{const d=days.slice().reverse().find(({data:r})=>_whSt(r)>0);return d?_whSt(d.data):0;})(),tk:'wh_st',ratio:true,u:'บาน', highlight:true},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.wh_oc/daysWithData,0):'—',u:`คน / OC 6`},
       ]
     },
@@ -3868,7 +3868,7 @@ async function buildMCompare() {
       {l:'เข้าคลัง FG', tk:'wh_in', vC:tC.wh_in_ag+tC.wh_in_cp, vP:tP.wh_in_ag+tP.wh_in_cp, u:'บาน', bold:true},
       {l:'  ▸ Ag',       vC:tC.wh_in_ag, vP:tP.wh_in_ag, u:'บาน'},
       {l:'  ▸ C+',       vC:tC.wh_in_cp, vP:tP.wh_in_cp, u:'บาน'},
-      {l:'Stock คลังสินค้า (ล่าสุด)', noPerDay:true, vC:stC, vP:stP, u:'บาน'},
+      {l:'Stock คลังสินค้า (ล่าสุด)', noPerDay:true, tk:'wh_st', vC:stC, vP:stP, u:'บาน', bold:true},
       {l:'โหลดสินค้า', tk:'wh_out',  vC:tC.wh_out_ag+tC.wh_out_cp, vP:tP.wh_out_ag+tP.wh_out_cp, u:'บาน', bold:true},
       {l:'  ▸ Ag',       vC:tC.wh_out_ag, vP:tP.wh_out_ag, u:'บาน'},
       {l:'  ▸ C+',       vC:tC.wh_out_cp, vP:tP.wh_out_cp, u:'บาน'},
@@ -3908,7 +3908,7 @@ async function buildMCompare() {
           <tr style="border-top:1px solid #f1f5f9;${i%2===0?'':'background:#fafafa'}">
             <td style="${lblStyle}${r.bold?'font-weight:700;color:var(--g800)':''}">${r.l}</td>
             <td style="${colStyle}font-size:14px;color:var(--g600);">${r.isPct?fmtPct(r.vP):fmt(r.vP,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span></td>
-            <td style="${colStyle}font-size:15px;font-weight:${r.bold?'800':'600'};color:var(--g800);">${r.isPct?fmtPct(r.vC):fmt(r.vC,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span>${r.tk?tgLine({tk:r.tk, raw:r.vC, ratio:!!r.isPct}, TG_MONTH_DAYS):''}</td>
+            <td style="${colStyle}font-size:15px;font-weight:${r.bold?'800':'600'};color:var(--g800);">${r.isPct?fmtPct(r.vC):fmt(r.vC,r.dec||0)} <span style="font-size:10px;color:#cbd5e1;">${r.u}</span>${r.tk?tgLine({tk:r.tk, raw:r.vC, ratio:!!(r.isPct||r.noPerDay)}, TG_MONTH_DAYS):''}</td>
             <td style="${colStyle}">${chg(r.vC,r.vP,r.lowerBetter,r.isPct||r.noPerDay)}</td>
           </tr>`).join('')}
         </tbody>
