@@ -2237,12 +2237,18 @@ let TARGETS = (() => {
   try { return Object.assign({}, TG_DEFAULT, JSON.parse(localStorage.getItem(TG_KEY) || '{}')); }
   catch(e) { return Object.assign({}, TG_DEFAULT); }
 })();
-(function _tgMigrate() {           // ยิงโครง มอก. ไม่ใช้เป้า
-  if (localStorage.getItem('door_tg_mig_bf') === '2') return;
-  delete TARGETS.bf_m;
-  if (TARGETS.bf_w == null) TARGETS.bf_w = 300;
-  try { localStorage.setItem(TG_KEY, JSON.stringify(TARGETS)); } catch(e) {}
-  localStorage.setItem('door_tg_mig_bf', '2');
+/* ── เวอร์ชันชุดเป้าในไฟล์นี้ ──
+   ถ้าเลขนี้ต่างจากที่เครื่องเคยเก็บไว้ = ไฟล์ใหม่มาพร้อมเป้าชุดใหม่
+   → เขียนทับเป้าเดิมในเครื่อง (แก้ปัญหาอัปไฟล์ขึ้น GitHub แล้วเป้าไม่เปลี่ยน)
+   ถ้าแก้เป้าในหน้าตั้งค่าเอง จะยังอยู่จนกว่าจะมีไฟล์เวอร์ชันใหม่          */
+const TG_VERSION = '2026-08-24';
+(function _tgSync() {
+  if (localStorage.getItem('door_targets_ver') !== TG_VERSION) {
+    TARGETS = Object.assign({}, TG_DEFAULT);
+    try { localStorage.setItem(TG_KEY, JSON.stringify(TARGETS)); } catch(e) {}
+    localStorage.setItem('door_targets_ver', TG_VERSION);
+  }
+  delete TARGETS.bf_m;   // ยิงโครง มอก. ไม่ใช้เป้า
 })();
 function tg(k) { const v = TARGETS[k]; return (v === '' || v == null) ? 0 : (parseFloat(v) || 0); }
 function tgLower(k) {
