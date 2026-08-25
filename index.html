@@ -1679,17 +1679,17 @@ body.view-only .view-only-badge { display: flex; }
       <span class="oc-chip">👷 OC 6 คน</span>
     </div>
     <div class="card">
-      <div class="card-title"><span class="title-bar" style="background:var(--yellow-500)"></span>ยอดพาเลท (Pcs.)</div>
+      <div class="card-title"><span class="title-bar" style="background:var(--yellow-500)"></span>ยอดพาเลท (Pallet)</div>
       <div class="pallet-grid">
-        <div class="metric-item"><div class="metric-item-label">3"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_3x6" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x6" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8s" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD ตัวใหม่)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--orange-500)" type="number" id="pl_4x8sn" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×8" (HPL)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8h" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x9" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×10"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x10" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">4"×12"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x12" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
-        <div class="metric-item"><div class="metric-item-label">7"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_7x9" placeholder="0"><span class="metric-unit">Pcs.</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">3"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_3x6" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×6"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x6" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8s" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (SPD ตัวใหม่)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--orange-500)" type="number" id="pl_4x8sn" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×8" (HPL)</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x8h" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x9" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×10"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x10" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">4"×12"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_4x12" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
+        <div class="metric-item"><div class="metric-item-label">7"×9"</div><div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--yellow-600)" type="number" id="pl_7x9" placeholder="0"><span class="metric-unit">Pallet</span></div></div>
       </div>
     </div>
     <div class="manpower-strip section-gap" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;">
@@ -2222,7 +2222,7 @@ const TG_DEF = [
     {k:'w_pct',    l:'% ของเสีย (ต่อเดือน)', u:'%', lower:true, ratio:true},
   ]},
   { grp:'📦 พาเลท', items:[
-    {k:'pl_total', l:'พาเลทรวมทั้งหมด', u:'แผ่น'},
+    {k:'pl_total', l:'พาเลทรวมทั้งหมด', u:'Pallet'},
   ]},
   { grp:'🏭 คลัง FG', items:[
     {k:'wh_in',  l:'เข้าคลัง', u:'บาน'},
@@ -2846,12 +2846,12 @@ function updateOverview() {
 
     C('📦','พาเลท','#d97706','linear-gradient(135deg,#fffbeb,#fef3c7)','#fcd34d',
       miniGrid([['3×6',g('pl_3x6')],['4×6',g('pl_4x6')],['4×8S',g('pl_4x8s')],['4×8SN',g('pl_4x8sn')],['4×8H',g('pl_4x8h')],['4×9',g('pl_4x9')],['4×10',g('pl_4x10')],['4×12',g('pl_4x12')],['7×9',g('pl_7x9')]],'#fffbeb','#fde68a','#92400e') +
-      R('รวมทั้งหมด', plt, 'แผ่น', {vc:'#d97706', tk:'pl_total'}) +
+      R('รวมทั้งหมด', plt, 'Pallet', {vc:'#d97706', tk:'pl_total'}) +
       groupBarChart([
         {name:'พาเลทรวม', color:'#d97706', fields:['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9']},
         {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('pl_total')},
-      ], {title:'ยอดพาเลทรายวัน เทียบเป้า', unit:'แผ่น', target:tg('pl_total'), targetAsBar:true}),
-      g('pl_oc'), 6, {l:'พาเลทรวมวันนี้', v:plt, u:'แผ่น', tk:'pl_total'}),
+      ], {title:'ยอดพาเลทรายวัน เทียบเป้า', unit:'Pallet', target:tg('pl_total'), targetAsBar:true}),
+      g('pl_oc'), 6, {l:'พาเลทรวมวันนี้', v:plt, u:'Pallet', tk:'pl_total'}),
 
     C('🏭','คลัง FG','#0d9488','linear-gradient(135deg,#f0fdfa,#ccfbf1)','#6ee7b7',
       R('เข้าคลัง', g('wh_in'), 'บาน', {vc:'#0d9488', tk:'wh_in'}) +
@@ -3337,7 +3337,7 @@ async function buildMonthly() {
     {l:'ยิงโครงกระดาษ', v:fmtN(tot.p1_frame), u:'pcs.', c:'purple'},
     {l:'ยิงโครงไม้', v:fmtN(tot.bf_w+tot.bf_m), u:'pcs.', c:''},
     {l:'ยอดเลื่อย รวม', v:fmtN(tot.s1_door+tot.s1_pal+tot.s2_saw,0), u:'Cu.ft.', c:''},
-    {l:'พาเลท รวม', v:fmtN(totalPallet), u:'Pcs.', c:'yellow'},
+    {l:'พาเลท รวม', v:fmtN(totalPallet), u:'Pallet', c:'yellow'},
     {l:'เข้าคลัง FG', v:fmtN(tot.wh_in), u:'บาน', c:''},
     {l:'ของเสีย', v:wastePct.toFixed(3)+'%', u:'เป้า ≤0.15%', c: wasteBase===0?'red': wastePct<=0.15?'green': wastePct<=0.30?'yellow':'red'},
   ];
@@ -3446,16 +3446,16 @@ async function buildMonthly() {
     {
       icon:'📦', title:'พาเลท',
       metrics:[
-        {l:'3"×6"',v:fmtN(tot.pl_3x6,0),u:'Pcs.'},
-        {l:'4"×6"',v:fmtN(tot.pl_4x6,0),u:'Pcs.'},
-        {l:'4"×8" SPD',v:fmtN(tot.pl_4x8s,0),u:'Pcs.'},
-        {l:'4"×8" SPD ใหม่',v:fmtN(tot.pl_4x8sn,0),u:'Pcs.'},
-        {l:'4"×8" HPL',v:fmtN(tot.pl_4x8h,0),u:'Pcs.'},
-        {l:'4"×9"',v:fmtN(tot.pl_4x9,0),u:'Pcs.'},
-        {l:'4"×10"',v:fmtN(tot.pl_4x10,0),u:'Pcs.'},
-        {l:'4"×12"',v:fmtN(tot.pl_4x12,0),u:'Pcs.'},
-        {l:'7"×9"',v:fmtN(tot.pl_7x9,0),u:'Pcs.'},
-        {l:'รวมทุกขนาด',v:fmtN(totalPallet,0),tk:'pl_total',u:'Pcs.'},
+        {l:'3"×6"',v:fmtN(tot.pl_3x6,0),u:'Pallet'},
+        {l:'4"×6"',v:fmtN(tot.pl_4x6,0),u:'Pallet'},
+        {l:'4"×8" SPD',v:fmtN(tot.pl_4x8s,0),u:'Pallet'},
+        {l:'4"×8" SPD ใหม่',v:fmtN(tot.pl_4x8sn,0),u:'Pallet'},
+        {l:'4"×8" HPL',v:fmtN(tot.pl_4x8h,0),u:'Pallet'},
+        {l:'4"×9"',v:fmtN(tot.pl_4x9,0),u:'Pallet'},
+        {l:'4"×10"',v:fmtN(tot.pl_4x10,0),u:'Pallet'},
+        {l:'4"×12"',v:fmtN(tot.pl_4x12,0),u:'Pallet'},
+        {l:'7"×9"',v:fmtN(tot.pl_7x9,0),u:'Pallet'},
+        {l:'รวมทุกขนาด',v:fmtN(totalPallet,0),tk:'pl_total',u:'Pallet'},
         {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.pl_oc/daysWithData,0):'—',u:`คน / OC 6`},
       ]
     },
@@ -3529,7 +3529,7 @@ async function buildMonthly() {
     {h:'อัดร้อน (บาน)', dec:0, fn: d => fmtN(toNum(d.data.p2_hot),0)},
     {h:'อัดเย็น (บาน)', dec:0, fn: d => fmtN(toNum(d.data.p3_cold),0)},
     {h:'ห่อประตู (บาน)', dec:0, fn: d => fmtN(toNum(d.data.cts_wrap),0)},
-    {h:'พาเลท (Pcs.)', dec:0, fn: d => { const pl=['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d.data[f]),0); return fmtN(pl,0); }},
+    {h:'พาเลท (Pallet)', dec:0, fn: d => { const pl=['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d.data[f]),0); return fmtN(pl,0); }},
     {h:'เข้าคลัง FG (บาน)', dec:0, fn: d => fmtN(toNum(d.data.wh_in),0)},
     {h:'โหลดสินค้า (บาน)', dec:0, fn: d => fmtN(toNum(d.data.wh_out),0)},
   ];
@@ -3622,16 +3622,16 @@ const WK_METRICS = [
   { label:'ของเสีย อัดเย็น',         unit:'บาน',    fn: d => toNum(d.w_cold)                                  },
   { label:'ของเสีย เครื่องซอย',      unit:'บาน',    fn: d => toNum(d.w_sloy)                                  },
   // ── พาเลท ──
-  { label:'พาเลท 3"×6"',             unit:'Pcs.',   fn: d => toNum(d.pl_3x6)                                  },
-  { label:'พาเลท 4"×6"',             unit:'Pcs.',   fn: d => toNum(d.pl_4x6)                                  },
-  { label:'พาเลท 4"×8" SPD',         unit:'Pcs.',   fn: d => toNum(d.pl_4x8s)                                 },
-  { label:'พาเลท 4"×8" SPD ใหม่',   unit:'Pcs.',   fn: d => toNum(d.pl_4x8sn)                                },
-  { label:'พาเลท 4"×8" HPL',         unit:'Pcs.',   fn: d => toNum(d.pl_4x8h)                                 },
-  { label:'พาเลท 4"×9"',             unit:'Pcs.',   fn: d => toNum(d.pl_4x9)                                  },
-  { label:'พาเลท 4"×10"',            unit:'Pcs.',   fn: d => toNum(d.pl_4x10)                                 },
-  { label:'พาเลท 4"×12"',            unit:'Pcs.',   fn: d => toNum(d.pl_4x12)                                 },
-  { label:'พาเลท 7"×9"',             unit:'Pcs.',   fn: d => toNum(d.pl_7x9)                                  },
-  { label:'พาเลท รวม',               unit:'Pcs.',   fn: d => ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0) },
+  { label:'พาเลท 3"×6"',             unit:'Pallet',   fn: d => toNum(d.pl_3x6)                                  },
+  { label:'พาเลท 4"×6"',             unit:'Pallet',   fn: d => toNum(d.pl_4x6)                                  },
+  { label:'พาเลท 4"×8" SPD',         unit:'Pallet',   fn: d => toNum(d.pl_4x8s)                                 },
+  { label:'พาเลท 4"×8" SPD ใหม่',   unit:'Pallet',   fn: d => toNum(d.pl_4x8sn)                                },
+  { label:'พาเลท 4"×8" HPL',         unit:'Pallet',   fn: d => toNum(d.pl_4x8h)                                 },
+  { label:'พาเลท 4"×9"',             unit:'Pallet',   fn: d => toNum(d.pl_4x9)                                  },
+  { label:'พาเลท 4"×10"',            unit:'Pallet',   fn: d => toNum(d.pl_4x10)                                 },
+  { label:'พาเลท 4"×12"',            unit:'Pallet',   fn: d => toNum(d.pl_4x12)                                 },
+  { label:'พาเลท 7"×9"',             unit:'Pallet',   fn: d => toNum(d.pl_7x9)                                  },
+  { label:'พาเลท รวม',               unit:'Pallet',   fn: d => ['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0) },
   // ── คลังสินค้า ──
   { label:'เข้าคลัง FG รวม',         unit:'บาน',    fn: d => toNum(d.wh_in)                                   },
   { label:'เข้าคลัง Ag',             unit:'บาน',    fn: d => toNum(d.wh_in_ag)                                },
@@ -3886,7 +3886,7 @@ async function buildMCompare() {
       {l:'  ▸ C+',       vC:tC.wh_out_cp, vP:tP.wh_out_cp, u:'บาน'},
     ]},
     { title:'🔲 พาเลท', rows:[
-      {l:'รวมทุกขนาด', tk:'pl_total', vC:palC, vP:palP, u:'Pcs.', bold:true},
+      {l:'รวมทุกขนาด', tk:'pl_total', vC:palC, vP:palP, u:'Pallet', bold:true},
     ]},
   ];
 
@@ -3984,16 +3984,16 @@ async function buildWeekly() {
     { label:'ของเสีย อัดเย็น',                   unit:'บาน',       fn: d=>toNum(d.w_cold),                          grp:'✂️ CTS & คัดเกรด' },
     { label:'ของเสีย เครื่องซอย',                unit:'บาน',       fn: d=>toNum(d.w_sloy),                          grp:'✂️ CTS & คัดเกรด' },
     // พาเลท
-    { label:'พาเลท 3"×6"',                      unit:'Pcs.',      fn: d=>toNum(d.pl_3x6),                          grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×6"',                      unit:'Pcs.',      fn: d=>toNum(d.pl_4x6),                          grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×8" SPD',                  unit:'Pcs.',      fn: d=>toNum(d.pl_4x8s),                         grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×8" SPD ใหม่',             unit:'Pcs.',      fn: d=>toNum(d.pl_4x8sn),                        grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×8" HPL',                  unit:'Pcs.',      fn: d=>toNum(d.pl_4x8h),                         grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×9"',                      unit:'Pcs.',      fn: d=>toNum(d.pl_4x9),                          grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×10"',                     unit:'Pcs.',      fn: d=>toNum(d.pl_4x10),                         grp:'🪵 พาเลท' },
-    { label:'พาเลท 4"×12"',                     unit:'Pcs.',      fn: d=>toNum(d.pl_4x12),                         grp:'🪵 พาเลท' },
-    { label:'พาเลท 7"×9"',                      unit:'Pcs.',      fn: d=>toNum(d.pl_7x9),                          grp:'🪵 พาเลท' },
-    { label:'พาเลท รวม',                         unit:'Pcs.',      fn: d=>['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0), grp:'🪵 พาเลท' },
+    { label:'พาเลท 3"×6"',                      unit:'Pallet',      fn: d=>toNum(d.pl_3x6),                          grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×6"',                      unit:'Pallet',      fn: d=>toNum(d.pl_4x6),                          grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×8" SPD',                  unit:'Pallet',      fn: d=>toNum(d.pl_4x8s),                         grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×8" SPD ใหม่',             unit:'Pallet',      fn: d=>toNum(d.pl_4x8sn),                        grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×8" HPL',                  unit:'Pallet',      fn: d=>toNum(d.pl_4x8h),                         grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×9"',                      unit:'Pallet',      fn: d=>toNum(d.pl_4x9),                          grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×10"',                     unit:'Pallet',      fn: d=>toNum(d.pl_4x10),                         grp:'🪵 พาเลท' },
+    { label:'พาเลท 4"×12"',                     unit:'Pallet',      fn: d=>toNum(d.pl_4x12),                         grp:'🪵 พาเลท' },
+    { label:'พาเลท 7"×9"',                      unit:'Pallet',      fn: d=>toNum(d.pl_7x9),                          grp:'🪵 พาเลท' },
+    { label:'พาเลท รวม',                         unit:'Pallet',      fn: d=>['pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9'].reduce((s,f)=>s+toNum(d[f]),0), grp:'🪵 พาเลท' },
     // คลัง FG
     { label:'เข้าคลัง FG รวม',                  unit:'บาน',       fn: d=>toNum(d.wh_in),                           grp:'📦 คลัง FG' },
     { label:'เข้าคลัง Ag',                       unit:'บาน',       fn: d=>toNum(d.wh_in_ag),                        grp:'📦 คลัง FG' },
