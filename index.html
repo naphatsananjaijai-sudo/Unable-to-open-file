@@ -2690,21 +2690,20 @@ function isFitMode() {
   // ย่อพอดีจอเฉพาะแท็บเล็ต/จอกลาง — มือถือจอแคบย่อแล้วอ่านไม่ออก ให้เลื่อนดูแทน
   const w = window.innerWidth;
   if (w < 620 || w >= 1400) return false;
-  // ถ้าผู้ใช้ซูมเอง (นิ้วถ่างจอ / Ctrl+ลูกกลิ้ง) ให้เคารพการซูมของผู้ใช้ ไม่ไปย่อทับ
-  const vv = window.visualViewport;
-  if (vv && Math.abs(vv.scale - 1) > 0.02) return false;
   return true;
 }
 function _fitGrid() {
   const wrap = document.getElementById('ov-dept-wrap');
   return wrap ? wrap.querySelector('div:last-child') : null;
 }
+/* จำนวนคอลัมน์ถูกล็อกไว้ตั้งแต่เปิดหน้า — ซูมเข้า/ออกแล้วหน้าตาไม่เปลี่ยนรูปแบบ
+   จะคำนวณใหม่เฉพาะตอนหมุนจอ หรือเปลี่ยนขนาดหน้าต่างจริง ๆ เท่านั้น */
+let _wallCols = null;
 function _wallColumns() {
+  if (_wallCols) return _wallCols;
   const w = window.innerWidth;
-  if (w < 620)  return 1;
-  if (w < 1050) return 2;
-  if (w < 1500) return 3;
-  return 4;
+  _wallCols = w < 620 ? 1 : w < 1050 ? 2 : w < 1500 ? 3 : 4;
+  return _wallCols;
 }
 function applyFitMode() {
   const grid = _fitGrid();
@@ -2731,19 +2730,23 @@ function toggleFitMode() {
   localStorage.setItem(FIT_KEY, isFitMode() ? '0' : '1');
   applyFitMode();
 }
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    clearTimeout(_fitTimer);
-    _fitTimer = setTimeout(applyFitMode, 200);
-  });
-}
+/* ซูมด้วยนิ้วเป็นการขยายภาพอย่างเดียว ไม่แตะการจัดหน้า */
 let _fitTimer = null;
-['resize', 'orientationchange'].forEach(ev =>
-  window.addEventListener(ev, () => {
-    clearTimeout(_fitTimer);
-    _fitTimer = setTimeout(applyFitMode, 180);
-  })
-);
+let _lastDPR = window.devicePixelRatio || 1;
+
+window.addEventListener('resize', () => {
+  const dpr = window.devicePixelRatio || 1;
+  const zoomed = Math.abs(dpr - _lastDPR) > 0.01;   // ผู้ใช้ซูมเข้า/ออก
+  _lastDPR = dpr;
+  if (zoomed) return;                                // ซูม = คงรูปแบบเดิมไว้ ไม่จัดใหม่
+  clearTimeout(_fitTimer);
+  _fitTimer = setTimeout(() => { _wallCols = null; applyWallMode(); }, 200);
+});
+
+window.addEventListener('orientationchange', () => {
+  clearTimeout(_fitTimer);
+  _fitTimer = setTimeout(() => { _wallCols = null; applyWallMode(); }, 350);
+});
 
 /* ── Overview KPIs ── */
 const OC_DEF = [
