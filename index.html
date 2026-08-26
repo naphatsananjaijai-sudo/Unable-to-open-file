@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>โรงงานประตู</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -717,7 +717,7 @@ body.view-only .view-only-badge { display: flex; }
 
 /* ══ โหมดจอรวม (wall) — กางทุกแผนกพร้อมกัน อ่านจบในหน้าเดียว ══ */
 /* จัดแบบคอลัมน์ต่อเนื่อง การ์ดจะไหลชิดกัน ไม่เหลือช่องว่างใหญ่ ๆ */
-#ov-dept-wrap.wall > div:last-child { display: block !important; column-gap: 14px; }
+#ov-dept-wrap.wall > div:last-child { display: block !important; column-width: 310px; column-gap: 14px; }
 #ov-dept-wrap.wall .ov-card { display: block !important; break-inside: avoid; -webkit-column-break-inside: avoid; margin: 0 0 14px; }
 #ov-dept-wrap.wall .ov-card-body { display: block !important; padding: 8px 14px 12px !important; }
 #ov-dept-wrap.wall .ov-hero,
@@ -729,10 +729,8 @@ body.view-only .view-only-badge { display: flex; }
 #ov-dept-wrap.wall .ov-card-body b { font-size: 14.5px !important; }
 #ov-dept-wrap.wall .ov-card-body span { font-size: 12px !important; }
 #ov-dept-wrap.wall .ov-card:hover { transform: none; }
-.ov-wall-btn { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; font-weight: 800; }
-.ov-wall-btn:hover { background: #e0e7ff; }
-.ov-fit-btn { background: #f0fdfa; border-color: #99f6e4; color: #0f766e; font-weight: 800; }
-.ov-fit-btn:hover { background: #ccfbf1; }
+.ov-wall-btn { background: #E8F5E9; border-color: #A5D6A7; color: #1B5E20; font-weight: 800; }
+.ov-wall-btn:hover { background: #d7ecd8; }
 
 /* โหมดจอรวมสำหรับหน้ารายงาน (สรุปรายเดือน / เปรียบเทียบเดือน / รายสัปดาห์) */
 #mo-sections.wall .ov-card-body,
@@ -2426,7 +2424,7 @@ function _ovRow(label, val, unit, opts) {
   </div>`;
 }
 
-/* เฉดประจำแผนก (โทนธุรกิจ) — ใช้เป็นแถบบนการ์ดเพื่อแยกแผนก ไม่ใช้กับตัวเลข */
+/* เฉดประจำแผนก (โทนเขียว) — ใช้เป็นแถบบนการ์ด ไม่ใช้กับตัวเลข */
 const OV_INK = {
   '#16a34a':'#1B5E20', '#ea580c':'#66BB6A', '#0284c7':'#2e7d32', '#475569':'#1B5E20',
   '#db2777':'#66BB6A', '#dc2626':'#2e7d32', '#7c3aed':'#1B5E20', '#d97706':'#66BB6A',
@@ -2660,7 +2658,7 @@ function _ovToggleAll(show, containerSel) {
 
 /* ══ โหมดจอรวม: กางทุกแผนกในหน้าเดียว ไม่ต้องกดเปิด-ปิด ══ */
 const WALL_KEY = 'door_wall_mode';
-function isWallMode() { return true; }   // กางทุกแผนกเสมอ (ไม่มีปุ่มสลับแล้ว)
+function isWallMode() { return localStorage.getItem(WALL_KEY) !== '0'; }   // ค่าเริ่มต้น = เปิด
 function applyWallMode() {
   const on0 = isWallMode();
   ['mo-sections','mc-body','wk-compare'].forEach(id => {
@@ -2673,80 +2671,13 @@ function applyWallMode() {
   const on   = isWallMode();
   if (wrap) wrap.classList.toggle('wall', on);
   if (btn)  btn.textContent = on ? '🗂️ โหมดการ์ด (กดดูทีละแผนก)' : '🖥️ ดูทุกแผนกในหน้าเดียว';
-  if (hint) hint.textContent = '';
+  if (hint) hint.textContent = on ? '(เห็นทุกหัวข้อพร้อมกัน — กดหัวข้อเพื่อดูกราฟ)' : '(คลิกที่หัวข้อเพื่อดูข้อมูล)';
   document.querySelectorAll('.ov-card-only').forEach(b => b.style.display = on ? 'none' : '');
-  applyFitMode();
 }
 function toggleWallMode() {
   localStorage.setItem(WALL_KEY, isWallMode() ? '0' : '1');
   applyWallMode();
 }
-
-/* ══ โหมดพอดีจอ (auto-fit) ══
-   ย่อ/ขยายเนื้อหาอัตโนมัติให้ทุกแผนกอยู่ในหน้าจอเดียว
-   ค่าเริ่มต้น: เปิดเองบนมือถือ/แท็บเล็ต (จอ < 1200px) — คอมใหญ่ปิดไว้ */
-const FIT_KEY = 'door_fit_mode';
-function isFitMode() {
-  // ย่อพอดีจอเฉพาะแท็บเล็ต/จอกลาง — มือถือจอแคบย่อแล้วอ่านไม่ออก ให้เลื่อนดูแทน
-  const w = window.innerWidth;
-  if (w < 620 || w >= 1400) return false;
-  return true;
-}
-function _fitGrid() {
-  const wrap = document.getElementById('ov-dept-wrap');
-  return wrap ? wrap.querySelector('div:last-child') : null;
-}
-/* จำนวนคอลัมน์ถูกล็อกไว้ตั้งแต่เปิดหน้า — ซูมเข้า/ออกแล้วหน้าตาไม่เปลี่ยนรูปแบบ
-   จะคำนวณใหม่เฉพาะตอนหมุนจอ หรือเปลี่ยนขนาดหน้าต่างจริง ๆ เท่านั้น */
-let _wallCols = null;
-function _wallColumns() {
-  if (_wallCols) return _wallCols;
-  const w = window.innerWidth;
-  _wallCols = w < 620 ? 1 : w < 1050 ? 2 : w < 1500 ? 3 : 4;
-  return _wallCols;
-}
-function applyFitMode() {
-  const grid = _fitGrid();
-  const on = isFitMode();
-  if (!grid) return;
-  // ล็อกจำนวนคอลัมน์ตามขนาดจอจริง การ์ดจะกว้างเท่าเดิมแม้ย่อให้พอดีจอ
-  grid.style.columnCount = isWallMode() ? String(_wallColumns()) : '';
-  grid.style.zoom = '';
-  if (!on || !isWallMode()) return;
-
-  const top   = grid.getBoundingClientRect().top;
-  const avail = window.innerHeight - top - 14;
-  if (avail < 140) return;                       // จอเตี้ยมาก ไม่ต้องย่อ
-  if (grid.scrollHeight <= avail) return;        // พอดีอยู่แล้ว
-
-  // ไล่หาสเกลที่ใหญ่ที่สุดที่ยังใส่ได้พอดีจอ (ย่อแล้วคอลัมน์จัดใหม่ ต้องวัดจริงทุกครั้ง)
-  const steps = [0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4];
-  for (const sc of steps) {
-    grid.style.zoom = String(sc);
-    if (grid.scrollHeight * sc <= avail) return;
-  }
-}
-function toggleFitMode() {
-  localStorage.setItem(FIT_KEY, isFitMode() ? '0' : '1');
-  applyFitMode();
-}
-/* ซูมด้วยนิ้วเป็นการขยายภาพอย่างเดียว ไม่แตะการจัดหน้า */
-let _fitTimer = null;
-let _lastDPR = window.devicePixelRatio || 1;
-
-window.addEventListener('resize', () => {
-  const dpr = window.devicePixelRatio || 1;
-  const zoomed = Math.abs(dpr - _lastDPR) > 0.01;   // ผู้ใช้ซูมเข้า/ออก
-  _lastDPR = dpr;
-  if (zoomed) return;                                // ซูม = คงรูปแบบเดิมไว้ ไม่จัดใหม่
-  clearTimeout(_fitTimer);
-  _fitTimer = setTimeout(() => { _wallCols = null; applyWallMode(); }, 200);
-});
-
-window.addEventListener('orientationchange', () => {
-  clearTimeout(_fitTimer);
-  _fitTimer = setTimeout(() => { _wallCols = null; applyWallMode(); }, 350);
-});
 
 /* ── Overview KPIs ── */
 const OC_DEF = [
@@ -3030,6 +2961,7 @@ function updateOverview() {
     <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:12px;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
       <span>📋 รายละเอียดแต่ละแผนก <span id="ov-mode-hint" style="font-weight:500;color:#94a3b8;font-size:11px;"></span></span>
       <span style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="ov-toggle-all-btn ov-wall-btn" id="ov-wall-btn" onclick="toggleWallMode()"></button>
         <button type="button" class="ov-toggle-all-btn ov-card-only" onclick="_ovToggleAll(true)">ขยายทั้งหมด</button>
         <button type="button" class="ov-toggle-all-btn ov-card-only" onclick="_ovToggleAll(false)">ย่อทั้งหมด</button>
       </span>
