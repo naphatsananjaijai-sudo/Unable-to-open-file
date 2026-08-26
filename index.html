@@ -41,16 +41,20 @@ body {
   --g800: #1e293b;
   --g700: #334155;
   --g600: #475569;
-  --g500: #0284c7;
-  --g400: #0ea5e9;
-  --g300: #38bdf8;
-  --g200: #bae6fd;
-  --g100: #e0f2fe;
-  --g50:  #f0f9ff;
-  /* sky-blue accent */
-  --gold: #0ea5e9;
-  --gold-light: #7dd3fc;
-  --gold-bg: #f0f9ff;
+  --g500: #2e7d32;
+  --g400: #66BB6A;
+  --g300: #8bc98e;
+  --g200: #A5D6A7;
+  --g100: #d7ecd8;
+  --g50:  #E8F5E9;
+  /* brand green accent */
+  --brand-dark:  #1B5E20;
+  --brand:       #66BB6A;
+  --brand-light: #A5D6A7;
+  --brand-bg:    #E8F5E9;
+  --gold: #66BB6A;
+  --gold-light: #A5D6A7;
+  --gold-bg: #E8F5E9;
   /* status */
   --red-50: #fef2f2;
   --red-500: #ef4444;
@@ -205,7 +209,7 @@ body {
 }
 .save-btn {
   display: flex; align-items: center; gap: 7px;
-  background: linear-gradient(135deg, var(--gold), #0369a1);
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
   color: #fff;
   border: none;
   border-radius: var(--radius-xs);
@@ -239,8 +243,8 @@ body {
   .btn-label { display: none; }
   #auth-btn { max-width: 104px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
-.refresh-btn { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
-.refresh-btn:hover { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+.refresh-btn { background: #E8F5E9; border-color: #A5D6A7; color: #1B5E20; }
+.refresh-btn:hover { background: #d7ecd8; border-color: #66BB6A; color: #14481a; }
 .logout-btn { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
 .logout-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 
@@ -272,7 +276,7 @@ body {
 }
 #auth-err { color: var(--red-600); font-size: 12px; min-height: 18px; margin-bottom: 14px; }
 .auth-submit {
-  width: 100%; padding: 11px; background: linear-gradient(135deg, var(--gold), #0369a1);
+  width: 100%; padding: 11px; background: linear-gradient(135deg, var(--brand), var(--brand-dark));
   color: #fff; border: none; border-radius: var(--radius-xs); font-size: 15px;
   font-weight: 800; cursor: pointer; font-family: inherit; margin-bottom: 10px;
   transition: opacity .15s; box-shadow: 0 2px 8px rgba(14,165,233,.25);
@@ -366,10 +370,10 @@ body.view-only .view-only-badge { display: flex; }
 .import-fab {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 14px; border: none; border-radius: 8px;
-  background: #4f46e5; color: #fff; font-size: 13px; font-weight: 700;
+  background: #2e7d32; color: #fff; font-size: 13px; font-weight: 700;
   cursor: pointer; white-space: nowrap;
 }
-.import-fab:hover { background: #4338ca; }
+.import-fab:hover { background: #1B5E20; }
 
 /* ── Layout ── */
 .layout { display: flex; flex: 1; min-height: 0; }
@@ -683,9 +687,9 @@ body.view-only .view-only-badge { display: flex; }
   border-radius: 999px; padding: 4px 12px; transition: all .15s;
 }
 .ov-chip:hover { background: #f1f5f9; }
-.ov-chip.on { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.ov-chip.on { background: #2e7d32; border-color: #2e7d32; color: #fff; }
 .ov-modal-hint {
-  font-size: 12px; color: #6366f1; background: #eef2ff; border: 1px solid #c7d2fe;
+  font-size: 12px; color: #1B5E20; background: #E8F5E9; border: 1px solid #A5D6A7;
   border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; text-align: center;
 }
 .ov-nav-row { display: flex; align-items: stretch; gap: 8px; }
@@ -695,7 +699,7 @@ body.view-only .view-only-badge { display: flex; }
   background: #fff; color: #475569; font-size: 15px; font-weight: 800;
   font-family: inherit; cursor: pointer; transition: background .15s, color .15s;
 }
-.ov-nav-btn:hover { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; }
+.ov-nav-btn:hover { background: #E8F5E9; border-color: #A5D6A7; color: #1B5E20; }
 .ov-nav-btn[disabled] { opacity: .35; cursor: default; }
 .ov-modal-foot { padding: 12px 20px 16px; border-top: 1px solid #f1f5f9; flex-shrink: 0; }
 .ov-modal-back {
@@ -720,10 +724,10 @@ body.view-only .view-only-badge { display: flex; }
 #ov-dept-wrap.wall .ov-chevron,
 #ov-dept-wrap.wall .ov-chart { display: none !important; }
 #ov-dept-wrap.wall .ov-card-head { padding: 11px 14px !important; }
-#ov-dept-wrap.wall .ov-card-head span { font-size: 13.5px; }
+#ov-dept-wrap.wall .ov-card-head span { font-size: 14px; }
 #ov-dept-wrap.wall .ov-card-body > div { padding-top: 3px !important; padding-bottom: 3px !important; }
-#ov-dept-wrap.wall .ov-card-body b { font-size: 13.5px !important; }
-#ov-dept-wrap.wall .ov-card-body span { font-size: 11px !important; }
+#ov-dept-wrap.wall .ov-card-body b { font-size: 14.5px !important; }
+#ov-dept-wrap.wall .ov-card-body span { font-size: 12px !important; }
 #ov-dept-wrap.wall .ov-card:hover { transform: none; }
 .ov-wall-btn { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; font-weight: 800; }
 .ov-wall-btn:hover { background: #e0e7ff; }
@@ -817,17 +821,17 @@ body.view-only .view-only-badge { display: flex; }
   background: var(--g50); border: 1px solid var(--g100); border-radius: var(--radius-sm);
   padding: 12px 14px;
 }
-.mo-metric-label { font-size: 11px; color: var(--g400); font-weight: 700; margin-bottom: 5px; }
+.mo-metric-label { font-size: 12px; color: #475569; font-weight: 700; margin-bottom: 5px; }
 .mo-metric-value { font-size: 22px; font-weight: 900; color: var(--g800); line-height: 1; }
-.mo-metric-unit { font-size: 11px; color: var(--g300); font-weight: 600; margin-top: 2px; }
+.mo-metric-unit { font-size: 11px; color: #8b95a6; font-weight: 600; margin-top: 2px; }
 .tg-line {
   margin-top: 5px; padding-top: 4px; border-top: 1px dashed #e2e8f0;
   font-size: 10.5px; line-height: 1.5;
   display: flex; flex-wrap: nowrap; justify-content: space-between;
   align-items: baseline; gap: 6px; white-space: nowrap;
 }
-.tg-goal { color: #94a3b8; white-space: nowrap; }
-.tg-src  { color: #cbd5e1; }
+.tg-goal { color: #64748b; font-weight: 600; white-space: nowrap; }
+.tg-src  { color: #94a3b8; }
 .tg-diff { font-weight: 800; white-space: nowrap; margin-left: auto; }
 /* ในไทล์แคบ ๆ ของหน้าสรุปรายเดือน ตัดส่วนที่ไม่จำเป็นออกให้อยู่บรรทัดเดียว
    (รายละเอียดเต็มยังอ่านได้จาก tooltip เมื่อชี้เมาส์) */
@@ -2416,16 +2420,17 @@ function _ovRow(label, val, unit, opts) {
   const sm = opts.sm;
   return `<div style="padding:${sm ? '2px' : '5px'} 0;border-bottom:1px dashed #f1f5f9;">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span style="font-size:${sm ? 11 : 12}px;color:${sm ? '#b0b8c9' : '#94a3b8'};white-space:nowrap;">${label}</span>
-      <span style="text-align:right;"><b style="font-size:14px;color:${opts.vc || '#334155'};">${disp}</b> <span style="font-size:10px;font-weight:500;color:#cbd5e1;">${unit}</span></span>
+      <span style="font-size:${sm ? 11.5 : 12.5}px;color:${sm ? '#64748b' : '#475569'};font-weight:600;white-space:nowrap;">${label}</span>
+      <span style="text-align:right;"><b style="font-size:15px;color:#0f172a;">${disp}</b> <span style="font-size:10.5px;font-weight:600;color:#8b95a6;">${unit}</span></span>
     </div>${bar}
   </div>`;
 }
 
-const OV_INK = {  // เฉดเข้มขึ้นของแต่ละแผนก ใช้กับตัวเลขหลักให้อ่านชัดบนพื้นสีอ่อน
-  '#16a34a':'#15803d', '#ea580c':'#c2410c', '#0284c7':'#0369a1', '#475569':'#334155',
-  '#db2777':'#be185d', '#dc2626':'#b91c1c', '#7c3aed':'#6d28d9', '#d97706':'#b45309',
-  '#0d9488':'#0f766e'
+/* เฉดประจำแผนก (โทนธุรกิจ) — ใช้เป็นแถบบนการ์ดเพื่อแยกแผนก ไม่ใช้กับตัวเลข */
+const OV_INK = {
+  '#16a34a':'#1B5E20', '#ea580c':'#66BB6A', '#0284c7':'#2e7d32', '#475569':'#1B5E20',
+  '#db2777':'#66BB6A', '#dc2626':'#2e7d32', '#7c3aed':'#1B5E20', '#d97706':'#66BB6A',
+  '#0d9488':'#2e7d32'
 };
 function _ovCard(emoji, title, color, bg, border, body, ocA, ocM, pv) {
   const ink = OV_INK[color] || color;
@@ -2445,11 +2450,11 @@ function _ovCard(emoji, title, color, bg, border, body, ocA, ocM, pv) {
       const ok  = v >= T, near = v >= T * 0.75;
       const bc  = ok ? '#16a34a' : near ? '#f59e0b' : '#ef4444';
       meter = `<div style="margin-top:10px;">
-        <div style="height:6px;background:rgba(255,255,255,.9);border:1px solid rgba(15,23,42,.06);border-radius:4px;overflow:hidden;">
+        <div style="height:6px;background:#eef2f7;border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;">
           <div style="height:100%;width:${pct.toFixed(1)}%;background:${bc};border-radius:4px;transition:width .4s;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:10.5px;margin-top:4px;">
-          <span style="color:#7c8798;font-weight:600;">🎯 ${T.toLocaleString('en-US')}</span>
+          <span style="color:#64748b;font-weight:700;">🎯 ${T.toLocaleString('en-US')}</span>
           <span style="color:${bc};font-weight:800;">${((v/T)*100).toFixed(0)}%</span>
         </div>
       </div>`;
@@ -2457,17 +2462,17 @@ function _ovCard(emoji, title, color, bg, border, body, ocA, ocM, pv) {
     hero = `<div class="ov-hero" style="margin-top:12px;">
       <div style="font-size:11.5px;color:#7c8798;font-weight:700;letter-spacing:.2px;">${pv.l}</div>
       <div style="display:flex;align-items:baseline;gap:5px;margin-top:2px;">
-        <span style="font-size:28px;font-weight:900;line-height:1.05;color:${ink};letter-spacing:-.5px;">${disp}</span>
+        <span style="font-size:28px;font-weight:900;line-height:1.05;color:#0f172a;letter-spacing:-.5px;">${disp}</span>
         <span style="font-size:11.5px;font-weight:700;color:#8b95a6;">${pv.u || ''}</span>
       </div>${meter}</div>`;
   }
 
-  return `<div class="ov-card" style="border-color:${border};">
-    <div class="ov-card-head" style="padding:16px 18px;background:${bg};border-bottom:1.5px solid ${border};display:block;" onclick="_ovToggle(this)">
+  return `<div class="ov-card" style="border-color:#e2e8f0;border-top:3px solid ${ink};">
+    <div class="ov-card-head" style="padding:14px 18px;background:#F5FAF6;border-bottom:1px solid #dfeee1;display:block;" onclick="_ovToggle(this)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <span style="font-size:15px;font-weight:800;color:${ink};">${emoji} ${title}</span>
+        <span style="font-size:15px;font-weight:800;color:#1e293b;">${emoji} ${title}</span>
         <span style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:11.5px;background:rgba(255,255,255,.88);border:1px solid ${border};border-radius:12px;padding:3px 9px;font-weight:700;color:${oc};">👷 ${parseFloat(ocA) || 0}/${ocM}</span>
+          <span style="font-size:11.5px;background:#fff;border:1px solid #dbe2ea;border-radius:12px;padding:3px 9px;font-weight:700;color:${oc};">👷 ${parseFloat(ocA) || 0}/${ocM}</span>
           <span class="ov-chevron" style="font-size:12px;color:${color};transition:transform .2s;">▾</span>
         </span>
       </div>
@@ -2888,9 +2893,9 @@ function updateOverview() {
 
   const miniGrid = (items, bg2, border2, textColor) =>
     `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px;">
-      ${items.map(([s,v]) => `<div style="text-align:center;background:${bg2};border:1px solid ${border2};border-radius:8px;padding:4px 2px;">
-        <div style="font-size:10px;color:${textColor};opacity:.7;">${s}</div>
-        <div style="font-size:14px;font-weight:800;color:${textColor};">${(parseFloat(v)||0).toLocaleString('en-US')}</div>
+      ${items.map(([s,v]) => `<div style="text-align:center;background:#f8fafc;border:1px solid #e6ebf1;border-radius:8px;padding:4px 2px;">
+        <div style="font-size:10.5px;color:#64748b;font-weight:700;">${s}</div>
+        <div style="font-size:14.5px;font-weight:800;color:#0f172a;">${(parseFloat(v)||0).toLocaleString('en-US')}</div>
       </div>`).join('')}
     </div>`;
 
@@ -2992,13 +2997,13 @@ function updateOverview() {
     C('🏭','คลัง FG','#0d9488','linear-gradient(135deg,#f0fdfa,#ccfbf1)','#6ee7b7',
       R('เข้าคลัง', g('wh_in'), 'บาน', {vc:'#0d9488', tk:'wh_in'}) +
       `<div style="display:flex;gap:6px;margin:2px 0 4px;">
-        <span style="font-size:11px;color:#0d9488;background:#f0fdfa;border:1px solid #6ee7b7;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_in_ag')||0).toLocaleString('en-US')}</span>
-        <span style="font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #c4b5fd;border-radius:6px;padding:2px 8px;">CP ${(g('wh_in_cp')||0).toLocaleString('en-US')}</span>
+        <span style="font-size:11px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_in_ag')||0).toLocaleString('en-US')}</span>
+        <span style="font-size:11px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;">CP ${(g('wh_in_cp')||0).toLocaleString('en-US')}</span>
       </div>` +
       R('โหลดสินค้า', g('wh_out'), 'บาน', {vc:'#ea580c', tk:'wh_out'}) +
       `<div style="display:flex;gap:6px;margin-top:2px;">
-        <span style="font-size:11px;color:#0d9488;background:#f0fdfa;border:1px solid #6ee7b7;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_out_ag')||0).toLocaleString('en-US')}</span>
-        <span style="font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #c4b5fd;border-radius:6px;padding:2px 8px;">CP ${(g('wh_out_cp')||0).toLocaleString('en-US')}</span>
+        <span style="font-size:11px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;">Ag ${(g('wh_out_ag')||0).toLocaleString('en-US')}</span>
+        <span style="font-size:11px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;">CP ${(g('wh_out_cp')||0).toLocaleString('en-US')}</span>
       </div>` +
       R('Stock คลังสินค้า', g('wh_st'), 'บาน', {vc:'#7c3aed', tk:'wh_st'}) +
       groupBarChart([
@@ -4048,7 +4053,7 @@ async function buildMCompare() {
       <div class="ov-card-body">
       <table style="width:100%;border-collapse:collapse;">
         <thead>
-          <tr style="background:#f8fafc;font-size:11px;font-weight:700;color:var(--g300);">
+          <tr style="background:#f1f5f9;font-size:11.5px;font-weight:800;color:#475569;">
             <th style="padding:8px 14px;text-align:left;font-weight:700;">รายการ</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${prevLabel}</th>
             <th style="padding:8px 14px;text-align:right;font-weight:700;">${curLabel}</th>
