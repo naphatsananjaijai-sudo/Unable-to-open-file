@@ -3505,6 +3505,7 @@ async function buildMonthly() {
         {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),tk:'bs_h1',u:'pcs.'},
         {l:'ไม้หัว (เบญ-ยาง)',v:fmtN(tot.bs_h1_ben,0),u:'pcs.'},
         {l:'ไม้หัว มอก.',v:fmtN(tot.bs_h1_mok,0),u:'pcs.'},
+        {l:'เฉลี่ยกำลังคน (8 ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
       ]
     },
     {
@@ -3513,9 +3514,8 @@ async function buildMonthly() {
         {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),tk:'p1_frame',u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),tk:'bf_w',u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),tk:'bf_m',u:'pcs.'},
-        {l:'เฉลี่ยกำลังคน (8 ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
-        {l:'เฉลี่ยกำลังคน (ยิงโครง)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
-        {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
+        {l:'เฉลี่ยกำลังคน (ยิงโครงกระดาษ)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
+        {l:'เฉลี่ยกำลังคน (ยิงโครงไม้)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
       ]
     },
     {
