@@ -3505,21 +3505,25 @@ async function buildMonthly() {
         {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),tk:'bs_h1',u:'pcs.'},
         {l:'ไม้หัว (เบญ-ยาง)',v:fmtN(tot.bs_h1_ben,0),u:'pcs.'},
         {l:'ไม้หัว มอก.',v:fmtN(tot.bs_h1_mok,0),u:'pcs.'},
-        {l:'— ยิงโครง —',v:`${daysWithData} วัน`,u:''},
+      ]
+    },
+    {
+      icon:'🔧', title:'ยิงโครง',
+      metrics:[
+        {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),tk:'p1_frame',u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),tk:'bf_w',u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),tk:'bf_m',u:'pcs.'},
         {l:'เฉลี่ยกำลังคน (8 ใบ)',v:daysWithData?fmtN(tot.b8_oc/daysWithData,0):'—',u:`คน / OC 30`},
+        {l:'เฉลี่ยกำลังคน (ยิงโครง)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
         {l:'เฉลี่ยกำลังคน (โครง)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
       ]
     },
     {
       icon:'🔥', title:'อัดร้อน / อัดเย็น',
       metrics:[
-        {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),tk:'p1_frame',u:'pcs.'},
         {l:'อัดร้อน',v:fmtN(tot.p2_hot,0),tk:'p2_hot',u:'บาน'},
         {l:'Downtime รวม',v:fmtN(tot.p2_down,0),u:'นาที'},
         {l:'อัดเย็น',v:fmtN(tot.p3_cold,0),tk:'p3_cold',u:'บาน'},
-        {l:'เฉลี่ยกำลังคน (ยิงโครง)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
         {l:'เฉลี่ยกำลังคน (อัดร้อน)',v:daysWithData?fmtN(tot.p2_oc/daysWithData,0):'—',u:`คน / OC 11`},
         {l:'เฉลี่ยกำลังคน (อัดเย็น)',v:daysWithData?fmtN(tot.p3_oc/daysWithData,0):'—',u:`คน / OC 3`},
       ]
@@ -3961,12 +3965,14 @@ async function buildMCompare() {
       {l:'รวมยอดเลื่อย',   vC:tC.s1_door+tC.s1_pal+tC.s2_saw, vP:tP.s1_door+tP.s1_pal+tP.s2_saw, u:'Cu.ft.', bold:true},
     ]},
     { title:'🚪 โรงประตู', rows:[
-      {l:'ยิงโครงกระดาษ', tk:'p1_frame', vC:tC.p1_frame, vP:tP.p1_frame, u:'pcs.'},
-      {l:'ยิงโครงไม้', tk:'bf_w',    vC:tC.bf_w+tC.bf_m, vP:tP.bf_w+tP.bf_m, u:'pcs.'},
       {l:'อัดร้อน', tk:'p2_hot',       vC:tC.p2_hot,  vP:tP.p2_hot,  u:'บาน', bold:true},
       {l:'อัดเย็น', tk:'p3_cold',       vC:tC.p3_cold, vP:tP.p3_cold, u:'บาน'},
       {l:'ซอย', tk:'cts_sloy',           vC:tC.cts_sloy,vP:tP.cts_sloy,u:'บาน'},
       {l:'ห่อประตู', tk:'cts_wrap',      vC:tC.cts_wrap,vP:tP.cts_wrap,u:'บาน', bold:true},
+    ]},
+    { title:'🔨 ยิงโครง', rows:[
+      {l:'ยิงโครงกระดาษ', tk:'p1_frame', vC:tC.p1_frame, vP:tP.p1_frame, u:'pcs.'},
+      {l:'ยิงโครงไม้', tk:'bf_w',    vC:tC.bf_w+tC.bf_m, vP:tP.bf_w+tP.bf_m, u:'pcs.'},
     ]},
     { title:'⚠️ ของเสีย', rows:[
       {l:'ของเสียรวม', tk:'w_total', vC:wTotC, vP:wTotP, u:'บาน', lowerBetter:true},
