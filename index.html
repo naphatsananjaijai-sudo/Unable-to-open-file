@@ -741,9 +741,9 @@ body.view-only .view-only-badge { display: flex; }
 #wk-compare.wall .ov-chevron { display: none !important; }
 #mo-sections.wall .ov-card,
 #mc-body.wall .ov-card { margin-bottom: 14px; }
-/* การ์ดสัปดาห์: กางแล้วเรียงข้างกันเป็นคอลัมน์ ดูเทียบได้ทันที */
-#wk-compare.wall .wk-card-grid { display: block !important; column-width: 300px; column-gap: 14px; }
-#wk-compare.wall .ov-card { break-inside: avoid; -webkit-column-break-inside: avoid; margin: 0 0 14px; }
+/* การ์ดสัปดาห์: กางแล้วเรียงข้างกันเป็นแถว เรียงลำดับ 1,2,3... จากซ้ายไปขวา */
+#wk-compare.wall .wk-card-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)) !important; gap: 14px; }
+#wk-compare.wall .ov-card { margin: 0; }
 
 /* ── KPI overview ── */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 14px; margin-bottom: 22px; }
