@@ -1110,6 +1110,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">อื่น ๆ</div>
+  <button class="nav-item admin-only-nav" onclick="goPage('manpower',this);buildManpowerPage()">
+    <span class="nav-icon">👷</span> กำลังคนรายวัน
+  </button>
   <button class="nav-item admin-only-nav" onclick="goPage('targets',this);buildTargets()">
     <span class="nav-icon">🎯</span> ตั้งค่าเป้า
   </button>
@@ -1826,6 +1829,25 @@ html, body { max-width: 100%; overflow-x: hidden; }
     </div>
   </div>
 
+  <!-- ───── กำลังคนรายวัน (มุมมองแอดมิน) ───── -->
+  <div class="page" id="page-manpower">
+    <div class="page-header">
+      <div>
+        <div class="page-title">👷 รายการกำลังคนรายวัน</div>
+        <div class="page-subtitle">กรอกกำลังคนของทุกแผนกพร้อมกันในหน้าเดียว ไม่ต้องเปิดเข้าไปทีละแผนก · วันที่ <span id="hc_date_label">—</span></div>
+      </div>
+      <span class="oc-chip" id="hc_total_chip">👷 รวม 0 / 0 คน</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-bar" style="background:var(--green-500)"></span>กำลังคนแต่ละแผนก</div>
+      <div id="manpower-grid" style="display:flex;flex-direction:column;gap:14px;margin-top:12px;"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+        <button type="button" class="save-btn" onclick="saveManpower()">💾 บันทึกกำลังคนทั้งหมด</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- ───── สรุปรายเดือน ───── -->
   <div class="page" id="page-monthly">
@@ -2148,6 +2170,103 @@ function updOC(inId, oc, valId, pctId, barId) {
   bar.style.width = Math.min(pct,100)+'%';
   bar.style.background = barColor(pct);
   updateOverview();
+}
+
+/* ══════════════════════════════════════════════════
+   กำลังคนรายวัน (มุมมองแอดมิน) — กรอกกำลังคนทุกแผนกในหน้าเดียว
+   โดยไม่ต้องเปิดเข้าไปทีละแผนก แต่ยังใช้ id/ค่าเดิม (เช่น s1_oc)
+   ของแต่ละแผนกอยู่เบื้องหลัง เพื่อให้ข้อมูลตรงกันทุกที่ในระบบ
+══════════════════════════════════════════════════ */
+const MANPOWER_DEPTS = [
+  { key: 's1',  icon: '🪵', name: 'โรงเลื่อยไทรน้อย',   oc: 40 },
+  { key: 's2',  icon: '🪵', name: 'โรงเลื่อยปราจีน',     oc: 17 },
+  { key: 'dry', icon: '🌡️', name: 'โรงอบ',              oc: 5  },
+  { key: 'b8',  icon: '⚙️', name: 'โรง 8 ใบ',            oc: 30 },
+  { key: 'p1',  icon: '🔨', name: 'ยิงโครงกระดาษ',       oc: 20 },
+  { key: 'bf',  icon: '🔨', name: 'ยิงโครงไม้',          oc: 10 },
+  { key: 'p2',  icon: '🔥', name: 'อัดร้อน',             oc: 11 },
+  { key: 'p3',  icon: '🔥', name: 'อัดเย็น',             oc: 3  },
+  { key: 'cts', icon: '✂️', name: 'CTS & คัดเกรด',       oc: 25 },
+  { key: 'pl',  icon: '📦', name: 'พาเลท',               oc: 6  },
+  { key: 'wh',  icon: '🏬', name: 'คลังสินค้า',           oc: 6  }
+];
+
+function buildManpowerPage() {
+  const wrap = document.getElementById('manpower-grid');
+  if (!wrap) return;
+  wrap.innerHTML = MANPOWER_DEPTS.map(d => `
+    <div class="manpower-strip">
+      <span class="mp-icon">${d.icon}</span>
+      <div class="mp-info">
+        <div class="mp-label">${d.name}</div>
+        <div class="mp-number" id="hc_${d.key}_v">0</div>
+        <div class="mp-oc">OC ${d.oc} คน</div>
+      </div>
+      <div class="mp-bar-area">
+        <input class="mp-input" type="number" id="hc_${d.key}" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="${d.oc}"
+          oninput="hcSync('${d.key}',${d.oc})">
+        <div class="progress-meta"><span>Actual vs OC ${d.oc}</span><span class="progress-pct" id="hc_${d.key}_p">0%</span></div>
+        <div class="progress-bg"><div class="progress-fill" id="hc_${d.key}_b" style="width:0%"></div></div>
+      </div>
+    </div>
+  `).join('');
+  hcRefreshFromFields();
+}
+
+/* ดึงค่ากำลังคนล่าสุด (ของวันที่กำลังเลือกอยู่) มาแสดงในหน้านี้ */
+function hcRefreshFromFields() {
+  const wrap = document.getElementById('manpower-grid');
+  if (!wrap) return; // ยังไม่เคยเปิดหน้านี้ ไม่ต้องทำอะไร
+  const lbl = document.getElementById('hc_date_label');
+  if (lbl && typeof currentIso !== 'undefined') lbl.textContent = fmtDate(currentIso);
+  MANPOWER_DEPTS.forEach(d => {
+    const src = document.getElementById(d.key + '_oc');
+    const dst = document.getElementById('hc_' + d.key);
+    if (dst) dst.value = src ? src.value : '';
+    hcUpdateDisplay(d.key, d.oc);
+  });
+  hcUpdateTotal();
+}
+
+function hcUpdateDisplay(key, oc) {
+  const input = document.getElementById('hc_' + key);
+  if (!input) return;
+  const v = parseFloat(input.value) || 0;
+  document.getElementById('hc_' + key + '_v').textContent = Math.round(v).toLocaleString('en-US');
+  const pct = Math.min((v / oc) * 100, 150);
+  document.getElementById('hc_' + key + '_p').textContent = pct.toFixed(0) + '%';
+  const bar = document.getElementById('hc_' + key + '_b');
+  bar.style.width = Math.min(pct, 100) + '%';
+  bar.style.background = barColor(pct);
+}
+
+function hcUpdateTotal() {
+  let sum = 0, ocSum = 0;
+  MANPOWER_DEPTS.forEach(d => {
+    const input = document.getElementById('hc_' + d.key);
+    sum += input ? (parseFloat(input.value) || 0) : 0;
+    ocSum += d.oc;
+  });
+  const chip = document.getElementById('hc_total_chip');
+  if (chip) chip.textContent = `👷 รวม ${Math.round(sum).toLocaleString('en-US')} / ${ocSum} คน`;
+}
+
+function hcSync(key, oc) {
+  hcUpdateDisplay(key, oc);
+  hcUpdateTotal();
+}
+
+/* บันทึกกำลังคนของทุกแผนกในครั้งเดียว: ซิงก์ค่ากลับไปยัง field เดิมของแต่ละแผนก
+   แล้วเรียก saveData() ตัวเดียวกับปุ่มบันทึกหลัก เพื่อให้ข้อมูลตรงกันทั้งระบบ */
+function saveManpower() {
+  MANPOWER_DEPTS.forEach(d => {
+    const hc = document.getElementById('hc_' + d.key);
+    const src = document.getElementById(d.key + '_oc');
+    if (!hc || !src) return;
+    src.value = hc.value;
+    updOC(d.key + '_oc', d.oc, d.key + '_oc_v', d.key + '_ocp', d.key + '_ocb');
+  });
+  saveData();
 }
 
 /* ── Generic progress ── */
@@ -3227,6 +3346,7 @@ async function loadData() {
   });
   [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',0,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
   updateOverview();
+  hcRefreshFromFields();
 }
 
 /* ══════════════════════════════════════════════════
@@ -3285,15 +3405,23 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     'door_2026-08-20': {"s1_enter": "50.068", "s1_door": "800.67", "s1_pal": "200.68", "s1_oc": "38", "s2_enter": "16.97", "s2_saw": "296.77", "s2_oc": "11", "d1_cf": "889.91", "d1_pl": "21", "d2_cf": "11191.56", "d2_pl": "273", "dry_oc": "5", "bk_pr": "4079.15", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "27165", "bk_lvl": "11880", "bc_cuft": "265.94", "bc_rate": "16.62", "bj_6": "", "bj_45": "300", "bj_3": "", "bj_fj": "", "bs_h1": "2911", "bs_h1_ben": "2911", "bs_h1_mok": "0", "bs_k1": "2419", "bs_k2": "2419", "bs_mok": "25059", "bs_lvl": "0", "bf_w": "161", "bf_m": "0", "bf_oc": "10", "b8_oc": "26", "p1_frame": "1658", "p1_oc": "17", "p2_hot": "1505", "p2_oc": "10", "p2_down": "0", "p3_cold": "62", "p3_oc": "3", "cts_sloy": "1607", "cts_wrap": "1128", "cts_oc": "23", "w_hot": "3", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "1", "pl_4x12": "", "pl_7x9": "16", "pl_oc": "6", "wh_in": "2163", "wh_in_ag": "2161", "wh_in_cp": "2", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_oc": "6"},
     'door_2026-08-21': {"s1_enter": "43.744", "s1_door": "722.86", "s1_pal": "152.02", "s1_oc": "37", "s2_enter": "15.93", "s2_saw": "282.30", "s2_oc": "10", "d1_cf": "888.16", "d1_pl": "20", "d2_cf": "11234.09", "d2_pl": "273", "dry_oc": "5", "bk_pr": "4319.10", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28180", "bk_lvl": "11880", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "25059", "bs_lvl": "", "bf_w": "53", "bf_m": "0", "bf_oc": "6", "b8_oc": "24", "p1_frame": "1698", "p1_oc": "19", "p2_hot": "1490", "p2_oc": "10", "p2_down": "0", "p3_cold": "73", "p3_oc": "3", "cts_sloy": "995", "cts_wrap": "1599", "cts_oc": "25", "w_hot": "6", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "3", "wh_in": "715", "wh_in_ag": "613", "wh_in_cp": "102", "wh_out": "1147", "wh_out_ag": "1101", "wh_out_cp": "46", "wh_st": "0", "wh_st_ag": "", "wh_st_cp": "", "wh_oc": "6"},
     'door_2026-08-22': {"s1_enter": "44.629", "s1_door": "793.02", "s1_pal": "99.56", "s1_oc": "37", "s2_enter": "12.18", "s2_saw": "212.64", "s2_oc": "11", "d1_cf": "894.49", "d1_pl": "20", "d2_cf": "11230.71", "d2_pl": "273", "dry_oc": "5", "bk_pr": "4799.00", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28180", "bk_lvl": "9720", "bc_cuft": "216.08", "bc_rate": "20.58", "bj_6": "750", "bj_45": "240", "bj_3": "0", "bj_fj": "0", "bs_h1": "5327", "bs_h1_ben": "5327", "bs_h1_mok": "0", "bs_k1": "2781", "bs_k2": "2781", "bs_mok": "25059", "bs_lvl": "0", "bf_w": "167", "bf_m": "0", "bf_oc": "9", "b8_oc": "27", "p1_frame": "2136", "p1_oc": "19", "p2_hot": "1443", "p2_oc": "10", "p2_down": "0", "p3_cold": "32", "p3_oc": "3", "cts_sloy": "2096", "cts_wrap": "1559", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "2134", "wh_in_ag": "2010", "wh_in_cp": "124", "wh_out": "99", "wh_out_ag": "0", "wh_out_cp": "99", "wh_st": "38659", "wh_oc": "6"},
-    'door_2026-08-24': {"s1_enter": "43.322", "s1_door": "866.43", "s1_pal": "0.00", "s1_oc": "37", "s2_enter": "14.05", "s2_saw": "248.15", "s2_oc": "9", "d1_cf": "900.01", "d1_pl": "20", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "5422.87", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28877", "bk_lvl": "9720", "bc_cuft": "415.53", "bc_rate": "23.74", "bj_6": "1070", "bj_45": "120", "bj_3": "0", "bj_fj": "0", "bs_h1": "3587", "bs_h1_ben": "3469", "bs_h1_mok": "118", "bs_k1": "2850", "bs_k2": "2850", "bs_mok": "24352", "bs_lvl": "0", "bf_w": "145", "bf_m": "0", "bf_oc": "8", "b8_oc": "27", "p1_frame": "1852", "p1_oc": "16", "p2_hot": "1566", "p2_oc": "11", "p2_down": "0", "p3_cold": "98", "p3_oc": "3", "cts_sloy": "1327", "cts_wrap": "2030", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "1903", "wh_in_ag": "1718", "wh_in_cp": "185", "wh_out": "1605", "wh_out_ag": "1502", "wh_out_cp": "103", "wh_st": "39114", "wh_oc": "6"},
+    'door_2026-08-24': {"s1_enter": "43.322", "s1_door": "866.43", "s1_pal": "0.00", "s1_oc": "37", "s2_enter": "14.05", "s2_saw": "248.15", "s2_oc": "9", "d1_cf": "900.01", "d1_pl": "20", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "5422.87", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28877", "bk_lvl": "9720", "bc_cuft": "415.53", "bc_rate": "23.74", "bj_6": "1070", "bj_45": "120", "bj_3": "0", "bj_fj": "0", "bs_h1": "3587", "bs_h1_ben": "3469", "bs_h1_mok": "118", "bs_k1": "2850", "bs_k2": "2850", "bs_mok": "24352", "bs_lvl": "0", "bf_w": "145", "bf_m": "0", "bf_oc": "8", "b8_oc": "27", "p1_frame": "1852", "p1_oc": "16", "p2_hot": "1566", "p2_oc": "11", "p2_down": "0", "p3_cold": "98", "p3_oc": "3", "cts_sloy": "1327", "cts_wrap": "2030", "cts_oc": "24", "w_hot": "2", "w_cold": "0", "w_sloy": "0", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "5", "wh_in": "1903", "wh_in_ag": "1718", "wh_in_cp": "185", "wh_out": "1605", "wh_out_ag": "1502", "wh_out_cp": "103", "wh_st": "39114", "wh_oc": "6"},
     'door_2026-08-25': {"s1_enter": "47.739", "s1_door": "875.12", "s1_pal": "79.67", "s1_oc": "37", "s2_enter": "15.48", "s2_saw": "279.90", "s2_oc": "10", "d1_cf": "0", "d1_pl": "0", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "5374.88", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28842", "bk_lvl": "9720", "bc_cuft": "443.23", "bc_rate": "21.11", "bj_6": "675", "bj_45": "114", "bj_3": "0", "bj_fj": "540", "bs_h1": "4498", "bs_h1_ben": "4298", "bs_h1_mok": "200", "bs_k1": "8084", "bs_k2": "1604", "bs_mok": "24352", "bs_lvl": "6480", "bf_w": "145", "bf_m": "0", "bf_oc": "10", "b8_oc": "27", "p1_frame": "1865", "p1_oc": "18", "p2_hot": "2120", "p2_oc": "11", "p2_down": "50", "p3_cold": "85", "p3_oc": "3", "cts_sloy": "1714", "cts_wrap": "1955", "cts_oc": "23", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "20", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "2066", "wh_in_ag": "1810", "wh_in_cp": "256", "wh_out": "1904", "wh_out_ag": "1812", "wh_out_cp": "92", "wh_st": "39128", "wh_oc": "6"},
     'door_2026-08-26': {"s1_enter": "45.425", "s1_door": "839.90", "s1_pal": "68.60", "s1_oc": "37", "s2_enter": "14.08", "s2_saw": "246.26", "s2_oc": "11", "d1_cf": "1564.91", "d1_pl": "38", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "4703.02", "bk_h": "2038", "bk_h_ben": "2038", "bk_h_mok": "0", "bk_ben": "25081", "bk_lvl": "16200", "bc_cuft": "398.91", "bc_rate": "21.56", "bj_6": "715", "bj_45": "", "bj_3": "", "bj_fj": "450", "bs_h1": "4160", "bs_h1_ben": "3540", "bs_h1_mok": "620", "bs_k1": "6612", "bs_k2": "4452", "bs_mok": "24352", "bs_lvl": "2160", "bf_w": "153", "bf_m": "0", "bf_oc": "10", "b8_oc": "", "p1_frame": "2128", "p1_oc": "18", "p2_hot": "1576", "p2_oc": "11", "p2_down": "275", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "2120", "cts_wrap": "2060", "cts_oc": "24", "w_hot": "5", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "12", "pl_oc": "6", "wh_in": "2443", "wh_in_ag": "2443", "wh_in_cp": "0", "wh_out": "516", "wh_out_ag": "367", "wh_out_cp": "149", "wh_st": "41192", "wh_oc": "6"},
-    'door_2026-08-27': {"s1_enter": "44.115", "s1_door": "864.52", "s1_pal": "17.78", "s1_oc": "35", "s2_enter": "17.38", "s2_saw": "313.72", "s2_oc": "9", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13150.99", "d2_pl": "304", "dry_oc": "5", "bk_pr": "4655.03", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "30175", "bk_lvl": "15120", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "406", "bj_45": "", "bj_3": "256", "bj_fj": "420", "bs_h1": "2000", "bs_h1_ben": "2000", "bs_h1_mok": "0", "bs_k1": "3900", "bs_k2": "1740", "bs_mok": "24352", "bs_lvl": "2160", "bf_w": "207", "bf_m": "", "bf_oc": "10", "b8_oc": "27", "p1_frame": "2074", "p1_oc": "19", "p2_hot": "2038", "p2_oc": "10", "p2_down": "140", "p3_cold": "103", "p3_oc": "3", "cts_sloy": "1537", "cts_wrap": "1682", "cts_oc": "23", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "2289", "wh_in_ag": "2179", "wh_in_cp": "110", "wh_out": "1694", "wh_out_ag": "1533", "wh_out_cp": "161", "wh_st": "41854", "wh_oc": "6"},
-    'door_2026-08-28': {"s1_enter": "43.070", "s1_door": "846.86", "s1_pal": "14.54", "s1_oc": "37", "s2_enter": "13.97", "s2_saw": "241.91", "s2_oc": "9", "d1_cf": "0", "d1_pl": "0", "d2_cf": "11793.55", "d2_pl": "261", "dry_oc": "5", "bk_pr": "3599.25", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "32145", "bk_lvl": "11880", "bc_cuft": "457.08", "bc_rate": "21.08", "bj_6": "0", "bj_45": "1170", "bj_3": "0", "bj_fj": "0", "bs_h1": "4248", "bs_h1_ben": "3248", "bs_h1_mok": "1000", "bs_k1": "1792", "bs_k2": "1792", "bs_mok": "22863", "bs_lvl": "0", "bf_w": "165", "bf_m": "", "bf_oc": "8", "b8_oc": "23", "p1_frame": "2076", "p1_oc": "19", "p2_hot": "2140", "p2_oc": "10", "p2_down": "0", "p3_cold": "69", "p3_oc": "3", "cts_sloy": "1947", "cts_wrap": "1682", "cts_oc": "23", "w_hot": "", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1973", "wh_in_ag": "1973", "wh_in_cp": "0", "wh_out": "683", "wh_out_ag": "593", "wh_out_cp": "90", "wh_st": "40931", "wh_oc": "6"},
-    'door_2026-08-29': {"s1_enter": "4.817", "s1_door": "96.34", "s1_pal": "0.00", "s1_oc": "16", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "2032.80", "d1_pl": "40", "d2_cf": "10165.44", "d2_pl": "225", "dry_oc": "5", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "451.54", "bc_rate": "21.50", "bj_6": "260", "bj_45": "1489", "bj_3": "", "bj_fj": "", "bs_h1": "2962", "bs_h1_ben": "2962", "bs_h1_mok": "0", "bs_k1": "2025", "bs_k2": "2025", "bs_mok": "", "bs_lvl": "0", "bf_w": "175", "bf_m": "", "bf_oc": "7", "b8_oc": "15", "p1_frame": "1457", "p1_oc": "14", "p2_hot": "1595", "p2_oc": "7", "p2_down": "", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "2226", "cts_wrap": "1542", "cts_oc": "21", "w_hot": "2", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "0", "wh_in": "1940", "wh_in_ag": "1858", "wh_in_cp": "82", "wh_out": "2253", "wh_out_ag": "2180", "wh_out_cp": "73", "wh_st": "42912", "wh_oc": "6"},
-    'door_2026-08-31': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "2783.42", "bk_h": "2000", "bk_h_ben": "2000", "bk_h_mok": "0", "bk_ben": "26204", "bk_lvl": "9729", "bc_cuft": "", "bc_rate": "", "bj_6": "150", "bj_45": "684", "bj_3": "", "bj_fj": "", "bs_h1": "4174", "bs_h1_ben": "4174", "bs_h1_mok": "", "bs_k1": "3219", "bs_k2": "3219", "bs_mok": "22863", "bs_lvl": "", "bf_w": "175", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "1677", "p1_oc": "", "p2_hot": "2491", "p2_oc": "", "p2_down": "35", "p3_cold": "", "p3_oc": "", "cts_sloy": "1512", "cts_wrap": "1505", "cts_oc": "21", "w_hot": "", "w_cold": "", "w_sloy": "1", "pl_3x6": "10", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "2061", "wh_in_ag": "2051", "wh_in_cp": "10", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_st": "44154", "wh_oc": "6"}
+    'door_2026-08-27': {"s1_enter": "44.115", "s1_door": "864.52", "s1_pal": "17.78", "s1_oc": "35", "s2_enter": "17.38", "s2_saw": "313.72", "s2_oc": "9", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13150.99", "d2_pl": "304", "dry_oc": "5", "bk_pr": "4655.03", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "30175", "bk_lvl": "15120", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "406", "bj_45": "", "bj_3": "256", "bj_fj": "420", "bs_h1": "2000", "bs_h1_ben": "2000", "bs_h1_mok": "0", "bs_k1": "3900", "bs_k2": "1740", "bs_mok": "24352", "bs_lvl": "2160", "bf_w": "207", "bf_m": "", "bf_oc": "10", "b8_oc": "27", "p1_frame": "2074", "p1_oc": "19", "p2_hot": "2038", "p2_oc": "10", "p2_down": "140", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "1537", "cts_wrap": "1682", "cts_oc": "23", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "2289", "wh_in_ag": "2179", "wh_in_cp": "110", "wh_out": "1694", "wh_out_ag": "1533", "wh_out_cp": "161", "wh_st": "41854", "wh_oc": "6"},
+    'door_2026-08-28': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "3599.25", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "32145", "bk_lvl": "11880", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "22863", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_st": "", "wh_oc": ""},
+    'door_2026-08-29': {"s1_enter": "4.817", "s1_door": "96.34", "s1_pal": "0.00", "s1_oc": "16", "s2_enter": "17.39", "s2_saw": "304.730", "s2_oc": "10", "d1_cf": "2032.80", "d1_pl": "40", "d2_cf": "10165.44", "d2_pl": "225", "dry_oc": "5", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "451.54", "bc_rate": "21.50", "bj_6": "260", "bj_45": "1489", "bj_3": "", "bj_fj": "", "bs_h1": "2962", "bs_h1_ben": "2962", "bs_h1_mok": "0", "bs_k1": "2025", "bs_k2": "2025", "bs_mok": "", "bs_lvl": "0", "bf_w": "175", "bf_m": "", "bf_oc": "7", "b8_oc": "15", "p1_frame": "1457", "p1_oc": "14", "p2_hot": "1595", "p2_oc": "7", "p2_down": "", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "2226", "cts_wrap": "1542", "cts_oc": "21", "w_hot": "2", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "0", "wh_in": "1940", "wh_in_ag": "1858", "wh_in_cp": "82", "wh_out": "2253", "wh_out_ag": "2180", "wh_out_cp": "73", "wh_st": "42912", "wh_oc": "6"},
+    'door_2026-08-31': {"s1_enter": "47.465", "s1_door": "679.48", "s1_pal": "269.81", "s1_oc": "36", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "1752.35", "d1_pl": "42", "d2_cf": "8534.76", "d2_pl": "189", "dry_oc": "5", "bk_pr": "2783.42", "bk_h": "2000", "bk_h_ben": "2000", "bk_h_mok": "0", "bk_ben": "26204", "bk_lvl": "9729", "bc_cuft": "225.29", "bc_rate": "21.46", "bj_6": "150", "bj_45": "684", "bj_3": "", "bj_fj": "", "bs_h1": "4174", "bs_h1_ben": "4174", "bs_h1_mok": "0", "bs_k1": "3219", "bs_k2": "3219", "bs_mok": "22863", "bs_lvl": "0", "bf_w": "175", "bf_m": "", "bf_oc": "10", "b8_oc": "27", "p1_frame": "1677", "p1_oc": "19", "p2_hot": "2491", "p2_oc": "11", "p2_down": "35", "p3_cold": "52", "p3_oc": "3", "cts_sloy": "1512", "cts_wrap": "1505", "cts_oc": "24", "w_hot": "0", "w_cold": "", "w_sloy": "1", "pl_3x6": "10", "pl_4x6": "", "pl_4x8s": "19", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "2006", "wh_in_ag": "1996", "wh_in_cp": "10", "wh_out": "765", "wh_out_ag": "755", "wh_out_cp": "10", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-01': {"s1_enter": "42.814", "s1_door": "768.20", "s1_pal": "88.09", "s1_oc": "35", "s2_enter": "18.22", "s2_saw": "327.02", "s2_oc": "11", "d1_cf": "910.01", "d1_pl": "20", "d2_cf": "11772.26", "d2_pl": "261", "dry_oc": "5", "bk_pr": "", "bk_h": "4534", "bk_h_ben": "4534", "bk_h_mok": "0", "bk_ben": "28698", "bk_lvl": "9726", "bc_cuft": "361.93", "bc_rate": "22.62", "bj_6": "850", "bj_45": "115", "bj_3": "0", "bj_fj": "0", "bs_h1": "3456", "bs_h1_ben": "3456", "bs_h1_mok": "0", "bs_k1": "3150", "bs_k2": "3150", "bs_mok": "22863", "bs_lvl": "0", "bf_w": "", "bf_m": "", "bf_oc": "9", "b8_oc": "25", "p1_frame": "", "p1_oc": "20", "p2_hot": "1420", "p2_oc": "11", "p2_down": "125", "p3_cold": "60", "p3_oc": "3", "cts_sloy": "1952", "cts_wrap": "911", "cts_oc": "22", "w_hot": "5", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "1424", "wh_in_ag": "1222", "wh_in_cp": "202", "wh_out": "657", "wh_out_ag": "583", "wh_out_cp": "74", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-02': {"s1_enter": "42.960", "s1_door": "723.90", "s1_pal": "135.30", "s1_oc": "35", "s2_enter": "16.48", "s2_saw": "289.84", "s2_oc": "10", "d1_cf": "900.10", "d1_pl": "20", "d2_cf": "13095.32", "d2_pl": "297", "dry_oc": "3", "bk_pr": "", "bk_h": "4828", "bk_h_ben": "4828", "bk_h_mok": "", "bk_ben": "27553", "bk_lvl": "9729", "bc_cuft": "470.24", "bc_rate": "22.39", "bj_6": "482", "bj_45": "0", "bj_3": "680", "bj_fj": "0", "bs_h1": "3810", "bs_h1_ben": "3810", "bs_h1_mok": "0", "bs_k1": "4022", "bs_k2": "4022", "bs_mok": "22109", "bs_lvl": "0", "bf_w": "55", "bf_m": "70", "bf_oc": "10", "b8_oc": "23", "p1_frame": "1028", "p1_oc": "19", "p2_hot": "1809", "p2_oc": "9", "p2_down": "", "p3_cold": "84", "p3_oc": "3", "cts_sloy": "1680", "cts_wrap": "1202", "cts_oc": "23", "w_hot": "3", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1658", "wh_in_ag": "1625", "wh_in_cp": "33", "wh_out": "1447", "wh_out_ag": "1333", "wh_out_cp": "114", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-03': {"s1_enter": "45.983", "s1_door": "854.40", "s1_pal": "65.26", "s1_oc": "40", "s2_enter": "16.42", "s2_saw": "293.44", "s2_oc": "11", "d1_cf": "1467.96", "d1_pl": "37", "d2_cf": "13082.85", "d2_pl": "297", "dry_oc": "5", "bk_pr": "", "bk_h": "8638", "bk_h_ben": "8638", "bk_h_mok": "0", "bk_ben": "29583", "bk_lvl": "9729", "bc_cuft": "533.26", "bc_rate": "25.39", "bj_6": "121", "bj_45": "1081", "bj_3": "200", "bj_fj": "0", "bs_h1": "5151", "bs_h1_ben": "5151", "bs_h1_mok": "0", "bs_k1": "1515", "bs_k2": "1515", "bs_mok": "20909", "bs_lvl": "0", "bf_w": "55", "bf_m": "119", "bf_oc": "10", "b8_oc": "26", "p1_frame": "711", "p1_oc": "18", "p2_hot": "1571", "p2_oc": "11", "p2_down": "35", "p3_cold": "93", "p3_oc": "3", "cts_sloy": "1790", "cts_wrap": "1208", "cts_oc": "23", "w_hot": "1", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1374", "wh_in_ag": "1300", "wh_in_cp": "74", "wh_out": "1289", "wh_out_ag": "1090", "wh_out_cp": "199", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-04': {"s1_enter": "45.108", "s1_door": "824.82", "s1_pal": "77.34", "s1_oc": "40", "s2_enter": "16.44", "s2_saw": "288.65", "s2_oc": "11", "d1_cf": "924.97", "d1_pl": "20", "d2_cf": "13082.85", "d2_pl": "297", "dry_oc": "5", "bk_pr": "", "bk_h": "8349", "bk_h_ben": "8349", "bk_h_mok": "0", "bk_ben": "27583", "bk_lvl": "9729", "bc_cuft": "533.26", "bc_rate": "25.39", "bj_6": "", "bj_45": "983", "bj_3": "", "bj_fj": "410", "bs_h1": "4404", "bs_h1_ben": "4404", "bs_h1_mok": "0", "bs_k1": "2848", "bs_k2": "2842", "bs_mok": "20242", "bs_lvl": "0", "bf_w": "55", "bf_m": "107", "bf_oc": "10", "b8_oc": "26", "p1_frame": "1708", "p1_oc": "20", "p2_hot": "1893", "p2_oc": "11", "p2_down": "", "p3_cold": "96", "p3_oc": "3", "cts_sloy": "1658", "cts_wrap": "1015", "cts_oc": "24", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "4", "wh_in": "1534", "wh_in_ag": "1334", "wh_in_cp": "200", "wh_out": "573", "wh_out_ag": "403", "wh_out_cp": "170", "wh_st": "", "wh_oc": "5"},
+    'door_2026-09-05': {"s1_enter": "43.453", "s1_door": "805.03", "s1_pal": "64.03", "s1_oc": "40", "s2_enter": "19", "s2_saw": "343.02", "s2_oc": "10", "d1_cf": "453.08", "d1_pl": "10", "d2_cf": "14721.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "12378", "bk_h_ben": "12378", "bk_h_mok": "0", "bk_ben": "26336", "bk_lvl": "9729", "bc_cuft": "497.25", "bc_rate": "23.68", "bj_6": "", "bj_45": "1141", "bj_3": "", "bj_fj": "250", "bs_h1": "2706", "bs_h1_ben": "2706", "bs_h1_mok": "", "bs_k1": "3284", "bs_k2": "3284", "bs_mok": "20242", "bs_lvl": "", "bf_w": "133", "bf_m": "45", "bf_oc": "10", "b8_oc": "26", "p1_frame": "0", "p1_oc": "19", "p2_hot": "", "p2_oc": "11", "p2_down": "", "p3_cold": "", "p3_oc": "3", "cts_sloy": "1835", "cts_wrap": "1364", "cts_oc": "24", "w_hot": "3", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "30", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1619", "wh_in_ag": "1343", "wh_in_cp": "276", "wh_out": "38", "wh_out_ag": "0", "wh_out_cp": "38", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-07': {"s1_enter": "46.782", "s1_door": "896.68", "s1_pal": "38.95", "s1_oc": "40", "s2_enter": "14.47", "s2_saw": "254.72", "s2_oc": "10", "d1_cf": "765.74", "d1_pl": "18", "d2_cf": "14721.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "11378", "bk_h_ben": "11378", "bk_h_mok": "0", "bk_ben": "24480", "bk_lvl": "9729", "bc_cuft": "", "bc_rate": "", "bj_6": "583", "bj_45": "612", "bj_3": "0", "bj_fj": "0", "bs_h1": "4735", "bs_h1_ben": "4735", "bs_h1_mok": "0", "bs_k1": "3045", "bs_k2": "3045", "bs_mok": "19650", "bs_lvl": "0", "bf_w": "169", "bf_m": "0", "bf_oc": "10", "b8_oc": "26", "p1_frame": "0", "p1_oc": "17", "p2_hot": "", "p2_oc": "10", "p2_down": "480", "p3_cold": "85", "p3_oc": "3", "cts_sloy": "", "cts_wrap": "1501", "cts_oc": "19", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "37", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1745", "wh_in_ag": "1586", "wh_in_cp": "159", "wh_out": "1227", "wh_out_ag": "1022", "wh_out_cp": "205", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-08': {"s1_enter": "45.667", "s1_door": "847.35", "s1_pal": "65.98", "s1_oc": "43", "s2_enter": "16.53", "s2_saw": "297.31", "s2_oc": "11", "d1_cf": "691.22", "d1_pl": "15", "d2_cf": "14271.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "12476", "bk_h_ben": "12476", "bk_h_mok": "0", "bk_ben": "25401", "bk_lvl": "9729", "bc_cuft": "141.97", "bc_rate": "20.28", "bj_6": "500", "bj_45": "130", "bj_3": "", "bj_fj": "", "bs_h1": "4153", "bs_h1_ben": "4153", "bs_h1_mok": "0", "bs_k1": "3168", "bs_k2": "2088", "bs_mok": "19650", "bs_lvl": "1080", "bf_w": "154", "bf_m": "0", "bf_oc": "9", "b8_oc": "25", "p1_frame": "1103", "p1_oc": "18", "p2_hot": "1760", "p2_oc": "11", "p2_down": "", "p3_cold": "61", "p3_oc": "3", "cts_sloy": "338", "cts_wrap": "340", "cts_oc": "23", "w_hot": "", "w_cold": "3", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "4", "wh_in": "795", "wh_in_ag": "634", "wh_in_cp": "161", "wh_out": "527", "wh_out_ag": "495", "wh_out_cp": "32", "wh_st": "", "wh_oc": "6"},
+    'door_2026-09-09': {"s1_enter": "44.745", "s1_door": "835.87", "s1_pal": "59.03", "s1_oc": "41", "s2_enter": "8.10", "s2_saw": "142.66", "s2_oc": "11", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13082.63", "d2_pl": "294", "dry_oc": "5", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "", "bs_lvl": "", "bf_w": "115", "bf_m": "", "bf_oc": "7", "b8_oc": "13", "p1_frame": "1600", "p1_oc": "20", "p2_hot": "1829", "p2_oc": "10", "p2_down": "", "p3_cold": "", "p3_oc": "3", "cts_sloy": "", "cts_wrap": "244", "cts_oc": "23", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "3", "wh_in": "379", "wh_in_ag": "146", "wh_in_cp": "233", "wh_out": "795", "wh_out_ag": "791", "wh_out_cp": "4", "wh_st": "", "wh_oc": "6"}
   };
-  const DATA_VERSION = '2026-09-01-2';
+  const DATA_VERSION = '2026-08-28-3';
   const storedVersion = localStorage.getItem('door_data_version');
   for (const [k,v] of Object.entries(bulk)) {
     if (!localStorage.getItem(k) || storedVersion !== DATA_VERSION) {
@@ -3502,6 +3630,7 @@ async function buildMonthly() {
         {l:'— ยอดซอย —',v:`${daysWithData} วัน`,u:''},
         {l:'ไม้ข้าง (รวม)',v:fmtN(tot.bs_k1,0),tk:'bs_k1',u:'pcs.'},
         {l:'ไม้ข้าง (เบญจพรรณ)',v:fmtN(tot.bs_k2,0),u:'pcs.'},
+        {l:'ไม้ข้าง (มอก.)',v:fmtN(tot.bs_mok,0),u:'pcs.'},
         {l:'ไม้ LVL',v:fmtN(tot.bs_lvl,0),u:'pcs.'},
         {l:'ไม้หัว (รวม)',v:fmtN(tot.bs_h1,0),tk:'bs_h1',u:'pcs.'},
         {l:'ไม้หัว (เบญ-ยาง)',v:fmtN(tot.bs_h1_ben,0),u:'pcs.'},
@@ -4282,7 +4411,7 @@ function applyMode() {
     if (outBtn) outBtn.style.display = 'none';
     if (shareBtn) shareBtn.style.display = 'none';
     // Redirect to overview if currently on an admin-only page
-    const adminPages = ['saw1','saw2','dry','blade8','frame','press','cts','pallet','warehouse'];
+    const adminPages = ['saw1','saw2','dry','blade8','frame','press','cts','pallet','warehouse','manpower'];
     const activePage = document.querySelector('.page.active');
     if (activePage && adminPages.some(p => activePage.id === 'page-' + p)) {
       goPage('overview', document.querySelector('.nav-item:first-child'));
@@ -4482,8 +4611,8 @@ function showImportModal() {
     wrap.innerHTML = `
       <div class="import-overlay-bg" onclick="closeImportModal()"></div>
       <div class="import-box">
-        <div class="import-title">📥 นำเข้าข้อมูลจากฟอร์มเลื่อย</div>
-        <div class="import-hint">คัดลอกโค้ดจากปุ่ม <strong>📱 แชร์</strong> ในแอปฟอร์มเลื่อย แล้ววางที่นี่</div>
+        <div class="import-title">📥 นำเข้าข้อมูลจากฟอร์มเลื่อย / โรงอบ</div>
+        <div class="import-hint">คัดลอกโค้ดจากปุ่ม <strong>📱 แชร์</strong> ในแอปฟอร์มเลื่อย (แท็บโรงเลื่อย หรือแท็บ 🏭 โรงอบ) แล้ววางที่นี่</div>
         <textarea class="import-ta" id="_import-ta"
           placeholder="PP:2026-07-31:eyJkIjoiMjAyNi0wN..."></textarea>
         <div class="import-btn-row">
@@ -4521,7 +4650,56 @@ function _applyImportCode(raw, fromHash) {
   };
 
   try {
-    if (!raw || !raw.startsWith('PP:')) throw new Error('รูปแบบโค้ดไม่ถูกต้อง (ต้องขึ้นต้นด้วย PP:)');
+    if (!raw) throw new Error('กรุณาวางโค้ด');
+
+    // ── PPKILN: โค้ดจากหน้าโรงอบ (ฟอร์มเลื่อย แท็บ 🏭 โรงอบ ปุ่ม 📱 แชร์) ──
+    if (raw.startsWith('PPKILN:')) {
+      const rest = raw.slice('PPKILN:'.length);
+      const colonIdx = rest.indexOf(':');
+      if (colonIdx < 0) throw new Error('โค้ดโรงอบไม่ครบถ้วน');
+      const kDate = rest.slice(0, colonIdx);
+      const kB64  = rest.slice(colonIdx + 1);
+      if (!kDate.match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error('วันที่ในโค้ดไม่ถูกต้อง: ' + kDate);
+
+      let kPayload;
+      try { kPayload = JSON.parse(decodeURIComponent(escape(atob(kB64)))); } catch(e) { kPayload = JSON.parse(atob(kB64)); }
+      const kiln = kPayload.kiln || {};
+
+      // คำนวณคงเหลือในเตาอบ (ยอดยกมา + เข้า − ออก) — สูตรเดียวกับปุ่ม 📤 ส่ง ในฟอร์มเลื่อย
+      const remCbft = (parseFloat(kiln.prevCbft) || 0) + (parseFloat(kiln.inCbft) || 0) - (parseFloat(kiln.outCbft) || 0);
+      const remPal  = (parseInt(kiln.prevPal)   || 0) + (parseInt(kiln.inPal)   || 0) - (parseInt(kiln.outPal)   || 0);
+
+      const kKey = 'door_' + kDate;
+      let kExisting = {};
+      try { const r = localStorage.getItem(kKey); if (r) kExisting = JSON.parse(r); } catch(_) {}
+      if (kiln.saw8Cbft !== undefined && kiln.saw8Cbft !== '') kExisting.d1_cf = kiln.saw8Cbft;
+      if (kiln.saw8Pal  !== undefined && kiln.saw8Pal  !== '') kExisting.d1_pl = kiln.saw8Pal;
+      kExisting.d2_cf = remCbft.toFixed(2);
+      kExisting.d2_pl = String(remPal);
+      localStorage.setItem(kKey, JSON.stringify(kExisting));
+
+      currentIso = kDate;
+      const [ky, km, kday] = kDate.split('-');
+      dateEl.value = `${kday}/${km}/${ky}`;
+      hdrDate.textContent = fmtDate(kDate);
+
+      const MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const kDateDisp = `${parseInt(kday)} ${MONTHS_SHORT[parseInt(km) - 1]} ${parseInt(ky) + 543}`;
+      showResult(true, `✅ นำเข้าข้อมูลโรงอบสำเร็จ! วันที่ ${kDateDisp} — ส่งโรง 8 ใบ ${(parseFloat(kiln.saw8Cbft) || 0).toFixed(2)} Cu.ft. | ค้างเตาอบ ${remCbft.toFixed(2)} Cu.ft.`);
+
+      loadData();
+      updateOverview();
+
+      const kToast = document.getElementById('toast');
+      kToast.textContent = `📥 รับข้อมูลโรงอบ ${kDateDisp} ✓`;
+      kToast.classList.add('show');
+      setTimeout(() => { kToast.classList.remove('show'); kToast.textContent = '✅ บันทึกข้อมูลแล้ว'; }, 3000);
+
+      if (!fromHash) setTimeout(() => closeImportModal(), 2500);
+      return;
+    }
+
+    if (!raw.startsWith('PP:')) throw new Error('รูปแบบโค้ดไม่ถูกต้อง (ต้องขึ้นต้นด้วย PP: หรือ PPKILN:)');
     const colonIdx2 = raw.indexOf(':', 3); // after "PP:"
     if (colonIdx2 < 0) throw new Error('โค้ดไม่ครบ');
     const date = raw.slice(3, colonIdx2);   // YYYY-MM-DD
