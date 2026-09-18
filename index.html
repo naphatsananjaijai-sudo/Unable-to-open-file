@@ -837,6 +837,9 @@ body.view-only .view-only-badge { display: flex; }
 .mo-metric .tg-line { font-size: 10px; gap: 4px; }
 .tg-goal { overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 640px) { .tg-src { display: none; } }
+/* หน้าเปรียบเทียบรายเดือน: บรรทัดเป้า/ผลต่างเดิมกว้างเต็มคอลัมน์ (ชิดซ้าย) ทำให้ดูหลุดแนวไปจากตัวเลขที่ชิดขวาด้านบน
+   ปรับให้กล่องนี้หดตามเนื้อหาและชิดขวา จะได้อยู่แนวเดียวกับตัวเลขด้านบนเป๊ะ ๆ */
+#mc-body .tg-line { width: max-content; max-width: 100%; margin: 4px 0 0 auto; }
 .mo-days-badge {
   margin-left: auto; font-size: 11px; background: var(--g100);
   color: var(--g500); border-radius: 10px; padding: 3px 10px; font-weight: 700;
@@ -993,9 +996,110 @@ html, body { max-width: 100%; overflow-x: hidden; }
     font-size: 16px; /* prevent iOS zoom */
   }
 }
+
+/* ── Welcome splash screen — iOS "Liquid Glass" style ── */
+#welcome-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, #dff3e4 0%, #bfe6d2 32%, #9fd8d8 62%, #bcd7f2 100%);
+  text-align: center; padding: 24px;
+  opacity: 1; visibility: visible;
+  transition: opacity .4s ease, visibility 0s linear 0s;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Sarabun', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+#welcome-screen.hide { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s ease, visibility 0s linear .4s; }
+
+/* Floating gradient orbs (depth-of-field liquid background) */
+#welcome-screen::before, #welcome-screen::after, .welcome-orb {
+  content: ''; position: absolute; border-radius: 50%; filter: blur(60px);
+  opacity: .55; pointer-events: none;
+}
+#welcome-screen::before {
+  width: 420px; height: 420px; top: -120px; left: -100px;
+  background: radial-gradient(circle, #66BB6A 0%, transparent 70%);
+  animation: orbFloat1 14s ease-in-out infinite;
+}
+#welcome-screen::after {
+  width: 380px; height: 380px; bottom: -140px; right: -90px;
+  background: radial-gradient(circle, #4FC3F7 0%, transparent 70%);
+  animation: orbFloat2 16s ease-in-out infinite;
+}
+.welcome-orb {
+  width: 260px; height: 260px; top: 38%; left: 58%;
+  background: radial-gradient(circle, #FFD54F 0%, transparent 72%);
+  opacity: .35; animation: orbFloat3 12s ease-in-out infinite;
+}
+@keyframes orbFloat1 { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(40px,50px) scale(1.08); } }
+@keyframes orbFloat2 { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-30px,-40px) scale(1.1); } }
+@keyframes orbFloat3 { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-25px,25px) scale(.92); } }
+
+/* Glass card */
+.welcome-box {
+  position: relative; z-index: 1;
+  max-width: 380px; width: 100%;
+  padding: 44px 34px 34px;
+  border-radius: 36px;
+  background: rgba(255,255,255,.45);
+  backdrop-filter: blur(34px) saturate(180%);
+  -webkit-backdrop-filter: blur(34px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.6);
+  box-shadow: 0 8px 32px rgba(20,60,30,.18), inset 0 1px 0 rgba(255,255,255,.8);
+  animation: welcomeIn .6s cubic-bezier(.22,1,.36,1);
+}
+@keyframes welcomeIn { from { opacity:0; transform:translateY(18px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+.welcome-icon {
+  position: relative;
+  width: 92px; height: 92px; margin: 0 auto 24px; border-radius: 24px;
+  background: linear-gradient(150deg, #7FE08A 0%, var(--brand) 45%, var(--brand-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; line-height: 1;
+  box-shadow: 0 10px 26px rgba(27,94,32,.38), inset 0 1px 1px rgba(255,255,255,.5);
+}
+.welcome-icon::after {
+  content:''; position:absolute; inset:0; border-radius:24px;
+  background: linear-gradient(160deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 45%);
+}
+.welcome-sub { font-size: 12px; color: #2e6b3e; margin-bottom: 6px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; opacity: .75; }
+.welcome-title { font-size: 28px; font-weight: 800; color: #0f2e16; letter-spacing: -.2px; margin-bottom: 12px; line-height: 1.25; }
+.welcome-title span { display: block; font-size: 14px; font-weight: 700; color: #3f8a52; letter-spacing: 2px; margin-top: 5px; }
+.welcome-desc { font-size: 14px; color: #3a5a42; opacity: .85; margin-bottom: 30px; line-height: 1.65; }
+.welcome-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: #fff; border: none; border-radius: 999px; padding: 16px 38px;
+  font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 10px 24px rgba(27,94,32,.32), inset 0 1px 0 rgba(255,255,255,.35);
+  transition: transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s;
+  letter-spacing: .2px; width: 100%; justify-content: center;
+}
+.welcome-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(27,94,32,.4), inset 0 1px 0 rgba(255,255,255,.35); }
+.welcome-btn:active { transform: translateY(0) scale(.96); }
+.welcome-foot { margin-top: 20px; font-size: 11px; color: #4a6b52; opacity: .65; letter-spacing: .3px; }
+@media (max-width: 480px) {
+  .welcome-box { padding: 36px 24px 28px; border-radius: 30px; }
+  .welcome-icon { width: 78px; height: 78px; font-size: 40px; border-radius: 20px; }
+  .welcome-title { font-size: 23px; }
+  .welcome-btn { padding: 14px 26px; font-size: 15px; }
+}
 </style>
 </head>
 <body>
+
+<!-- ══ WELCOME SCREEN ══ -->
+<div id="welcome-screen">
+  <div class="welcome-orb"></div>
+  <div class="welcome-box">
+    <div class="welcome-icon">🏭</div>
+    <div class="welcome-sub">Welcome to</div>
+    <div class="welcome-title">โรงงานประตู<span>DOOR FACTORY</span></div>
+    <div class="welcome-desc">ระบบติดตามผลผลิตและรายงานประจำวัน<br>ทุกแผนกในที่เดียว</div>
+    <button type="button" class="welcome-btn" onclick="enterDashboard()">📊 เข้าดูรายงาน</button>
+    <div class="welcome-foot">คลิกปุ่มด้านบนเพื่อเข้าสู่แดชบอร์ด</div>
+  </div>
+</div>
 
 <!-- ══ TOPBAR ══ -->
 <div class="topbar">
@@ -1056,14 +1160,23 @@ html, body { max-width: 100%; overflow-x: hidden; }
 <!-- ══ SIDEBAR ══ -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-section-label">เมนูหลัก</div>
-  <button class="nav-item active" onclick="goPage('overview',this)">
-    <span class="nav-icon">📊</span> ภาพรวมประจำวัน
+  <button class="nav-item active" onclick="goPage('monthly',this);buildMonthly()">
+    <span class="nav-icon">📅</span> ภาพรวมรายเดือน
+  </button>
+  <button class="nav-item" onclick="goPage('mcompare',this)">
+    <span class="nav-icon">📈</span> เปรียบเทียบเดือน
+  </button>
+  <button class="nav-item" onclick="goPage('weekly',this);buildWeekly()">
+    <span class="nav-icon">📊</span> เปรียบเทียบรายสัปดาห์
+  </button>
+  <button class="nav-item" onclick="goPage('overview',this)">
+    <span class="nav-icon">📆</span> ภาพรวมรายวัน
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">การผลิต</div>
   <button class="nav-item admin-only-nav" onclick="goPage('saw1',this)">
     <span class="nav-icon">🪵</span> โรงเลื่อยไทรน้อย
-    <span class="nav-badge">OC 40</span>
+    <span class="nav-badge">OC 46</span>
   </button>
   <button class="nav-item admin-only-nav" onclick="goPage('saw2',this)">
     <span class="nav-icon">🪵</span> โรงเลื่อยปราจีน
@@ -1099,17 +1212,17 @@ html, body { max-width: 100%; overflow-x: hidden; }
   </button>
 
   <div class="sidebar-section-label" style="margin-top:8px;">รายงาน</div>
-  <button class="nav-item" onclick="goPage('monthly',this);buildMonthly()">
-    <span class="nav-icon">📅</span> สรุปรายเดือน
-  </button>
-  <button class="nav-item" onclick="goPage('mcompare',this)">
-    <span class="nav-icon">📈</span> เปรียบเทียบเดือน
-  </button>
-  <button class="nav-item" onclick="goPage('weekly',this);buildWeekly()">
-    <span class="nav-icon">📊</span> เปรียบเทียบรายสัปดาห์
+  <button class="nav-item" onclick="window.open('https://script.google.com/macros/s/AKfycbySOkYaZMZ2Y1gYuOPjZZ_BVbpmuq9lqO3B_Su7d-k9_0J0lI99-RjqDDRVZFFe1joW/exec','_blank')">
+    <span class="nav-icon">🪵</span> LumberTrack Pro <span style="margin-left:auto;font-size:10px;color:var(--g300);">↗</span>
   </button>
 
   <div class="sidebar-section-label admin-only-nav" style="margin-top:8px;">อื่น ๆ</div>
+  <button class="nav-item admin-only-nav" onclick="window.open('https://claude.ai/artifact/E5W2AWa2Pe2DtJtaJDngzf','_blank')">
+    <span class="nav-icon">🔥</span> PP-FM-08 อัดประตู <span style="margin-left:auto;font-size:10px;color:var(--g300);">↗</span>
+  </button>
+  <button class="nav-item admin-only-nav" onclick="window.open('https://claude.ai/artifact/RfN9virQCNH3haMcKkSjbJ','_blank')">
+    <span class="nav-icon">🏬</span> PP-FM-11 รับ-จ่าย FG <span style="margin-left:auto;font-size:10px;color:var(--g300);">↗</span>
+  </button>
   <button class="nav-item admin-only-nav" onclick="goPage('manpower',this);buildManpowerPage()">
     <span class="nav-icon">👷</span> กำลังคนรายวัน
   </button>
@@ -1194,7 +1307,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 <div class="content">
 
   <!-- ───── OVERVIEW ───── -->
-  <div class="page active" id="page-overview">
+  <div class="page" id="page-overview">
     <div class="page-header" style="display:none;">
       <div>
         <div class="page-title">📊 ภาพรวมประจำวัน</div>
@@ -1258,7 +1371,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <div class="page-title">🪵 โรงเลื่อยไทรน้อย</div>
         <div class="page-subtitle">ยอดเข้าเลื่อย · ยอดเลื่อย · กำลังคน</div>
       </div>
-      <span class="oc-chip">👷 OC 40 คน</span>
+      <span class="oc-chip">👷 OC 46 คน</span>
     </div>
 
     <div class="card">
@@ -1317,11 +1430,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <div class="mp-info">
           <div class="mp-label">กำลังคน</div>
           <div class="mp-number" id="s1_oc_v">0</div>
-          <div class="mp-oc">OC 40 คน</div>
+          <div class="mp-oc">OC 46 คน</div>
         </div>
         <div class="mp-bar-area">
-          <input class="mp-input" type="number" id="s1_oc" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="40" oninput="updOC('s1_oc',40,'s1_oc_v','s1_ocp','s1_ocb')">
-          <div class="progress-meta"><span>Actual vs OC 40</span><span class="progress-pct" id="s1_ocp">0%</span></div>
+          <input class="mp-input" type="number" id="s1_oc" placeholder="กรอกจำนวนคนที่ทำงานจริง" min="0" max="46" oninput="updOC('s1_oc',46,'s1_oc_v','s1_ocp','s1_ocb')">
+          <div class="progress-meta"><span>Actual vs OC 46</span><span class="progress-pct" id="s1_ocp">0%</span></div>
           <div class="progress-bg"><div class="progress-fill" id="s1_ocb" style="width:0%"></div></div>
         </div>
       </div>
@@ -1623,6 +1736,20 @@ html, body { max-width: 100%; overflow-x: hidden; }
         </div>
       </div>
     </div>
+
+    <div class="card section-gap">
+      <div class="card-title"><span class="title-bar" style="background:var(--purple-500)"></span>Stock โครง <span style="font-weight:500;color:#94a3b8;font-size:11px;margin-left:6px;">(ยอดคงเหลือ ณ สิ้นวัน)</span></div>
+      <div class="g2">
+        <div class="metric-item">
+          <div class="metric-item-label">Stock โครงกระดาษ</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--orange-500)" type="number" id="p1_frame_st" placeholder="0" oninput="updateOverview()"><span class="metric-unit">pcs.</span></div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-item-label">Stock โครงไม้</div>
+          <div class="metric-item-input-row"><input class="metric-item-input" style="color:var(--pink-500)" type="number" id="bf_w_st" placeholder="0" oninput="updateOverview()"><span class="metric-unit">pcs.</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ───── อัดร้อน/เย็น ───── -->
@@ -1850,7 +1977,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 
   <!-- ───── สรุปรายเดือน ───── -->
-  <div class="page" id="page-monthly">
+  <div class="page active" id="page-monthly">
     <div class="page-header">
       <div>
         <div class="page-title">📅 สรุปยอดผลิตรายเดือน</div>
@@ -2130,6 +2257,16 @@ document.addEventListener('click', e => {
 });
 calPopup.addEventListener('click', e => e.stopPropagation());
 
+/* ── Welcome splash screen ── */
+function enterDashboard() {
+  const w = document.getElementById('welcome-screen');
+  if (w) w.classList.add('hide');
+}
+document.addEventListener('keydown', e => {
+  const w = document.getElementById('welcome-screen');
+  if (w && !w.classList.contains('hide') && (e.key === 'Enter' || e.key === ' ')) enterDashboard();
+});
+
 /* ── Navigation ── */
 function goPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2178,7 +2315,7 @@ function updOC(inId, oc, valId, pctId, barId) {
    ของแต่ละแผนกอยู่เบื้องหลัง เพื่อให้ข้อมูลตรงกันทุกที่ในระบบ
 ══════════════════════════════════════════════════ */
 const MANPOWER_DEPTS = [
-  { key: 's1',  icon: '🪵', name: 'โรงเลื่อยไทรน้อย',   oc: 40 },
+  { key: 's1',  icon: '🪵', name: 'โรงเลื่อยไทรน้อย',   oc: 46 },
   { key: 's2',  icon: '🪵', name: 'โรงเลื่อยปราจีน',     oc: 17 },
   { key: 'dry', icon: '🌡️', name: 'โรงอบ',              oc: 5  },
   { key: 'b8',  icon: '⚙️', name: 'โรง 8 ใบ',            oc: 30 },
@@ -2391,6 +2528,8 @@ const TG_DEF = [
     {k:'p1_frame', l:'ยิงโครงกระดาษ', u:'pcs.'},
     {k:'bf_w',     l:'โครงไม้', u:'pcs.'},
     {k:'bf_m',     l:'มอก.', u:'pcs.'},
+    {k:'p1_frame_st', l:'Stock โครงกระดาษ — เป้าต่อเดือน', u:'pcs./เดือน', ratio:true},
+    {k:'bf_w_st',     l:'Stock โครงไม้ — เป้าต่อเดือน', u:'pcs./เดือน', ratio:true},
   ]},
   { grp:'🔥 อัดประตู', items:[
     {k:'p2_hot',  l:'อัดร้อน', u:'บาน'},
@@ -2801,7 +2940,7 @@ function toggleWallMode() {
 
 /* ── Overview KPIs ── */
 const OC_DEF = [
-  {label:'โรงเลื่อย ไทรน้อย', oc:40, ids:['s1_oc']},
+  {label:'โรงเลื่อย ไทรน้อย', oc:46, ids:['s1_oc']},
   {label:'โรงเลื่อย ปราจีน', oc:17, ids:['s2_oc']},
   {label:'โรงอบ', oc:5, ids:['dry_oc']},
   {label:'โรง 8 ใบ', oc:30, ids:['b8_oc']},
@@ -2838,7 +2977,7 @@ const FMT_FIELDS = [
   'bj_6','bj_45','bj_3','bj_fj',
   'bs_h1','bs_h1_ben','bs_h1_mok','bs_k1','bs_k2','bs_mok','bs_lvl',
   'bf_w','bf_m',
-  'p1_frame','p2_hot','p2_down','p3_cold',
+  'p1_frame','p1_frame_st','bf_w_st','p2_hot','p2_down','p3_cold',
   'cts_sloy','cts_wrap','w_hot','w_cold','w_sloy',
   'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_5x8',
   'wh_in_ag','wh_in_cp','wh_out_ag','wh_out_cp','wh_st'
@@ -2974,7 +3113,7 @@ function updateOverview() {
         {name:'ยอดเลื่อยรวม', color:'#16a34a', fields:['s1_door','s1_pal']},
         {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('s1_total')},
       ], {title:'ยอดเลื่อยรายวัน เทียบเป้า', unit:'Cu.ft.', target:tg('s1_total'), targetAsBar:true}),
-      g('s1_oc'), 40, {l:'ยอดเลื่อยรวมวันนี้', v:s1t, u:'Cu.ft.', dec:2, tk:'s1_total'}),
+      g('s1_oc'), 46, {l:'ยอดเลื่อยรวมวันนี้', v:s1t, u:'Cu.ft.', dec:2, tk:'s1_total'}),
 
     C('🪵','โรงเลื่อยปราจีน','#ea580c','linear-gradient(135deg,#fff7ed,#ffedd5)','#fdba74',
       R('เข้าเลื่อย', g('s2_enter'), 'Ton.', {tk:'s2_enter'}) +
@@ -3023,6 +3162,8 @@ function updateOverview() {
       R('ยิงโครงกระดาษ', g('p1_frame'), 'pcs.', {vc:'#ea580c', tk:'p1_frame'}) +
       R('โครงไม้', g('bf_w'), 'pcs.', {vc:'#db2777', tk:'bf_w'}) +
       R('มอก.', g('bf_m'), 'pcs.', {vc:'#db2777', tk:'bf_m'}) +
+      R('Stock โครงกระดาษ', g('p1_frame_st'), 'pcs.', {sm:true, vc:'#7c3aed', tk:'p1_frame_st'}) +
+      R('Stock โครงไม้', g('bf_w_st'), 'pcs.', {sm:true, vc:'#7c3aed', tk:'bf_w_st'}) +
       groupBarChart([
         {name:'ยิงโครงกระดาษ', color:'#ea580c', fields:['p1_frame']},
         {name:'เป้า/วัน', color:'#cbd5e1', constVal:tg('p1_frame')},
@@ -3100,8 +3241,8 @@ const FIELDS = [
   'bk_pr','bk_h','bk_h_ben','bk_h_mok','bk_ben','bk_lvl','bc_cuft','bc_rate',
   'bj_6','bj_45','bj_3','bj_fj',
   'bs_h1','bs_h1_ben','bs_h1_mok','bs_k1','bs_k2','bs_mok','bs_lvl',
-  'bf_w','bf_m','bf_oc','b8_oc',
-  'p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
+  'bf_w','bf_m','bf_w_st','bf_oc','b8_oc',
+  'p1_frame','p1_frame_st','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
   'cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy',
   'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_5x8','pl_oc',
   'wh_in','wh_in_ag','wh_in_cp','wh_out','wh_out_ag','wh_out_cp','wh_st','wh_oc'
@@ -3341,7 +3482,7 @@ async function loadData() {
   calcWhSum(); calcBkKSum(); calcSaw1Total(); calcCutRate(); calcWaste(); calcSawMonthlyAvg();
   ['s1_oc','s2_oc','dry_oc','b8_oc','bf_oc','p1_oc','p2_oc','p3_oc','cts_oc','pl_oc','wh_oc'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
-    const maps = {'s1_oc':[40,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[30,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[25,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
+    const maps = {'s1_oc':[46,'s1_oc_v','s1_ocp','s1_ocb'],'s2_oc':[17,'s2_oc_v','s2_ocp','s2_ocb'],'dry_oc':[5,'dry_oc_v','dry_ocp','dry_ocb'],'b8_oc':[30,'b8_oc_v','b8_ocp','b8_ocb'],'bf_oc':[10,'bf_oc_v','bf_ocp','bf_ocb'],'p1_oc':[20,'p1_oc_v','p1_ocp','p1_ocb'],'p2_oc':[11,'p2_oc_v','p2_ocp','p2_ocb'],'p3_oc':[3,'p3_oc_v','p3_ocp','p3_ocb'],'cts_oc':[25,'cts_oc_v','cts_ocp','cts_ocb'],'pl_oc':[6,'pl_oc_v','pl_ocp','pl_ocb'],'wh_oc':[6,'wh_oc_v','wh_ocp','wh_ocb']};
     const m = maps[id]; if(m) updOC(id,...m);
   });
   [['p2_hot',2000,'p2hp','p2hb'],['p3_cold',160,'p3cp','p3cb'],['cts_wrap',1300,'ctwp','ctwb'],['p1_frame',2000,'p1fp','p1fb'],['bf_w',300,'bf_wp','bf_wb'],['bf_m',0,'bf_mp','bf_mb'],['bs_h1',4000,'bs_h1p','bs_h1b'],['bs_k1',4000,'bs_k1p','bs_k1b']].forEach(([a,b,c,d]) => calcProg(a,b,c,d));
@@ -3409,20 +3550,7 @@ const GAS_READY = GAS_URL !== 'YOUR_GAS_URL';
     'door_2026-08-25': {"s1_enter": "47.739", "s1_door": "875.12", "s1_pal": "79.67", "s1_oc": "37", "s2_enter": "15.48", "s2_saw": "279.90", "s2_oc": "10", "d1_cf": "0", "d1_pl": "0", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "5374.88", "bk_h": "", "bk_h_ben": "0", "bk_h_mok": "0", "bk_ben": "28842", "bk_lvl": "9720", "bc_cuft": "443.23", "bc_rate": "21.11", "bj_6": "675", "bj_45": "114", "bj_3": "0", "bj_fj": "540", "bs_h1": "4498", "bs_h1_ben": "4298", "bs_h1_mok": "200", "bs_k1": "8084", "bs_k2": "1604", "bs_mok": "24352", "bs_lvl": "6480", "bf_w": "145", "bf_m": "0", "bf_oc": "10", "b8_oc": "27", "p1_frame": "1865", "p1_oc": "18", "p2_hot": "2120", "p2_oc": "11", "p2_down": "50", "p3_cold": "85", "p3_oc": "3", "cts_sloy": "1714", "cts_wrap": "1955", "cts_oc": "23", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "20", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_oc": "6", "wh_in": "2066", "wh_in_ag": "1810", "wh_in_cp": "256", "wh_out": "1904", "wh_out_ag": "1812", "wh_out_cp": "92", "wh_st": "39128", "wh_oc": "6"},
     'door_2026-08-26': {"s1_enter": "45.425", "s1_door": "839.90", "s1_pal": "68.60", "s1_oc": "37", "s2_enter": "14.08", "s2_saw": "246.26", "s2_oc": "11", "d1_cf": "1564.91", "d1_pl": "38", "d2_cf": "11100.97", "d2_pl": "259", "dry_oc": "5", "bk_pr": "4703.02", "bk_h": "2038", "bk_h_ben": "2038", "bk_h_mok": "0", "bk_ben": "25081", "bk_lvl": "16200", "bc_cuft": "398.91", "bc_rate": "21.56", "bj_6": "715", "bj_45": "", "bj_3": "", "bj_fj": "450", "bs_h1": "4160", "bs_h1_ben": "3540", "bs_h1_mok": "620", "bs_k1": "6612", "bs_k2": "4452", "bs_mok": "24352", "bs_lvl": "2160", "bf_w": "153", "bf_m": "0", "bf_oc": "10", "b8_oc": "", "p1_frame": "2128", "p1_oc": "18", "p2_hot": "1576", "p2_oc": "11", "p2_down": "275", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "2120", "cts_wrap": "2060", "cts_oc": "24", "w_hot": "5", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "12", "pl_oc": "6", "wh_in": "2443", "wh_in_ag": "2443", "wh_in_cp": "0", "wh_out": "516", "wh_out_ag": "367", "wh_out_cp": "149", "wh_st": "41192", "wh_oc": "6"},
     'door_2026-08-27': {"s1_enter": "44.115", "s1_door": "864.52", "s1_pal": "17.78", "s1_oc": "35", "s2_enter": "17.38", "s2_saw": "313.72", "s2_oc": "9", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13150.99", "d2_pl": "304", "dry_oc": "5", "bk_pr": "4655.03", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "30175", "bk_lvl": "15120", "bc_cuft": "457.08", "bc_rate": "21.77", "bj_6": "406", "bj_45": "", "bj_3": "256", "bj_fj": "420", "bs_h1": "2000", "bs_h1_ben": "2000", "bs_h1_mok": "0", "bs_k1": "3900", "bs_k2": "1740", "bs_mok": "24352", "bs_lvl": "2160", "bf_w": "207", "bf_m": "", "bf_oc": "10", "b8_oc": "27", "p1_frame": "2074", "p1_oc": "19", "p2_hot": "2038", "p2_oc": "10", "p2_down": "140", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "1537", "cts_wrap": "1682", "cts_oc": "23", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "2289", "wh_in_ag": "2179", "wh_in_cp": "110", "wh_out": "1694", "wh_out_ag": "1533", "wh_out_cp": "161", "wh_st": "41854", "wh_oc": "6"},
-    'door_2026-08-28': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "3599.25", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "32145", "bk_lvl": "11880", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "22863", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_st": "", "wh_oc": ""},
-    'door_2026-08-29': {"s1_enter": "4.817", "s1_door": "96.34", "s1_pal": "0.00", "s1_oc": "16", "s2_enter": "17.39", "s2_saw": "304.730", "s2_oc": "10", "d1_cf": "2032.80", "d1_pl": "40", "d2_cf": "10165.44", "d2_pl": "225", "dry_oc": "5", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "451.54", "bc_rate": "21.50", "bj_6": "260", "bj_45": "1489", "bj_3": "", "bj_fj": "", "bs_h1": "2962", "bs_h1_ben": "2962", "bs_h1_mok": "0", "bs_k1": "2025", "bs_k2": "2025", "bs_mok": "", "bs_lvl": "0", "bf_w": "175", "bf_m": "", "bf_oc": "7", "b8_oc": "15", "p1_frame": "1457", "p1_oc": "14", "p2_hot": "1595", "p2_oc": "7", "p2_down": "", "p3_cold": "50", "p3_oc": "3", "cts_sloy": "2226", "cts_wrap": "1542", "cts_oc": "21", "w_hot": "2", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "0", "wh_in": "1940", "wh_in_ag": "1858", "wh_in_cp": "82", "wh_out": "2253", "wh_out_ag": "2180", "wh_out_cp": "73", "wh_st": "42912", "wh_oc": "6"},
-    'door_2026-08-31': {"s1_enter": "47.465", "s1_door": "679.48", "s1_pal": "269.81", "s1_oc": "36", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "1752.35", "d1_pl": "42", "d2_cf": "8534.76", "d2_pl": "189", "dry_oc": "5", "bk_pr": "2783.42", "bk_h": "2000", "bk_h_ben": "2000", "bk_h_mok": "0", "bk_ben": "26204", "bk_lvl": "9729", "bc_cuft": "225.29", "bc_rate": "21.46", "bj_6": "150", "bj_45": "684", "bj_3": "", "bj_fj": "", "bs_h1": "4174", "bs_h1_ben": "4174", "bs_h1_mok": "0", "bs_k1": "3219", "bs_k2": "3219", "bs_mok": "22863", "bs_lvl": "0", "bf_w": "175", "bf_m": "", "bf_oc": "10", "b8_oc": "27", "p1_frame": "1677", "p1_oc": "19", "p2_hot": "2491", "p2_oc": "11", "p2_down": "35", "p3_cold": "52", "p3_oc": "3", "cts_sloy": "1512", "cts_wrap": "1505", "cts_oc": "24", "w_hot": "0", "w_cold": "", "w_sloy": "1", "pl_3x6": "10", "pl_4x6": "", "pl_4x8s": "19", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "2006", "wh_in_ag": "1996", "wh_in_cp": "10", "wh_out": "765", "wh_out_ag": "755", "wh_out_cp": "10", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-01': {"s1_enter": "42.814", "s1_door": "768.20", "s1_pal": "88.09", "s1_oc": "35", "s2_enter": "18.22", "s2_saw": "327.02", "s2_oc": "11", "d1_cf": "910.01", "d1_pl": "20", "d2_cf": "11772.26", "d2_pl": "261", "dry_oc": "5", "bk_pr": "", "bk_h": "4534", "bk_h_ben": "4534", "bk_h_mok": "0", "bk_ben": "28698", "bk_lvl": "9726", "bc_cuft": "361.93", "bc_rate": "22.62", "bj_6": "850", "bj_45": "115", "bj_3": "0", "bj_fj": "0", "bs_h1": "3456", "bs_h1_ben": "3456", "bs_h1_mok": "0", "bs_k1": "3150", "bs_k2": "3150", "bs_mok": "22863", "bs_lvl": "0", "bf_w": "", "bf_m": "", "bf_oc": "9", "b8_oc": "25", "p1_frame": "", "p1_oc": "20", "p2_hot": "1420", "p2_oc": "11", "p2_down": "125", "p3_cold": "60", "p3_oc": "3", "cts_sloy": "1952", "cts_wrap": "911", "cts_oc": "22", "w_hot": "5", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "1424", "wh_in_ag": "1222", "wh_in_cp": "202", "wh_out": "657", "wh_out_ag": "583", "wh_out_cp": "74", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-02': {"s1_enter": "42.960", "s1_door": "723.90", "s1_pal": "135.30", "s1_oc": "35", "s2_enter": "16.48", "s2_saw": "289.84", "s2_oc": "10", "d1_cf": "900.10", "d1_pl": "20", "d2_cf": "13095.32", "d2_pl": "297", "dry_oc": "3", "bk_pr": "", "bk_h": "4828", "bk_h_ben": "4828", "bk_h_mok": "", "bk_ben": "27553", "bk_lvl": "9729", "bc_cuft": "470.24", "bc_rate": "22.39", "bj_6": "482", "bj_45": "0", "bj_3": "680", "bj_fj": "0", "bs_h1": "3810", "bs_h1_ben": "3810", "bs_h1_mok": "0", "bs_k1": "4022", "bs_k2": "4022", "bs_mok": "22109", "bs_lvl": "0", "bf_w": "55", "bf_m": "70", "bf_oc": "10", "b8_oc": "23", "p1_frame": "1028", "p1_oc": "19", "p2_hot": "1809", "p2_oc": "9", "p2_down": "", "p3_cold": "84", "p3_oc": "3", "cts_sloy": "1680", "cts_wrap": "1202", "cts_oc": "23", "w_hot": "3", "w_cold": "", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1658", "wh_in_ag": "1625", "wh_in_cp": "33", "wh_out": "1447", "wh_out_ag": "1333", "wh_out_cp": "114", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-03': {"s1_enter": "45.983", "s1_door": "854.40", "s1_pal": "65.26", "s1_oc": "40", "s2_enter": "16.42", "s2_saw": "293.44", "s2_oc": "11", "d1_cf": "1467.96", "d1_pl": "37", "d2_cf": "13082.85", "d2_pl": "297", "dry_oc": "5", "bk_pr": "", "bk_h": "8638", "bk_h_ben": "8638", "bk_h_mok": "0", "bk_ben": "29583", "bk_lvl": "9729", "bc_cuft": "533.26", "bc_rate": "25.39", "bj_6": "121", "bj_45": "1081", "bj_3": "200", "bj_fj": "0", "bs_h1": "5151", "bs_h1_ben": "5151", "bs_h1_mok": "0", "bs_k1": "1515", "bs_k2": "1515", "bs_mok": "20909", "bs_lvl": "0", "bf_w": "55", "bf_m": "119", "bf_oc": "10", "b8_oc": "26", "p1_frame": "711", "p1_oc": "18", "p2_hot": "1571", "p2_oc": "11", "p2_down": "35", "p3_cold": "93", "p3_oc": "3", "cts_sloy": "1790", "cts_wrap": "1208", "cts_oc": "23", "w_hot": "1", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1374", "wh_in_ag": "1300", "wh_in_cp": "74", "wh_out": "1289", "wh_out_ag": "1090", "wh_out_cp": "199", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-04': {"s1_enter": "45.108", "s1_door": "824.82", "s1_pal": "77.34", "s1_oc": "40", "s2_enter": "16.44", "s2_saw": "288.65", "s2_oc": "11", "d1_cf": "924.97", "d1_pl": "20", "d2_cf": "13082.85", "d2_pl": "297", "dry_oc": "5", "bk_pr": "", "bk_h": "8349", "bk_h_ben": "8349", "bk_h_mok": "0", "bk_ben": "27583", "bk_lvl": "9729", "bc_cuft": "533.26", "bc_rate": "25.39", "bj_6": "", "bj_45": "983", "bj_3": "", "bj_fj": "410", "bs_h1": "4404", "bs_h1_ben": "4404", "bs_h1_mok": "0", "bs_k1": "2848", "bs_k2": "2842", "bs_mok": "20242", "bs_lvl": "0", "bf_w": "55", "bf_m": "107", "bf_oc": "10", "b8_oc": "26", "p1_frame": "1708", "p1_oc": "20", "p2_hot": "1893", "p2_oc": "11", "p2_down": "", "p3_cold": "96", "p3_oc": "3", "cts_sloy": "1658", "cts_wrap": "1015", "cts_oc": "24", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "20", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "4", "wh_in": "1534", "wh_in_ag": "1334", "wh_in_cp": "200", "wh_out": "573", "wh_out_ag": "403", "wh_out_cp": "170", "wh_st": "", "wh_oc": "5"},
-    'door_2026-09-05': {"s1_enter": "43.453", "s1_door": "805.03", "s1_pal": "64.03", "s1_oc": "40", "s2_enter": "19", "s2_saw": "343.02", "s2_oc": "10", "d1_cf": "453.08", "d1_pl": "10", "d2_cf": "14721.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "12378", "bk_h_ben": "12378", "bk_h_mok": "0", "bk_ben": "26336", "bk_lvl": "9729", "bc_cuft": "497.25", "bc_rate": "23.68", "bj_6": "", "bj_45": "1141", "bj_3": "", "bj_fj": "250", "bs_h1": "2706", "bs_h1_ben": "2706", "bs_h1_mok": "", "bs_k1": "3284", "bs_k2": "3284", "bs_mok": "20242", "bs_lvl": "", "bf_w": "133", "bf_m": "45", "bf_oc": "10", "b8_oc": "26", "p1_frame": "0", "p1_oc": "19", "p2_hot": "", "p2_oc": "11", "p2_down": "", "p3_cold": "", "p3_oc": "3", "cts_sloy": "1835", "cts_wrap": "1364", "cts_oc": "24", "w_hot": "3", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "30", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1619", "wh_in_ag": "1343", "wh_in_cp": "276", "wh_out": "38", "wh_out_ag": "0", "wh_out_cp": "38", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-07': {"s1_enter": "46.782", "s1_door": "896.68", "s1_pal": "38.95", "s1_oc": "40", "s2_enter": "14.47", "s2_saw": "254.72", "s2_oc": "10", "d1_cf": "765.74", "d1_pl": "18", "d2_cf": "14721.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "11378", "bk_h_ben": "11378", "bk_h_mok": "0", "bk_ben": "24480", "bk_lvl": "9729", "bc_cuft": "", "bc_rate": "", "bj_6": "583", "bj_45": "612", "bj_3": "0", "bj_fj": "0", "bs_h1": "4735", "bs_h1_ben": "4735", "bs_h1_mok": "0", "bs_k1": "3045", "bs_k2": "3045", "bs_mok": "19650", "bs_lvl": "0", "bf_w": "169", "bf_m": "0", "bf_oc": "10", "b8_oc": "26", "p1_frame": "0", "p1_oc": "17", "p2_hot": "", "p2_oc": "10", "p2_down": "480", "p3_cold": "85", "p3_oc": "3", "cts_sloy": "", "cts_wrap": "1501", "cts_oc": "19", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "37", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "6", "wh_in": "1745", "wh_in_ag": "1586", "wh_in_cp": "159", "wh_out": "1227", "wh_out_ag": "1022", "wh_out_cp": "205", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-08': {"s1_enter": "45.667", "s1_door": "847.35", "s1_pal": "65.98", "s1_oc": "43", "s2_enter": "16.53", "s2_saw": "297.31", "s2_oc": "11", "d1_cf": "691.22", "d1_pl": "15", "d2_cf": "14271.70", "d2_pl": "333", "dry_oc": "5", "bk_pr": "", "bk_h": "12476", "bk_h_ben": "12476", "bk_h_mok": "0", "bk_ben": "25401", "bk_lvl": "9729", "bc_cuft": "141.97", "bc_rate": "20.28", "bj_6": "500", "bj_45": "130", "bj_3": "", "bj_fj": "", "bs_h1": "4153", "bs_h1_ben": "4153", "bs_h1_mok": "0", "bs_k1": "3168", "bs_k2": "2088", "bs_mok": "19650", "bs_lvl": "1080", "bf_w": "154", "bf_m": "0", "bf_oc": "9", "b8_oc": "25", "p1_frame": "1103", "p1_oc": "18", "p2_hot": "1760", "p2_oc": "11", "p2_down": "", "p3_cold": "61", "p3_oc": "3", "cts_sloy": "338", "cts_wrap": "340", "cts_oc": "23", "w_hot": "", "w_cold": "3", "w_sloy": "1", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "4", "wh_in": "795", "wh_in_ag": "634", "wh_in_cp": "161", "wh_out": "527", "wh_out_ag": "495", "wh_out_cp": "32", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-09': {"s1_enter": "44.745", "s1_door": "835.87", "s1_pal": "59.03", "s1_oc": "41", "s2_enter": "8.10", "s2_saw": "142.66", "s2_oc": "11", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13082.63", "d2_pl": "294", "dry_oc": "5", "bk_pr": "", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "", "bk_lvl": "", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "", "bs_lvl": "", "bf_w": "115", "bf_m": "", "bf_oc": "7", "b8_oc": "13", "p1_frame": "1600", "p1_oc": "20", "p2_hot": "1829", "p2_oc": "10", "p2_down": "", "p3_cold": "", "p3_oc": "3", "cts_sloy": "", "cts_wrap": "244", "cts_oc": "23", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "3", "wh_in": "379", "wh_in_ag": "146", "wh_in_cp": "233", "wh_out": "795", "wh_out_ag": "791", "wh_out_cp": "4", "wh_st": "", "wh_oc": "6"},
-    'door_2026-09-10': {"s1_enter": "46.345", "s1_door": "862.88", "s1_pal": "64.02", "s1_oc": "41", "s2_enter": "15.58", "s2_saw": "272.76", "s2_oc": "11", "d1_cf": "0", "d1_pl": "0", "d2_cf": "13082.63", "d2_pl": "294", "dry_oc": "5", "bk_pr": "3599.25", "bk_h": "", "bk_h_ben": "", "bk_h_mok": "", "bk_ben": "24386", "bk_lvl": "8640", "bc_cuft": "", "bc_rate": "", "bj_6": "356", "bj_45": "445", "bj_3": "128", "bj_fj": "", "bs_h1": "1365", "bs_h1_ben": "1365", "bs_h1_mok": "0", "bs_k1": "8400", "bs_k2": "840", "bs_mok": "19650", "bs_lvl": "7560", "bf_w": "110", "bf_m": "0", "bf_oc": "8", "b8_oc": "18", "p1_frame": "1010", "p1_oc": "19", "p2_hot": "1608", "p2_oc": "10", "p2_down": "50", "p3_cold": "", "p3_oc": "3", "cts_sloy": "2080", "cts_wrap": "1434", "cts_oc": "24", "w_hot": "2", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "21", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "1295", "wh_in_ag": "652", "wh_in_cp": "643", "wh_out": "151", "wh_out_ag": "0", "wh_out_cp": "151", "wh_st": "47627", "wh_oc": "6"},
-    'door_2026-09-11': {"s1_enter": "47.414", "s1_door": "833.75", "s1_pal": "114.53", "s1_oc": "41", "s2_enter": "12.62", "s2_saw": "225.64", "s2_oc": "11", "d1_cf": "806.13", "d1_pl": "18", "d2_cf": "13064.01", "d2_pl": "294", "dry_oc": "5", "bk_pr": "", "bk_h": "12476", "bk_h_ben": "12476", "bk_h_mok": "0", "bk_ben": "21399", "bk_lvl": "14040", "bc_cuft": "283.95", "bc_rate": "17.75", "bj_6": "485", "bj_45": "", "bj_3": "105", "bj_fj": "485", "bs_h1": "2634", "bs_h1_ben": "2634", "bs_h1_mok": "", "bs_k1": "2958", "bs_k2": "2958", "bs_mok": "19650", "bs_lvl": "", "bf_w": "130", "bf_m": "35", "bf_oc": "10", "b8_oc": "18", "p1_frame": "1536", "p1_oc": "19", "p2_hot": "1475", "p2_oc": "10", "p2_down": "", "p3_cold": "", "p3_oc": "3", "cts_sloy": "2518", "cts_wrap": "1415", "cts_oc": "24", "w_hot": "1", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "4", "wh_in": "1552", "wh_in_ag": "1457", "wh_in_cp": "95", "wh_out": "514", "wh_out_ag": "74", "wh_out_cp": "440", "wh_st": "47859", "wh_oc": "6"},
-    'door_2026-09-12': {"s1_enter": "23.220", "s1_door": "398.59", "s1_pal": "65.81", "s1_oc": "39", "s2_enter": "17.23", "s2_saw": "312.78", "s2_oc": "11", "d1_cf": "757.81", "d1_pl": "18", "d2_cf": "14676.26", "d2_pl": "330", "dry_oc": "4", "bk_pr": "3695.23", "bk_h": "10476", "bk_h_ben": "10476", "bk_h_mok": "0", "bk_ben": "24357", "bk_lvl": "12960", "bc_cuft": "128.83", "bc_rate": "16.10", "bj_6": "", "bj_45": "300", "bj_3": "", "bj_fj": "", "bs_h1": "1778", "bs_h1_ben": "1778", "bs_h1_mok": "", "bs_k1": "1015", "bs_k2": "1015", "bs_mok": "19650", "bs_lvl": "", "bf_w": "80", "bf_m": "67", "bf_oc": "9", "b8_oc": "26", "p1_frame": "1068", "p1_oc": "19", "p2_hot": "385", "p2_oc": "10", "p2_down": "240", "p3_cold": "", "p3_oc": "3", "cts_sloy": "1249", "cts_wrap": "278", "cts_oc": "24", "w_hot": "", "w_cold": "3", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "10", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "5", "wh_in": "15", "wh_in_ag": "13", "wh_in_cp": "2", "wh_out": "2777", "wh_out_ag": "2687", "wh_out_cp": "90", "wh_st": "47936", "wh_oc": "6"}
+    'door_2026-08-28': {"s1_enter": "", "s1_door": "", "s1_pal": "", "s1_oc": "", "s2_enter": "", "s2_saw": "", "s2_oc": "", "d1_cf": "", "d1_pl": "", "d2_cf": "", "d2_pl": "", "dry_oc": "", "bk_pr": "3599.25", "bk_h": "2924", "bk_h_ben": "2924", "bk_h_mok": "0", "bk_ben": "32145", "bk_lvl": "11880", "bc_cuft": "", "bc_rate": "", "bj_6": "", "bj_45": "", "bj_3": "", "bj_fj": "", "bs_h1": "", "bs_h1_ben": "", "bs_h1_mok": "", "bs_k1": "", "bs_k2": "", "bs_mok": "22863", "bs_lvl": "", "bf_w": "", "bf_m": "", "bf_oc": "", "b8_oc": "", "p1_frame": "", "p1_oc": "", "p2_hot": "", "p2_oc": "", "p2_down": "", "p3_cold": "", "p3_oc": "", "cts_sloy": "", "cts_wrap": "", "cts_oc": "", "w_hot": "", "w_cold": "", "w_sloy": "", "pl_3x6": "", "pl_4x6": "", "pl_4x8s": "", "pl_4x8sn": "", "pl_4x8h": "", "pl_4x9": "", "pl_4x10": "", "pl_4x12": "", "pl_7x9": "", "pl_5x8": "", "pl_oc": "", "wh_in": "0", "wh_in_ag": "", "wh_in_cp": "", "wh_out": "0", "wh_out_ag": "", "wh_out_cp": "", "wh_st": "", "wh_oc": ""}
   };
   const DATA_VERSION = '2026-08-28-3';
   const storedVersion = localStorage.getItem('door_data_version');
@@ -3538,8 +3666,8 @@ async function buildMonthly() {
     'bk_pr','bk_h','bk_k','bk_ben','bk_lvl','bk_h_ben','bk_h_mok',
     'bj_6','bj_45','bj_3','bj_fj',
     'bs_h1','bs_h1_ben','bs_h1_mok','bs_k1','bs_k2','bs_mok','bs_lvl',
-    'b8_oc','bf_w','bf_m','bf_oc',
-    'p1_frame','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
+    'b8_oc','bf_w','bf_m','bf_w_st','bf_oc',
+    'p1_frame','p1_frame_st','p1_oc','p2_hot','p2_oc','p2_down','p3_cold','p3_oc',
     'cts_sloy','cts_wrap','cts_oc','w_hot','w_cold','w_sloy',
     'pl_3x6','pl_4x6','pl_4x8s','pl_4x8sn','pl_4x8h','pl_4x9','pl_4x10','pl_4x12','pl_7x9','pl_5x8','pl_oc',
     'wh_in','wh_in_ag','wh_in_cp','wh_out','wh_out_ag','wh_out_cp','wh_st','wh_oc'];
@@ -3589,7 +3717,7 @@ async function buildMonthly() {
         {l:'ไม้เลื่อยส่งทำพาเลทและงานทั่วไป',v:fmtN(tot.s1_pal,0),tk:'s1_pal',u:'Cu.ft.'},
         {l:'รวมยอดเลื่อย',v:fmtN(tot.s1_door+tot.s1_pal,0),tk:'s1_total',u:'Cu.ft.'},
         {l:'เฉลี่ย/วัน',v:daysWithData?fmtN((tot.s1_door+tot.s1_pal)/daysWithData,2):'—',tk:'s1_avg',perDay:true,u:'Cu.ft./วัน', highlight:true},
-        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s1_oc/daysWithData,0):'—',u:`คน / OC 40`},
+        {l:'เฉลี่ยกำลังคน',v:daysWithData?fmtN(tot.s1_oc/daysWithData,0):'—',u:`คน / OC 46`},
       ]
     },
     {
@@ -3647,6 +3775,8 @@ async function buildMonthly() {
         {l:'ยิงโครงกระดาษ',v:fmtN(tot.p1_frame,0),tk:'p1_frame',u:'pcs.'},
         {l:'ยิงโครงไม้',v:fmtN(tot.bf_w,0),tk:'bf_w',u:'pcs.'},
         {l:'ยิงโครง มอก.',v:fmtN(tot.bf_m,0),tk:'bf_m',u:'pcs.'},
+        {l:'Stock โครงกระดาษ (ล่าสุด)',v:(()=>{const d=days.slice().reverse().find(({data:r})=>toNum(r.p1_frame_st)>0);return d?fmtN(toNum(d.data.p1_frame_st),0):'—';})(),raw:(()=>{const d=days.slice().reverse().find(({data:r})=>toNum(r.p1_frame_st)>0);return d?toNum(d.data.p1_frame_st):0;})(),tk:'p1_frame_st',ratio:true,u:'pcs.', highlight:true},
+        {l:'Stock โครงไม้ (ล่าสุด)',v:(()=>{const d=days.slice().reverse().find(({data:r})=>toNum(r.bf_w_st)>0);return d?fmtN(toNum(d.data.bf_w_st),0):'—';})(),raw:(()=>{const d=days.slice().reverse().find(({data:r})=>toNum(r.bf_w_st)>0);return d?toNum(d.data.bf_w_st):0;})(),tk:'bf_w_st',ratio:true,u:'pcs.', highlight:true},
         {l:'เฉลี่ยกำลังคน (ยิงโครงกระดาษ)',v:daysWithData?fmtN(tot.p1_oc/daysWithData,0):'—',u:`คน / OC 20`},
         {l:'เฉลี่ยกำลังคน (ยิงโครงไม้)',v:daysWithData?fmtN(tot.bf_oc/daysWithData,0):'—',u:`คน / OC 10`},
       ]
@@ -3843,6 +3973,8 @@ const WK_METRICS = [
   { label:'ยิงโครงกระดาษ',           unit:'pcs.',   fn: d => toNum(d.p1_frame)                               },
   { label:'ยิงโครงไม้',              unit:'pcs.',   fn: d => toNum(d.bf_w)                                   },
   { label:'ยิงโครง มอก.',            unit:'pcs.',   fn: d => toNum(d.bf_m)                                   },
+  { label:'Stock โครงกระดาษ',        unit:'pcs.',   fn: d => toNum(d.p1_frame_st)                            },
+  { label:'Stock โครงไม้',           unit:'pcs.',   fn: d => toNum(d.bf_w_st)                                },
   // ── อัดร้อน/อัดเย็น ──
   { label:'อัดร้อน',                 unit:'บาน',    fn: d => toNum(d.p2_hot)                                  },
   { label:'Downtime',                unit:'นาที',   fn: d => toNum(d.p2_down)                                 },
@@ -4059,6 +4191,17 @@ async function buildMCompare() {
     return 0;
   };
   const stC = _lastSt(curData), stP = _lastSt(prevData);
+  // Stock โครงกระดาษ/โครงไม้ = ค่าของวันล่าสุดในเดือนที่มีการกรอก (ไม่ใช่ผลรวม) — เหมือน Stock คลังสินค้า
+  const _lastField = (obj, field) => {
+    const ks = Object.keys(obj).sort();
+    for (let i = ks.length - 1; i >= 0; i--) {
+      const v = toNum((obj[ks[i]] || {})[field]);
+      if (v > 0) return v;
+    }
+    return 0;
+  };
+  const p1StC = _lastField(curData, 'p1_frame_st'), p1StP = _lastField(prevData, 'p1_frame_st');
+  const bfStC = _lastField(curData, 'bf_w_st'),      bfStP = _lastField(prevData, 'bf_w_st');
   const curDays  = _wd(curData);
   const prevDays = _wd(prevData);
   document.getElementById('mc-subtitle').textContent =
@@ -4106,6 +4249,8 @@ async function buildMCompare() {
     { title:'🔨 ยิงโครง', rows:[
       {l:'ยิงโครงกระดาษ', tk:'p1_frame', vC:tC.p1_frame, vP:tP.p1_frame, u:'pcs.'},
       {l:'ยิงโครงไม้', tk:'bf_w',    vC:tC.bf_w+tC.bf_m, vP:tP.bf_w+tP.bf_m, u:'pcs.'},
+      {l:'Stock โครงกระดาษ (ล่าสุด)', noPerDay:true, tk:'p1_frame_st', vC:p1StC, vP:p1StP, u:'pcs.'},
+      {l:'Stock โครงไม้ (ล่าสุด)', noPerDay:true, tk:'bf_w_st', vC:bfStC, vP:bfStP, u:'pcs.'},
     ]},
     { title:'⚠️ ของเสีย', rows:[
       {l:'ของเสียรวม', tk:'w_total', vC:wTotC, vP:wTotP, u:'บาน', lowerBetter:true},
@@ -4125,8 +4270,8 @@ async function buildMCompare() {
     ]},
   ];
 
-  const colStyle = 'padding:10px 14px;text-align:right;';
-  const lblStyle = 'padding:10px 14px;color:var(--g700);font-size:13px;';
+  const colStyle = 'padding:10px 14px;text-align:right;vertical-align:top;';
+  const lblStyle = 'padding:10px 14px;color:var(--g700);font-size:13px;vertical-align:top;';
 
   const html = `
     <!-- Detail groups -->
@@ -4209,6 +4354,8 @@ async function buildWeekly() {
     { label:'ยิงโครงกระดาษ', tk:'p1_frame',                     unit:'pcs.',      fn: d=>toNum(d.p1_frame),                        grp:'🔧 ยิงโครง' },
     { label:'ยิงโครงไม้', tk:'bf_w',                        unit:'pcs.',      fn: d=>toNum(d.bf_w),                            grp:'🔧 ยิงโครง' },
     { label:'ยิงโครง มอก.', tk:'bf_m',                      unit:'pcs.',      fn: d=>toNum(d.bf_m),                            grp:'🔧 ยิงโครง' },
+    { label:'Stock โครงกระดาษ (ล่าสุด)', tk:'p1_frame_st', isLast:true,      unit:'pcs.',      fn: d=>toNum(d.p1_frame_st),                     grp:'🔧 ยิงโครง' },
+    { label:'Stock โครงไม้ (ล่าสุด)', tk:'bf_w_st', isLast:true,             unit:'pcs.',      fn: d=>toNum(d.bf_w_st),                         grp:'🔧 ยิงโครง' },
     // อัดร้อน/อัดเย็น
     { label:'อัดร้อน', tk:'p2_hot',                           unit:'บาน',       fn: d=>toNum(d.p2_hot),                          grp:'🔥 อัดร้อน/อัดเย็น' },
     { label:'Downtime',                           unit:'นาที',      fn: d=>toNum(d.p2_down),                         grp:'🔥 อัดร้อน/อัดเย็น' },
@@ -4589,6 +4736,8 @@ window.addEventListener('load', () => {
   initFmtFields();
   loadData();
   updateOverview();
+  initMonthInput();
+  buildMonthly();
   // ── Auto-import from URL hash ──
   try {
     const hash = location.hash;
